@@ -13,8 +13,10 @@ import time
 import datetime
 
 # token和Cookie定期更换
-token = 2125306121
-cookie = 'ua_id=KAfRPZPRS2CqGIwQAAAAAOxEmPdP6Vk1H5bwISXzYUk=; wxuin=22183570217006; uuid=be01a727e82e2df87b0ce0b08caa6b25; _clck=betmb9|1|fnu|0; rand_info=CAESINMW9JU5OGYDKeV6vw3RxRp3tlUI9eSnAkPPCE5b0/Er; slave_bizuin=3931536317; data_bizuin=3931536317; bizuin=3931536317; data_ticket=/zKums45viYyDkC9XsGIsO+EC+lt/K+9Sasjo1yepKobaBNt0fu6EX41vtWD87Ct; slave_sid=Z0gycGNBRDk5WVJoMnRrVVFTM0NyT09QT2x6SGVZazk4cFpKcDl2MzhTZmpRekU5eEluWW9aNlF2QlM5eHFiRERTekFBeVVCNFpFdHdyX3k1bDFvalZ2cURfdkgzMjRSZVZXeGFWVjJmRERIUWJBRkNKc045azFIVm1zcndsVzhYcmVkcG1BWTZjaDYybU5x; slave_user=gh_bfe9a82e08da; xid=53179ffd3a528f00cbfbbe93f6abf430; mm_lang=zh_CN; _clsk=5yyxro|1722183661168|2|1|mp.weixin.qq.com/weheat-agent/payload/record'
+with open('./data/id_info.json', 'r', encoding='utf-8') as f:
+    id_info = json.load(f)
+token = id_info['token']
+cookie = id_info['cookie']
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
     'Cookie': cookie
@@ -28,9 +30,9 @@ def jstime2realtime(jstime):
 # 检查session和token是否过期
 def session_is_overdue(response):
     if response['base_resp']['err_msg'] == 'invalid session':
-        raise Exception('session 过期了')
+        raise Exception('session expired')
     if response['base_resp']['err_msg'] == 'invalid csrf token':
-        raise Exception('token 过期了')
+        raise Exception('token expired')
 
 # 计算时间差
 def time_delta(time1, time2):
@@ -140,6 +142,8 @@ def fakeid2message_update(fakeid, message_exist=[]):
     url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
     response = requests.get(url=url, params=params, headers=headers).json()
     session_is_overdue(response)
+    if 'publish_page' not in response.keys():
+        raise Exception('请求次数过快，请稍后重试')
     messages = json.loads(response['publish_page'])['publish_list']
     for message_i in range(len(messages)):
         message = json.loads(messages[message_i]['publish_info'])

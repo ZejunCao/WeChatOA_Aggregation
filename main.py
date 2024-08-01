@@ -21,7 +21,6 @@ if __name__ == '__main__':
     with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
         message_info = json.load(fp)
 
-    get_all = False
     try:
         for n, id in tqdm(name2fakeid_dict.items()):
             # 如果latest_time非空（之前太久不发文章的），或者今天已经爬取过，则跳过
@@ -29,12 +28,15 @@ if __name__ == '__main__':
                 continue
             message_info[n]['blogs'].extend(fakeid2message_update(id, message_info[n]['blogs']))
             message_info[n]['latest_time'] = time_now()
-        get_all = True
-    except:
-        pass
-    # 写入message_info
+    except Exception as e:
+        # 写入message_info，如果请求中间失败，及时写入
+        with open('./data/message_info.json', 'w', encoding='utf-8') as fp:
+            json.dump(message_info, fp, ensure_ascii=False, indent=4)
+        raise e
+
+    # 写入message_info，如果请求顺利进行，则正常写入
     with open('./data/message_info.json', 'w', encoding='utf-8') as fp:
         json.dump(message_info, fp, ensure_ascii=False, indent=4)
 
-    if get_all:
-        message2md(message_info)
+    # 将message_info转换为md上传到个人博客系统
+    message2md(message_info)
