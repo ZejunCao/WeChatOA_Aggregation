@@ -8,8 +8,8 @@
 
 from tqdm import tqdm
 import json
-from wechat_request import fakeid2message_update, time_delta, time_now
-from message2md import message2md
+from request_.wechat_request import fakeid2message_update, time_delta, time_now
+from util.message2md import message2md
 
 
 if __name__ == '__main__':
