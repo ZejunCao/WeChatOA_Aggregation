@@ -155,22 +155,6 @@
                 "aid": "2648413035_1"
             },
             {
-                "title": "大模型&知识图谱&RAG&文档理解技术分享：老刘说NLP技术社区对外持续纳新",
-                "create_time": "2024-07-22 09:23",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzAxMjc3MjkyMg==&mid=2648413051&idx=1&sn=103d2c3307269ab6d1a36717b2191a27&chksm=8383802eb4f409388dac538d3d1f37f794f61b50de597759872792546160ff6971576f09431e#rd",
-                "msgid": 1000000886,
-                "appmsgid": 2648413051,
-                "aid": "2648413051_1"
-            },
-            {
-                "title": "2024年上半年大模型发展回顾暨7月份半月度KG/RAG/LLM技术总结",
-                "create_time": "2024-07-22 09:23",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzAxMjc3MjkyMg==&mid=2648413051&idx=2&sn=9b30c0288c4bb7d3078825b514bfc7b9&chksm=8383802eb4f40938c74dcfa7ff8bbfcb75626cf3103753490d1b3bd176f646f3ea734af45c8a#rd",
-                "msgid": 1000000886,
-                "appmsgid": 2648413051,
-                "aid": "2648413051_2"
-            },
-            {
                 "title": "粗看最近爆火的mem0个性化轻量级框架：兼谈多模态数据的tokenizer",
                 "create_time": "2024-07-23 09:41",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzAxMjc3MjkyMg==&mid=2648413080&idx=2&sn=dbb8ef51ac6049f2992b1e4f6e3341ee&chksm=838380cdb4f409dbe286940b3de619fec20e238933791155ebb979be066da6795d00810921ee#rd",
@@ -193,22 +177,6 @@
                 "msgid": 1000000895,
                 "appmsgid": 2648413209,
                 "aid": "2648413209_1"
-            },
-            {
-                "title": "基于 NebulaGraph ，构建属于你的 Graph RAG",
-                "create_time": "2024-07-30 11:46",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzAxMjc3MjkyMg==&mid=2648413209&idx=2&sn=898e53170accd2305e966d89a52ddab2&chksm=8383874cb4f40e5ab234ff92d6fc3660731ee866f7a5160ad2507e9cb3cf033a31a1295e2d67#rd",
-                "msgid": 1000000895,
-                "appmsgid": 2648413209,
-                "aid": "2648413209_2"
-            },
-            {
-                "title": "大模型&知识图谱&RAG&文档理解技术分享：老刘说NLP技术社区对外持续纳新",
-                "create_time": "2024-07-29 09:13",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzAxMjc3MjkyMg==&mid=2648413187&idx=1&sn=b9072c96b6f2fa8bd065960209793a57&chksm=83838756b4f40e4061c6f5e2cac1c1a814a1861a27a3a4cf7f5853619232a820913ca60c8351#rd",
-                "msgid": 1000000893,
-                "appmsgid": 2648413187,
-                "aid": "2648413187_1"
             },
             {
                 "title": "四个大模型轻量级微调训练框架：兼看PPT转Markdown工具",
@@ -241,14 +209,6 @@
                 "msgid": 1000000889,
                 "appmsgid": 2648413133,
                 "aid": "2648413133_1"
-            },
-            {
-                "title": "大模型微调和对齐，这些方法更替太快了！",
-                "create_time": "2024-07-24 11:45",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzAxMjc3MjkyMg==&mid=2648413110&idx=1&sn=f8b2c3ca4b6ae4980fbccfce149e06d5&chksm=838380e3b4f409f513f107484e373d9601c36f8fda830cdb5c9e2422b025be9c4b8598539414#rd",
-                "msgid": 1000000888,
-                "appmsgid": 2648413110,
-                "aid": "2648413110_1"
             },
             {
                 "title": "Llama 3.1模型开源及RAG问答最新进展：兼看角色扮演大模型、text-SQL总结",
@@ -1261,14 +1221,6 @@
                 "msgid": 1000001093,
                 "appmsgid": 2247549541,
                 "aid": "2247549541_2"
-            },
-            {
-                "title": "1700 页，6 大主题！AI 学习路线手册发布！",
-                "create_time": "2024-07-21 22:26",
-                "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549594&idx=1&sn=0c3cbe17ea09c0c9ab8312fd740972f0&chksm=cfa5225af8d2ab4c0290f5ecb9d001ed0965e154d060239b81afe8a93aac289d507bd0b8be40#rd",
-                "msgid": 1000001094,
-                "appmsgid": 2247549594,
-                "aid": "2247549594_1"
             },
             {
                 "title": "梯度下降背后的数学之美",
@@ -4213,14 +4165,6 @@
                 "create_time": "2024-07-19 23:04"
             },
             {
-                "title": "LSTM又火了！最新52个创新思路+全部开源代码！",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583592&idx=1&sn=153887b50afed6eb29a3e826e656e4d7&chksm=fb3b2263cc4cab75a881341218b306df756cee414b50883e74c009b915e417afb9e56c3fc87a#rd",
-                "msgid": 1000001965,
-                "appmsgid": 2247583592,
-                "aid": "2247583592_1",
-                "create_time": "2024-07-18 14:18"
-            },
-            {
                 "title": "Numpy手写机器学习算法，3万行代码！",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583592&idx=2&sn=78b98def499045f93b7e89a4fcafbf8e&chksm=fb3b2263cc4cab7555f90cd1eae5b8769fc62fb69c446c5efeb329a42da771da9310fb55283d#rd",
                 "msgid": 1000001965,
@@ -4243,14 +4187,6 @@
                 "appmsgid": 2247583565,
                 "aid": "2247583565_2",
                 "create_time": "2024-07-17 19:02"
-            },
-            {
-                "title": "取代算法岗，又一新兴岗位在崛起！这才是程序员未来5年最好的就业方向！",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583412&idx=1&sn=eeba2795f1d32d1a0f4daa61ea694470&chksm=fb3b23bfcc4caaa95b198c8bf3808bc4fa2c4af788e2a9a33fda75ba2e78f3646870e4a796ca#rd",
-                "msgid": 1000001963,
-                "appmsgid": 2247583412,
-                "aid": "2247583412_1",
-                "create_time": "2024-07-16 14:07"
             },
             {
                 "title": "60个“特征工程”计算函数（Python代码）",
@@ -4315,14 +4251,6 @@
                 "appmsgid": 2247583342,
                 "aid": "2247583342_2",
                 "create_time": "2024-07-13 09:37"
-            },
-            {
-                "title": "发paper必备82个即插即用缝合模块！附下载",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583332&idx=1&sn=71da1e0fe165719da509b5e06a0b812a&chksm=fb3b236fcc4caa7922b39c6fe3207a1d06f59244de2f8ea2a959f8c18f4fe75054c90cec0185#rd",
-                "msgid": 1000001959,
-                "appmsgid": 2247583332,
-                "aid": "2247583332_1",
-                "create_time": "2024-07-11 14:09"
             },
             {
                 "title": "XGBoost和LightGBM时间序列预测对比",
@@ -4451,14 +4379,6 @@
                 "msgid": 1000001967,
                 "appmsgid": 2247583717,
                 "aid": "2247583717_1"
-            },
-            {
-                "title": "转行跳槽做量化一定要注意的几个大坑。",
-                "create_time": "2024-07-21 23:15",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583717&idx=2&sn=e7b3a29a298c95ce46a2f21f3d629975&chksm=fb3b22eecc4cabf8bd0356e780d761ff072b25a3a877299e5093a601bc4215246e60301754d9#rd",
-                "msgid": 1000001967,
-                "appmsgid": 2247583717,
-                "aid": "2247583717_2"
             },
             {
                 "title": "一文详解机器学习中最好用的提升方法：Boosting 与 AdaBoost",
@@ -4704,14 +4624,6 @@
                 "appmsgid": 2247506094,
                 "aid": "2247506094_2",
                 "create_time": "2024-07-15 10:14"
-            },
-            {
-                "title": "真心建议数据人冲一冲新兴领域，工资高前景好",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDA5NDYzNA==&mid=2247506088&idx=1&sn=74befdfa4e6ddee682bd870756d7189e&chksm=96c7f56da1b07c7b80f9459e162847e8843f1ab31012d4c3fb165a454867879db8cd41fe69bf#rd",
-                "msgid": 2247506088,
-                "appmsgid": 2247506088,
-                "aid": "2247506088_1",
-                "create_time": "2024-07-14 12:00"
             },
             {
                 "title": "小白学RAG：架构、策略和应用",
@@ -8536,14 +8448,6 @@
                 "aid": "2247519795_3"
             },
             {
-                "title": "60个最新开源Transformer压缩方法，让你的模型更高效！",
-                "create_time": "2024-07-24 20:24",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519771&idx=1&sn=590666e976ba8acd455b4c95e2702dfb&chksm=970705a7a0708cb1f77da0b3d05f41a678ac3a9464e61dbb87b9bc20d984a202fedbbc7b42d0#rd",
-                "msgid": 1000001941,
-                "appmsgid": 2247519771,
-                "aid": "2247519771_1"
-            },
-            {
                 "title": "有哪些话一听就知道一个博士生是个水货？知乎600+万热议！",
                 "create_time": "2024-07-24 20:24",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519771&idx=2&sn=1700c2c6b3eb9d14192fae83c2c7b717&chksm=970705a7a0708cb1a9b408fbf66e319abbdeaaa59f0e31510dc70b8b2567ad6a0c5eab319875#rd",
@@ -8733,14 +8637,6 @@
                 "aid": "2247488152_1"
             },
             {
-                "title": "又出王炸GPT-4o | 目测一大波机器学习算法人员的饭碗要碎了...",
-                "create_time": "2024-07-17 08:11",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488132&idx=1&sn=dc908c4d1c24244626c93d11689efeed&chksm=c17d2da0f60aa4b64441b4cc1e7214283eb4fe138c0dbd56b7663b72ea56cedbd06f911ec21a#rd",
-                "msgid": 1000000105,
-                "appmsgid": 2247488132,
-                "aid": "2247488132_1"
-            },
-            {
                 "title": "6种方案｜防止模型过拟合(overfitting)！",
                 "create_time": "2024-07-17 08:11",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488132&idx=2&sn=4ca5c10318738bc7270cf388c1b9114e&chksm=c17d2da0f60aa4b620f9de95ec815708dd4621d7218a6871625da1595c4dad5e0b84a7e6dff3#rd",
@@ -8773,14 +8669,6 @@
                 "aid": "2247488021_1"
             },
             {
-                "title": "我终于找到了全网最便宜的GPU算力",
-                "create_time": "2024-07-08 15:03",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247487974&idx=1&sn=1e785c6b6c8a5693f78534a7501ca037&chksm=c17d2ec2f60aa7d4cf27a6ce36a6ce012283aa85784aac5b3bdb33114f9d36f73e88792a0fdd#rd",
-                "msgid": 1000000101,
-                "appmsgid": 2247487974,
-                "aid": "2247487974_1"
-            },
-            {
                 "title": "机器学习模型的集成方法总结：Bagging, Boosting, Stacking, Voting, Blending",
                 "create_time": "2024-07-08 15:03",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247487974&idx=2&sn=1f28cf590e253652a3f372ad47da62eb&chksm=c17d2ec2f60aa7d411c249e67c274421ba4bae5fb2b5765b157629b343d3f70b57ea4870424f#rd",
@@ -8797,28 +8685,12 @@
                 "aid": "2247487875_1"
             },
             {
-                "title": "YYDS！哈工大博士的PyTorch笔记火了！！",
-                "create_time": "2024-07-04 14:08",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247487796&idx=1&sn=3cdaf5c53aa46cc2d9ee1653e632c136&chksm=c17d2e10f60aa706e0fe0f0a5b62a88133b34f85ff04e077f92fdbc6abccb75a8238d15020a0#rd",
-                "msgid": 1000000099,
-                "appmsgid": 2247487796,
-                "aid": "2247487796_1"
-            },
-            {
                 "title": "PCA的数学原理",
                 "create_time": "2024-07-04 14:08",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247487796&idx=2&sn=8cdd9648acdb694d2bdb22ec0805e8ea&chksm=c17d2e10f60aa70646ca7a52b8adc977e1660c6159011e48c6ff60982227ec06f6b3c01597c3#rd",
                 "msgid": 1000000099,
                 "appmsgid": 2247487796,
                 "aid": "2247487796_2"
-            },
-            {
-                "title": "独自一人，怒发顶会！",
-                "create_time": "2024-07-03 14:02",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247487709&idx=1&sn=2a2456587989b03abe63fbff79d41bb8&chksm=c17d2ff9f60aa6efaacb898a62df12c447628954441c1377ea1fb80d03794071b6e0106cd85f#rd",
-                "msgid": 1000000098,
-                "appmsgid": 2247487709,
-                "aid": "2247487709_1"
             },
             {
                 "title": "从0到1实现神经网络（Python）",
@@ -10787,28 +10659,12 @@
                 "aid": "2247528172_2"
             },
             {
-                "title": "U-net引用将破九万，稳坐医学图像分割王座！",
-                "create_time": "2024-07-15 20:12",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247528171&idx=1&sn=2551c234b55784f5b096dcc2de28079c&chksm=f90e2ab5ce79a3a315acadf21eeca4c4d638588baef109f64e8421c737a492ee3fefa144bf8b#rd",
-                "msgid": 1000001459,
-                "appmsgid": 2247528171,
-                "aid": "2247528171_1"
-            },
-            {
                 "title": "机器学习基础扫盲",
                 "create_time": "2024-07-15 20:12",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247528171&idx=2&sn=a6f25a94993b884aaa011fe531bbf0d6&chksm=f90e2ab5ce79a3a3cd32509588a9b5f1ca716c3e9e2cffe422892a7d8c27ab42f532f3c90aae#rd",
                 "msgid": 1000001459,
                 "appmsgid": 2247528171,
                 "aid": "2247528171_2"
-            },
-            {
-                "title": "这就叫专业！某站十万播放量的相关性热图竟能引起相关报道？简直是手残党的福音！",
-                "create_time": "2024-07-14 15:14",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247528155&idx=1&sn=59bcaf19e6206e914151ae74abd261f6&chksm=f90e2a85ce79a393ebeb3e48da3e729a875d854a2e8a3adb1dd955e341f46431daedcf37f831#rd",
-                "msgid": 1000001458,
-                "appmsgid": 2247528155,
-                "aid": "2247528155_1"
             },
             {
                 "title": "机器学习最困难部分--超参调试",
@@ -11493,14 +11349,6 @@
                 "aid": "2247563206_1"
             },
             {
-                "title": "清华汪玉教授团队：首部高效模型压缩与设计专著重磅上市 | 留言赠书",
-                "create_time": "2024-07-14 16:20",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563206&idx=2&sn=6b4d502b609cfefbb0804c112f57657b&chksm=976d525ba01adb4dfea79a7e468ec6570b542f55ed6635bbe98c7d5a3b64acfdc9ec3b42089e#rd",
-                "msgid": 1000002457,
-                "appmsgid": 2247563206,
-                "aid": "2247563206_2"
-            },
-            {
                 "title": "变天了！硕士学历停止发放生活及租房补贴。。。",
                 "create_time": "2024-07-13 15:42",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563191&idx=1&sn=c46c98df543846056d8d582e2e080627&chksm=976d522aa01adb3c93490142a76526bb01a176bf74a0a4a1d5e8f7991c0cbd72b38e3942a9f3#rd",
@@ -11701,22 +11549,6 @@
                 "aid": "2247562693_2"
             },
             {
-                "title": "突发！微软蓝屏，全球宕机。。。",
-                "create_time": "2024-07-20 15:18",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563407&idx=1&sn=78f984f3eda110f64e3f9c63fdd23960&chksm=976d5d12a01ad4048790b2a77a917c465555297725655137102840924c1737d119597c6d81e4#rd",
-                "msgid": 1000002463,
-                "appmsgid": 2247563407,
-                "aid": "2247563407_1"
-            },
-            {
-                "title": "重磅！国家超算互联网正式上线！",
-                "create_time": "2024-07-20 15:18",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563407&idx=2&sn=00e1024da474d8176d0335a7464321fe&chksm=976d5d12a01ad404e26a872f305b4ade2c7a9d2ba6574b7c9f42156dd1fc76c37d1d5d0140b2#rd",
-                "msgid": 1000002463,
-                "appmsgid": 2247563407,
-                "aid": "2247563407_2"
-            },
-            {
                 "title": "解约！211 新校区，不建了！",
                 "create_time": "2024-07-22 10:23",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563473&idx=1&sn=83e7e8d7d97eaa37017a94cb2ce9c2c7&chksm=976d5d4ca01ad45a7f357f3a7f930e03c2aa696d5adddc7d9e33152be1760310bbe62cf31314#rd",
@@ -11747,14 +11579,6 @@
                 "msgid": 1000002464,
                 "appmsgid": 2247563420,
                 "aid": "2247563420_1"
-            },
-            {
-                "title": "吴恩达新书《Machine Learning Yearning》完整中文版pdf下载",
-                "create_time": "2024-07-21 15:58",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563420&idx=2&sn=91a0482b3724152b5b14c559cbfcbd3e&chksm=976d5d01a01ad4173b65afcac3667b8d8913bf5e649f9704a61f93f63c202ada84cf7c835107#rd",
-                "msgid": 1000002464,
-                "appmsgid": 2247563420,
-                "aid": "2247563420_2"
             },
             {
                 "title": "被 GPT-4o 的价格劝退了！",
@@ -12176,14 +12000,6 @@
                 "msgid": 1000000161,
                 "appmsgid": 2247486287,
                 "aid": "2247486287_1"
-            },
-            {
-                "title": "终于有人曝光二次退个税的秘密。 啥？能退30000多",
-                "create_time": "2024-08-01 11:50",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzI1NzEzOTAzOA==&mid=2247486287&idx=2&sn=3a33d4a6e782d6ab74beaa8bef0b370a&chksm=ea1d437edd6aca687bd64b4c66243147844c9f696259b279e347e07237eeac2596ee61d94894#rd",
-                "msgid": 1000000161,
-                "appmsgid": 2247486287,
-                "aid": "2247486287_2"
             },
             {
                 "title": "3K star！LLM读不懂？那用可视化的方式来学吧",
@@ -13298,14 +13114,6 @@
                 "msgid": 1000002213,
                 "appmsgid": 2247621277,
                 "aid": "2247621277_2"
-            },
-            {
-                "title": "丢掉标定板！用线特征也能完成鲁棒的激光雷达和相机外参标定！",
-                "create_time": "2024-07-21 16:03",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621277&idx=3&sn=515909d277a3fd9732565bdd4e0a64da&chksm=fb54f871cc2371678bfa3e6d969f3da62f9d67a4b6d73b1bc258ca8e41804cd70d7b098074e6#rd",
-                "msgid": 1000002213,
-                "appmsgid": 2247621277,
-                "aid": "2247621277_3"
             },
             {
                 "title": "TPAMI 2024 | 题目：自我监督的深度盲视频超分辨率",
@@ -14902,14 +14710,6 @@
         "latest_time": "2024-08-06 02:14",
         "blogs": [
             {
-                "title": "大模型对齐，这些方法更替太快了",
-                "create_time": "2024-07-17 08:52",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDY1NTU5Mg==&mid=2247489664&idx=1&sn=a052ae7d8f5c0b71a41ed10ffbd4fcf8&chksm=973d8607a04a0f11b39e9e7a4c43b15a097a2eb32f26ecc10896ba835d5a503370acf2a86ccb#rd",
-                "msgid": 1000000340,
-                "appmsgid": 2247489664,
-                "aid": "2247489664_1"
-            },
-            {
                 "title": "大模型Infra发展路径盘点",
                 "create_time": "2024-07-17 08:52",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDY1NTU5Mg==&mid=2247489664&idx=2&sn=a487fa45d3e7214e75b996fb468e60b0&chksm=973d8607a04a0f1111ed9982e1b11bc8be5cb10ea7bae4d03c8a3ef912f580560a838d8a9395#rd",
@@ -14932,14 +14732,6 @@
                 "msgid": 1000000338,
                 "appmsgid": 2247489637,
                 "aid": "2247489637_1"
-            },
-            {
-                "title": "原来文章的idea都是这么找的？这方法简直“ 杀疯了 ” ....！",
-                "create_time": "2024-07-12 08:32",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDY1NTU5Mg==&mid=2247489623&idx=1&sn=c63b351f445276871ea5f63297a78503&chksm=973d86d0a04a0fc622cfa5b16a8129c9bb7ade50d09436953f208d6547ee416cbe5ba3d3712a#rd",
-                "msgid": 1000000337,
-                "appmsgid": 2247489623,
-                "aid": "2247489623_1"
             },
             {
                 "title": "大模型分离式推理架构从DistServe谈起",
@@ -15811,22 +15603,6 @@
                 "msgid": 1000001505,
                 "appmsgid": 2247511553,
                 "aid": "2247511553_1"
-            },
-            {
-                "title": "发paper必备82个即插即用缝合模块！附下载",
-                "create_time": "2024-07-18 23:44",
-                "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NDE5Nzg1Ng==&mid=2247511553&idx=2&sn=f65d9b68f8a88eec4d2e4309ad92a4b3&chksm=c32ab78ef45d3e98a9903a0ed9855cbdecf585f703c672d058af82162e3b4a95a9f6d574767b#rd",
-                "msgid": 1000001505,
-                "appmsgid": 2247511553,
-                "aid": "2247511553_2"
-            },
-            {
-                "title": "发paper必备82个即插即用缝合模块！附下载",
-                "create_time": "2024-07-17 08:19",
-                "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NDE5Nzg1Ng==&mid=2247511543&idx=1&sn=ada5fec549f404d74fec7621a8474e43&chksm=c32ab478f45d3d6e6616a4c66f3fb7c4e2fe7a9ea9050b81033aa918fae86d059a7bcb4679dd#rd",
-                "msgid": 1000001504,
-                "appmsgid": 2247511543,
-                "aid": "2247511543_1"
             },
             {
                 "title": "Kaggle自动写作评估 2.0 Top方案汇总。",
@@ -19477,14 +19253,6 @@
                 "aid": "2649261112_1"
             },
             {
-                "title": "离谱！某司裁员裁出新高度.....",
-                "create_time": "2024-07-24 06:26",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzAxMTMwNTMxMQ==&mid=2649261107&idx=1&sn=a0f97f9ddd02a47fe89b4b0a53425637&chksm=835f0c03b4288515cbddf186567c4c4cfbbb8f42a7f7ba396dd135fc7eb6a0d9cfb1a481918f#rd",
-                "msgid": 1000001221,
-                "appmsgid": 2649261107,
-                "aid": "2649261107_1"
-            },
-            {
                 "title": "为什么「正态分布」在自然界中如此常见？",
                 "create_time": "2024-06-21 08:55",
                 "link": "http://mp.weixin.qq.com/s?__biz=MzAxMTMwNTMxMQ==&mid=2649260950&idx=1&sn=8c559536484f660b9deba07e493b4f09&chksm=835f0ba6b42882b092a6d9094fd00e65db992895afdbdb22a5e8b9ae5ce4b97ab85a5aa9f2b4#rd",
@@ -19559,7 +19327,7 @@
         ]
     },
     "麻婆豆腐AI": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:33",
         "blogs": [
             {
                 "title": "【赛题解析直播-今日（7月4日）19:30】第五届“马栏山杯”推荐赛道",
@@ -19780,7 +19548,7 @@
         ]
     },
     "ChallengeHub": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:33",
         "blogs": [
             {
                 "title": "从想象到现实，“Innovate for Future 智在畅想”黑客马拉松招募开启",
@@ -19985,7 +19753,7 @@
         ]
     },
     "NLP日志": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:33",
         "blogs": [
             {
                 "title": "语言模型之text embedding（Decoder_only篇）",
@@ -20198,7 +19966,7 @@
         ]
     },
     "程序员飞哥": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:33",
         "blogs": [
             {
                 "title": "阿里Qwen2登顶全球开源第一",
@@ -20355,7 +20123,7 @@
         ]
     },
     "CVHub": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:33",
         "blogs": [
             {
                 "title": "书生大模型实战营第3期正式开启！零基础带您入门大模型，免费A100算力等你开启！",
@@ -20564,11 +20332,27 @@
                 "msgid": 1000000598,
                 "appmsgid": 2247507346,
                 "aid": "2247507346_2"
+            },
+            {
+                "title": "推动虚拟试衣模型真正走向落地与应用！| 中山大学联合 Pixocial 提出 CatVTON: 一种更加轻量化的扩散模型架构",
+                "create_time": "2024-08-02 09:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU1MzY0MDI2NA==&mid=2247507398&idx=1&sn=8140b812f3fe4ee3c329f650ea3051ac&chksm=fbed55e1cc9adcf754bd322a478559664d6ea3b41efb1a2bf5c2d94bfa74822dc905a4b5877c#rd",
+                "msgid": 1000000599,
+                "appmsgid": 2247507398,
+                "aid": "2247507398_1"
+            },
+            {
+                "title": "快上车！百度Apollo2025届校招offer等你来签",
+                "create_time": "2024-08-02 09:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU1MzY0MDI2NA==&mid=2247507398&idx=2&sn=eb1cd376ee992f964a4c6ae3053e99b7&chksm=fbed55e1cc9adcf766f767c8d7a6f18d63a0e541d711deadee20cb552862114c8be96b33a5e7#rd",
+                "msgid": 1000000599,
+                "appmsgid": 2247507398,
+                "aid": "2247507398_2"
             }
         ]
     },
     "AIGC Studio": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "图像创作，随心所欲！AnyControl：精准控制下的创意风暴，高质量图像一键生成！",
@@ -21569,11 +21353,147 @@
                 "msgid": 1000000170,
                 "appmsgid": 2247486833,
                 "aid": "2247486833_4"
+            },
+            {
+                "title": "最强开源文生图模型一夜易主！Stable Diffusion一作下场创业推出FLUX.1，已获3200万美元融资。",
+                "create_time": "2024-08-05 22:01",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486964&idx=1&sn=8245987351dd447137abd46a8f3a8450&chksm=fcf6f215cb817b03d930c7e46c635c14355e460382c5f66501f2b2ba551dd258cf237c243316#rd",
+                "msgid": 1000000176,
+                "appmsgid": 2247486964,
+                "aid": "2247486964_1"
+            },
+            {
+                "title": "Fal开源力作, AuraFlow图像生成模型亮相！ComfyUI&Diffusers已支持，开启AI绘画梦想之旅!",
+                "create_time": "2024-08-05 22:01",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486964&idx=2&sn=dc6960401248726aaabc60190003c4d3&chksm=fcf6f215cb817b03a9cbe07e2a239f3feece9c2cb4e80845e8e81262de995df88c8c47011091#rd",
+                "msgid": 1000000176,
+                "appmsgid": 2247486964,
+                "aid": "2247486964_2"
+            },
+            {
+                "title": "微软提出Pix2Gif：用于 GIF 生成的运动引导的扩散，一张图就可以生成Gif动图",
+                "create_time": "2024-08-05 22:01",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486964&idx=3&sn=6b7e97d5c944dc0739cddf2814fc9047&chksm=fcf6f215cb817b031ece15eea3cfb015a244016f773d34db86079a5f046903c153c1bacad9e5#rd",
+                "msgid": 1000000176,
+                "appmsgid": 2247486964,
+                "aid": "2247486964_3"
+            },
+            {
+                "title": "【独家】万字长文带你梳理Llama开源家族：从Llama-1到Llama-3",
+                "create_time": "2024-08-05 22:01",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486964&idx=4&sn=b3d66226db20ee61f58acd74b30ce8c3&chksm=fcf6f215cb817b0385c0dba04e58dc06c3d13bcdb4b22e9e7dfce7910cb841ceca44c0d742e6#rd",
+                "msgid": 1000000176,
+                "appmsgid": 2247486964,
+                "aid": "2247486964_4"
+            },
+            {
+                "title": "图像抠图革新！Matting by Generation生成式抠图技术，智能识别主体，边缘处理细腻入微。",
+                "create_time": "2024-08-04 23:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486942&idx=1&sn=8153adf3ae95ed82033c4975c2351b32&chksm=fcf6f23fcb817b29809bc6507a025033fcbe9403d945b1c49cea09ec597f89c6d49d6e66182e#rd",
+                "msgid": 1000000175,
+                "appmsgid": 2247486942,
+                "aid": "2247486942_1"
+            },
+            {
+                "title": "当CycleGAN遇到Diffusion能擦出什么火花？",
+                "create_time": "2024-08-04 23:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486942&idx=2&sn=fe85f924f837bb97fb4e9dddf65b022f&chksm=fcf6f23fcb817b298dfe262812693a30a039ac657b88de69ac201286154c6449d05691365ec6#rd",
+                "msgid": 1000000175,
+                "appmsgid": 2247486942,
+                "aid": "2247486942_2"
+            },
+            {
+                "title": "理想汽车提出3DRealCar：首个大规模3D真实汽车数据集!",
+                "create_time": "2024-08-04 23:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486942&idx=3&sn=91f75c19169360e90402051425d65a9e&chksm=fcf6f23fcb817b29bf56fe37d9f3170c8ed41aeb3d7c1336719ff20e2524b5f5c6fed785a7d8#rd",
+                "msgid": 1000000175,
+                "appmsgid": 2247486942,
+                "aid": "2247486942_3"
+            },
+            {
+                "title": "超越AnimateAnyone, 华科&中科大&阿里提出Unimate,可根据单张图片和姿势指导生成视频。",
+                "create_time": "2024-08-04 23:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486942&idx=4&sn=7f7294eedf55bcd3566d31b7ef7c5b13&chksm=fcf6f23fcb817b29e46224c3f9c6b034af8e70b09f23f75b55cc2bf788d70a6c3393518554f1#rd",
+                "msgid": 1000000175,
+                "appmsgid": 2247486942,
+                "aid": "2247486942_4"
+            },
+            {
+                "title": "超越比GroundingDINO！中大和美团联合提出开放域检测新SOTA方法: OV-DINO！",
+                "create_time": "2024-08-04 00:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486889&idx=1&sn=17d747be629f2619590359a21746f8c7&chksm=fcf6f248cb817b5e5a9ef2ae4edb8aed40d7adae480bda229bdf3a09389ba027e9f463e84fee#rd",
+                "msgid": 1000000174,
+                "appmsgid": 2247486889,
+                "aid": "2247486889_1"
+            },
+            {
+                "title": "ControlNet作者新作Omost，一句话让LLM生成构图小作文，再也不用担心不会写提示词了！",
+                "create_time": "2024-08-04 00:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486889&idx=2&sn=eadc5e59a2dd1b0d2dd1df2df66d0728&chksm=fcf6f248cb817b5e0da54a7806a7f3b80f6016df6b301f63720fc45c2d35fdbf36ee59b65cb5#rd",
+                "msgid": 1000000174,
+                "appmsgid": 2247486889,
+                "aid": "2247486889_2"
+            },
+            {
+                "title": "超越Animate Anyone，华科&阿里提出UniAnimate：高保真角色图像动画化方法",
+                "create_time": "2024-08-04 00:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486889&idx=3&sn=92c2f118625b42db7716ad83eb899b3c&chksm=fcf6f248cb817b5e2872de26ca7f2843b4571a5edd7132eadf59399f40bb536f68683cd470fe#rd",
+                "msgid": 1000000174,
+                "appmsgid": 2247486889,
+                "aid": "2247486889_3"
+            },
+            {
+                "title": "Streamer-Sales 销冠 —— 卖货主播大模型来了，一键生成解说文案，助力你成为销冠！",
+                "create_time": "2024-08-04 00:03",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486889&idx=4&sn=3837188ed50dc325f54b840f8ca73852&chksm=fcf6f248cb817b5efd9f8cf3d8258f0b592edb21566be2370131c09023f27f15120d19550381#rd",
+                "msgid": 1000000174,
+                "appmsgid": 2247486889,
+                "aid": "2247486889_4"
+            },
+            {
+                "title": "CVPR 2024深度揭秘！MIT发布的DistriFusion技术如何实现图像生成6倍加速，无损高清图像触手可及！",
+                "create_time": "2024-08-02 23:09",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486862&idx=1&sn=ea264fb934a73c05182f214962fe0e1c&chksm=fcf6f26fcb817b7941da336e2e0ebf652582f3415355679889980d27bed6b25986f97dd97f8e#rd",
+                "msgid": 1000000172,
+                "appmsgid": 2247486862,
+                "aid": "2247486862_1"
+            },
+            {
+                "title": "CVPR2024｜vivo提出使用对抗微调获得泛化性更强的SAM，分割性能直接登顶 SOTA！",
+                "create_time": "2024-08-02 23:09",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486862&idx=2&sn=d36428b1d2d46b6b337f77e15ecaa040&chksm=fcf6f26fcb817b79e70b956bd5891f225f9687bef0df280560497b76f34a68eb6047853f3f31#rd",
+                "msgid": 1000000172,
+                "appmsgid": 2247486862,
+                "aid": "2247486862_2"
+            },
+            {
+                "title": "入选ACL 2024！浙大推出首个海洋大语言模型OceanGPT，水下具身智能成现实。",
+                "create_time": "2024-08-02 23:09",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486862&idx=3&sn=6762e84de9ad7a6165421eda86cb1e6d&chksm=fcf6f26fcb817b79efc6a94aa3fd9e921b75af8a92c56f8e818c409d3ff8561f7e784700079d#rd",
+                "msgid": 1000000172,
+                "appmsgid": 2247486862,
+                "aid": "2247486862_3"
+            },
+            {
+                "title": "字节发布Depth Anything V2深度模型，比 Depth Anything V1更精细的细节。",
+                "create_time": "2024-08-02 23:09",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486862&idx=4&sn=f07d499aefae454a56e2c388774654b8&chksm=fcf6f26fcb817b79014aaab8331971e46265c71564d7255b4b18e3718c46b45c7500243b9bb0#rd",
+                "msgid": 1000000172,
+                "appmsgid": 2247486862,
+                "aid": "2247486862_4"
+            },
+            {
+                "title": "DeepMind再献力作！Still-Moving文生视频模型定制框架，引领AI创作新潮流！",
+                "create_time": "2024-08-02 23:09",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486862&idx=5&sn=1f7afe88f079e79197322d65786db718&chksm=fcf6f26fcb817b79f987e6e71952d7db678b04c0283e3e5ac629b447c4c3109645462b0486d4#rd",
+                "msgid": 1000000172,
+                "appmsgid": 2247486862,
+                "aid": "2247486862_5"
             }
         ]
     },
     "AIGC自修室": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "小红书低调推出自己的AI助手，问题搜索、笔记推荐、互动娱乐",
@@ -21738,7 +21658,7 @@
         ]
     },
     "小麦AIGC": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "借助AI，随便哼个调调都可以制作成音乐了",
@@ -21983,7 +21903,7 @@
         ]
     },
     "AIGC元宇宙": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "微软从Copilot Plus电脑发布中撤回其Recall AI工具",
@@ -22300,7 +22220,7 @@
         ]
     },
     "AIGC最前线": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "ClutterGen：用于机器人学习的杂乱场景生成器",
@@ -22465,7 +22385,7 @@
         ]
     },
     "慢慢学 AIGC": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "运用知识蒸馏（KD）构建小语言模型",
@@ -22670,7 +22590,7 @@
         ]
     },
     "AIGC研修社": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "Luma AI 即将推出视频编辑控制功能，视频可控性大战开始了",
@@ -22835,7 +22755,7 @@
         ]
     },
     "AIGC小白入门记": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "【LLM技术报告】Qwen2 Technical Report",
@@ -23764,11 +23684,43 @@
                 "msgid": 1000000087,
                 "appmsgid": 2247485267,
                 "aid": "2247485267_4"
+            },
+            {
+                "title": "LLM并发加速部署方案（llama.cpp、vllm、lightLLM、fastLLM）",
+                "create_time": "2024-08-06 19:35",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485286&idx=1&sn=3dc228a715acdbd737814678168af9c2&chksm=c1c23e68f6b5b77e2153c0493ff6e610c521a281c0bacbd7754df3ddb51bd4dd082bb484d667#rd",
+                "msgid": 1000000088,
+                "appmsgid": 2247485286,
+                "aid": "2247485286_1"
+            },
+            {
+                "title": "算法工程师面试题笔记",
+                "create_time": "2024-08-06 19:35",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485286&idx=2&sn=ece269b635fe8e0bf91254e9a5a88724&chksm=c1c23e68f6b5b77e918ebf69ff120c058c47534b499b611c221156951d69014057ba4e3da810#rd",
+                "msgid": 1000000088,
+                "appmsgid": 2247485286,
+                "aid": "2247485286_2"
+            },
+            {
+                "title": "说说我的实习面试历程，也许对你有帮助",
+                "create_time": "2024-08-06 19:35",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485286&idx=3&sn=75b9e76337d8a175b8294e3196452ed1&chksm=c1c23e68f6b5b77ec4ce768f3e2aa1f9d0e0a80ee01d06fc406e9c15547a514b7aaa6f2728c4#rd",
+                "msgid": 1000000088,
+                "appmsgid": 2247485286,
+                "aid": "2247485286_3"
+            },
+            {
+                "title": "算法工程师面试常考手撕题（更新）",
+                "create_time": "2024-08-06 19:35",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485286&idx=4&sn=ddfa3789ecb1d16e306f5e5c8739e992&chksm=c1c23e68f6b5b77ec8d0d009603bff0e5887560305d4ea266c34b80f801128ca5b6d9ee0b575#rd",
+                "msgid": 1000000088,
+                "appmsgid": 2247485286,
+                "aid": "2247485286_4"
             }
         ]
     },
     "AIGC启示录": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "震惊！微软蓝屏，全球大崩溃！发生了什么？",
@@ -23937,11 +23889,27 @@
                 "msgid": 1000000097,
                 "appmsgid": 2247488032,
                 "aid": "2247488032_1"
+            },
+            {
+                "title": "英伟达AI芯片重大设计缺陷，延期发布，波及多个科技巨头",
+                "create_time": "2024-08-05 19:45",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU5NjczODIzMg==&mid=2247488488&idx=1&sn=f4d2eaa6403758d44756737dc45f4f76&chksm=fe5f7a3fc928f329972ba42fb21e0e967aa79a1f4a5b30ae07584c8656134edc76dfe291611c#rd",
+                "msgid": 1000000121,
+                "appmsgid": 2247488488,
+                "aid": "2247488488_1"
+            },
+            {
+                "title": "AI的风还是刮到了TikTok，月入2万美金",
+                "create_time": "2024-08-02 17:26",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU5NjczODIzMg==&mid=2247488472&idx=1&sn=be493d86ad81a30b6d2dd473ffb75917&chksm=fe5f7a0fc928f319fb6a3f526f4890dbf766ef8c34c4b57b992dbec61a04e1efbfb431ca8a81#rd",
+                "msgid": 1000000120,
+                "appmsgid": 2247488472,
+                "aid": "2247488472_1"
             }
         ]
     },
     "硬核AIGC": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "停更3年的公众号，一发文就被推荐流量了",
@@ -24118,11 +24086,43 @@
                 "msgid": 1000000293,
                 "appmsgid": 2659279491,
                 "aid": "2659279491_1"
+            },
+            {
+                "title": "AI生成视频都在搞收费，智谱清影却开源了",
+                "create_time": "2024-08-06 18:26",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzI4ODEwMzI3Nw==&mid=2659279655&idx=1&sn=8532dbd8563fa3eec582ea1b9d680000&chksm=f0b64d25c7c1c4333dc0d24ceed60a55c45cac1c7c090a7f10313579afa0cd333b92c0930c9d#rd",
+                "msgid": 1000000298,
+                "appmsgid": 2659279655,
+                "aid": "2659279655_1"
+            },
+            {
+                "title": "豆包浏览器插件，你必须要知道的4个实用AI功能",
+                "create_time": "2024-08-05 18:21",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzI4ODEwMzI3Nw==&mid=2659279585&idx=1&sn=06bfa3b779ebabeb67506038f6f008a9&chksm=f0b64ce3c7c1c5f569a568fc0377e732a214e9245e3bb52d436cca6451d1f5e2b302e2ff47a9#rd",
+                "msgid": 1000000297,
+                "appmsgid": 2659279585,
+                "aid": "2659279585_1"
+            },
+            {
+                "title": "AI一键生成奥运专属头像：为中国选手加油！",
+                "create_time": "2024-08-02 18:26",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzI4ODEwMzI3Nw==&mid=2659279545&idx=1&sn=73ed39e54ab70bab13e01cb989b3b717&chksm=f0b64cbbc7c1c5ad95a19d4cce2830c4a751f91b3cefd013ac61c9f57b8777fbaf5cc31f8970#rd",
+                "msgid": 1000000296,
+                "appmsgid": 2659279545,
+                "aid": "2659279545_1"
+            },
+            {
+                "title": "iPhone终于能接收地震预警了！请火速设置！",
+                "create_time": "2024-08-02 11:31",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzI4ODEwMzI3Nw==&mid=2659279525&idx=1&sn=60f3af55e34db3d541d4ed91d7353bf4&chksm=f0b64ca7c7c1c5b1d055ec8830b5e41655be334fcbc62d88fdb9d29b2f16ee26736f734863ee#rd",
+                "msgid": 1000000295,
+                "appmsgid": 2659279525,
+                "aid": "2659279525_1"
             }
         ]
     },
     "AIGC学习社": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "软件开发与AI：掌握学习之道以及如何将AI融入软件开发中",
@@ -24319,7 +24319,7 @@
         ]
     },
     "AIGC智谷": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "【AIGC律师】AIGC智谷法律服务针对中小企业的法律痛点，提供全面的解决方案。",
@@ -24850,17 +24850,41 @@
                 "aid": "2247484979_6"
             },
             {
-                "title": "【AIGC舆情】AIGC行业新篇章，AI时代的规范与挑战",
-                "create_time": "2024-04-26 18:44",
-                "link": "http://mp.weixin.qq.com/s?__biz=MzkxNTUxMzYwMw==&mid=2247485210&idx=2&sn=b3c5188607809f87d470e8f700a0fd86&chksm=c15f4f76f628c660f8f0237f2da9f2fc93a06150104d09f78bd9587063295f9b8828f2a226a7#rd",
-                "msgid": 1000000021,
-                "appmsgid": 2247485210,
-                "aid": "2247485210_2"
+                "title": "【智谷要闻】AIGC智谷企业沙龙共探品牌创新与增长新路径",
+                "create_time": "2024-08-02 10:37",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkxNTUxMzYwMw==&mid=2247485887&idx=1&sn=17c804fa60b1acb3f78531534b425afb&chksm=c15f41d3f628c8c5c9ae23d2a82f9d5f74ad43385e65971e1080c443d31bca5407f17339baa3#rd",
+                "msgid": 1000000034,
+                "appmsgid": 2247485887,
+                "aid": "2247485887_1"
+            },
+            {
+                "title": "【智谷要闻】科技未来——智谷AI",
+                "create_time": "2024-08-02 10:37",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkxNTUxMzYwMw==&mid=2247485887&idx=2&sn=a76615e1abd4b907e84567134e4bf7d6&chksm=c15f41d3f628c8c5364d9f7453090b053e7563e2a4253bedbbd514ef8a87cde5020b25dae0e4#rd",
+                "msgid": 1000000034,
+                "appmsgid": 2247485887,
+                "aid": "2247485887_2"
+            },
+            {
+                "title": "【行业动态】北京发布AI新政策，76次提及“大模型”！马斯克宣布全球最大AI训练集群",
+                "create_time": "2024-08-02 10:37",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkxNTUxMzYwMw==&mid=2247485887&idx=3&sn=064dd914ea709bd2841da05e7c4eadc5&chksm=c15f41d3f628c8c58f6e473c512a3579b9bd9a168107e1eda9a1fb5a00a69bef8e490dee8a39#rd",
+                "msgid": 1000000034,
+                "appmsgid": 2247485887,
+                "aid": "2247485887_3"
+            },
+            {
+                "title": "【AIGC应用】抖音快手正对AI大模型领域展开全面攻势",
+                "create_time": "2024-08-02 10:37",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkxNTUxMzYwMw==&mid=2247485887&idx=4&sn=1f907e4467ca385b4b1f1b3b1c2e503d&chksm=c15f41d3f628c8c5f2792903169a364465bbacfde59a0f290a4aeb4f59f8d972c08ec30e0186#rd",
+                "msgid": 1000000034,
+                "appmsgid": 2247485887,
+                "aid": "2247485887_4"
             }
         ]
     },
     "AIGC创想者": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "Github开源项目日报 | 2024-07-16 Top15",
@@ -25309,11 +25333,83 @@
                 "msgid": 1000000103,
                 "appmsgid": 2247485270,
                 "aid": "2247485270_3"
+            },
+            {
+                "title": "44.9K+ Star！ComfyUI：一款功能强大、模块化的Stable Diffusion GUI，可设计和执行复杂的工作流",
+                "create_time": "2024-08-06 22:46",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485557&idx=1&sn=fe9f0266eb6b919d963baa04dba3aa44&chksm=c2fdb235f58a3b23358bc8e9d0f7d749bd12c1420d94a2bafb6dc30736f913001725578cf134#rd",
+                "msgid": 1000000125,
+                "appmsgid": 2247485557,
+                "aid": "2247485557_1"
+            },
+            {
+                "title": "Github开源项目日报 | 2024-08-06 Top11",
+                "create_time": "2024-08-06 22:46",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485557&idx=2&sn=2924c3ac039ee1ccc242f2b2a31afe25&chksm=c2fdb235f58a3b23dbd75203b82477da548028ef15bdc0d6a161cacc11f4fd57af9b3028e3c4#rd",
+                "msgid": 1000000125,
+                "appmsgid": 2247485557,
+                "aid": "2247485557_2"
+            },
+            {
+                "title": "今日Github最火的10个Python项目",
+                "create_time": "2024-08-06 22:46",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485557&idx=3&sn=2ba12485e3d9bdb4a2fc0925b9fdc4a1&chksm=c2fdb235f58a3b23d1d672b5912d86d2f268f6736bd7fc2b9e95e520534c7ad1f7caede8a8a9#rd",
+                "msgid": 1000000125,
+                "appmsgid": 2247485557,
+                "aid": "2247485557_3"
+            },
+            {
+                "title": "16.1K+ Star！LibreChat：一个功能丰富的开源AI聊天平台，支持深色模式、多语言和界面高度可定制",
+                "create_time": "2024-08-05 22:33",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485522&idx=1&sn=3ed89b4797e2409463a91dcdcb729032&chksm=c2fdb212f58a3b047d69d7e4adad68d4895e7a708b746c2a89d08ad93c798c1e4f84a76f0d74#rd",
+                "msgid": 1000000124,
+                "appmsgid": 2247485522,
+                "aid": "2247485522_1"
+            },
+            {
+                "title": "Github开源项目日报 | 2024-08-05 Top15",
+                "create_time": "2024-08-05 22:33",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485522&idx=2&sn=b1ca7dca95fcd247a2d937402d025bc2&chksm=c2fdb212f58a3b04e8d82148d03438f3684ad0e71ebda3e1fa1d73aa7926927f1774a2001a3a#rd",
+                "msgid": 1000000124,
+                "appmsgid": 2247485522,
+                "aid": "2247485522_2"
+            },
+            {
+                "title": "今日Github最火的10个Python项目",
+                "create_time": "2024-08-05 22:33",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485522&idx=3&sn=f0ff632025c2bdb97226115098e53af0&chksm=c2fdb212f58a3b0442f1182465b0d941a7093ed7efd42df9afd4b71d80075f51a6144b99ab29#rd",
+                "msgid": 1000000124,
+                "appmsgid": 2247485522,
+                "aid": "2247485522_3"
+            },
+            {
+                "title": "Github开源项目周报 | 第30周",
+                "create_time": "2024-08-04 12:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485496&idx=1&sn=64e8ec2a34a38bfdcc5c3bab856e2d75&chksm=c2fdb278f58a3b6e69c629ee67b91f3a3f6da84f4bc0164a00b779fb9a3365b6efa7844d54a1#rd",
+                "msgid": 1000000123,
+                "appmsgid": 2247485496,
+                "aid": "2247485496_1"
+            },
+            {
+                "title": "Github开源项目日报 | 2024-08-04 Top16",
+                "create_time": "2024-08-04 12:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485496&idx=2&sn=3a9ce5c96d4c51d51825de6cab7dee81&chksm=c2fdb278f58a3b6e83e42394e212f10872c0f7c8b75156b00fda4e978e95c348237e0b697141#rd",
+                "msgid": 1000000123,
+                "appmsgid": 2247485496,
+                "aid": "2247485496_2"
+            },
+            {
+                "title": "今日Github最火的10个Python项目",
+                "create_time": "2024-08-04 12:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485496&idx=3&sn=d6d123866e018865809c978c32423890&chksm=c2fdb278f58a3b6e73abea403cd918e210c128edd6af0925bdcc542204a6c4b3260398bdb607#rd",
+                "msgid": 1000000123,
+                "appmsgid": 2247485496,
+                "aid": "2247485496_3"
             }
         ]
     },
     "AIGC Research": {
-        "latest_time": "2024-08-02 00:15",
+        "latest_time": "2024-08-06 23:34",
         "blogs": [
             {
                 "title": "150-A1｜指令引导图像编辑，布局到图像合成；开放域故事可视化；Logo插入的定制化生成；隐形水印，文生图扩散结构化记忆与隐私",
@@ -26098,11 +26194,91 @@
                 "msgid": 1000000190,
                 "appmsgid": 2247504119,
                 "aid": "2247504119_2"
+            },
+            {
+                "title": "160-A1.1｜平滑能量引导，文本引导的快速图像编辑；广告图像生成，漫画章节对话转录，多模态绘画作品分析｜Fri",
+                "create_time": "2024-08-03 05:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504279&idx=1&sn=8dc90a8dafe1d6916af9c60dc4cc8efa&chksm=c24c585bf53bd14d98b9ce7a22f1719ace817958474f93114540dbaa618b7dcce9340441986f#rd",
+                "msgid": 1000000193,
+                "appmsgid": 2247504279,
+                "aid": "2247504279_1"
+            },
+            {
+                "title": "160-A1.2｜印地语系文生图偏见，扩散模型中复制现象的综述；基于生命之树的扩散分层条件化实现生物学意义的物种进化特征图像生成",
+                "create_time": "2024-08-03 05:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504279&idx=2&sn=7426f6b6ba5f629c6492c1c57cc5c3fe&chksm=c24c585bf53bd14d486b66e3070bcefe8a6b1256b528bae8916bc5ace36cd720682573be7928#rd",
+                "msgid": 1000000193,
+                "appmsgid": 2247504279,
+                "aid": "2247504279_2"
+            },
+            {
+                "title": "160-A2｜语义视频运动迁移；图生纹理化3D网格，文本引导本地化高斯场景编辑，NeRF风格迁移用于表达性体积可视化｜Fri",
+                "create_time": "2024-08-03 05:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504279&idx=3&sn=9da5fc86f047ff3b209e21a9538c80f7&chksm=c24c585bf53bd14dfcee80284a8fff719661ee804f997c1dfa96d0c5849264a87b2cfd2f1afa#rd",
+                "msgid": 1000000193,
+                "appmsgid": 2247504279,
+                "aid": "2247504279_3"
+            },
+            {
+                "title": "160-B1｜基于GNN的多模态参数微调，基于fMRI和电影画面的可解释性AI情感解码；分割一切模型2（SAM2），艺术文字分割",
+                "create_time": "2024-08-03 05:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504279&idx=4&sn=282a75d4ff61a09470911e50e47d2ce5&chksm=c24c585bf53bd14d8695559c57d0714ed847ee30277b62046b9b1b88718e8f8009ae353abf54#rd",
+                "msgid": 1000000193,
+                "appmsgid": 2247504279,
+                "aid": "2247504279_4"
+            },
+            {
+                "title": "160-B2｜稀疏视角高斯NVS，从随意捕捉的视频中创建和操纵任意对象的3D模型；音频驱动面部动画化，情感说话头，参数化全头模型",
+                "create_time": "2024-08-03 05:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504279&idx=5&sn=6728c8a4b09fc1f072afe493334b1857&chksm=c24c585bf53bd14d071d38ba5b5c7db60a71718bc92119d2cf75144b8c94b7848f254ac2bdd6#rd",
+                "msgid": 1000000193,
+                "appmsgid": 2247504279,
+                "aid": "2247504279_5"
+            },
+            {
+                "title": "160-B3｜神经八面体场用于非定向点云表面重建；文本驱动3D人类运动编辑，文本到运动的LLM增强对抗性攻击｜Fri",
+                "create_time": "2024-08-03 05:25",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504279&idx=6&sn=ecdcf0eed82e71922ab165407cd4771a&chksm=c24c585bf53bd14d6cff09d05a8cb80d3e70576870f25c4ae305b7c51e448f5e990170442c70#rd",
+                "msgid": 1000000193,
+                "appmsgid": 2247504279,
+                "aid": "2247504279_6"
+            },
+            {
+                "title": "论文简读｜文生图扩散反馈优化CLIP视觉感知，帮助CLIP练就火眼金睛｜中科院自动化所×北京智源研究院",
+                "create_time": "2024-08-02 00:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504187&idx=1&sn=11fbc5444434145e7eeb25f67d46ec98&chksm=c24c58f7f53bd1e10bf0054144311f4d4d40380094e4d5f02c411f1309b01b6d0c93712ce8a6#rd",
+                "msgid": 1000000191,
+                "appmsgid": 2247504187,
+                "aid": "2247504187_1"
+            },
+            {
+                "title": "159-A｜高质量视频的直接采样，轨迹导向DiT视频生成；生成视频质量评估；电影叙事视频理解；MLLM交互式3D家具布局设计",
+                "create_time": "2024-08-02 00:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504187&idx=2&sn=74b598aa39fb14f2c7de7290303de439&chksm=c24c58f7f53bd1e12ae9e2c6a3a3543205d44ef92bbf2557d4b4d7f5a6cf525dc5edc0c4ac2b#rd",
+                "msgid": 1000000191,
+                "appmsgid": 2247504187,
+                "aid": "2247504187_2"
+            },
+            {
+                "title": "159-B1｜检测量化解释减轻生成模型（扩散、GAN等）中的数据记忆现象；文生图不安全内容移除（直接去学习优化、人类反馈反演）",
+                "create_time": "2024-08-02 00:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504187&idx=3&sn=acd6b1c136eae3b1326c4df467afd766&chksm=c24c58f7f53bd1e109a4ace952efd074363a9ad6000fce7cf9616c225249cd064de9e65428a4#rd",
+                "msgid": 1000000191,
+                "appmsgid": 2247504187,
+                "aid": "2247504187_3"
+            },
+            {
+                "title": "159-B2｜3D植物点云注释数据集；单目视频生成丰富表情手势全身高斯化身，非结构化视频集合成个性化人脸；多模态控制人类动作生成",
+                "create_time": "2024-08-02 00:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504187&idx=4&sn=aac9fa4e356ac8f9b3b97463145a384d&chksm=c24c58f7f53bd1e1cc629c6a5e02f0d46ebe59e7b4def2351db3a7ce9b3a3ae4c2ecfdf6628a#rd",
+                "msgid": 1000000191,
+                "appmsgid": 2247504187,
+                "aid": "2247504187_4"
             }
         ]
     },
     "AIGC开放社区": {
-        "latest_time": "2024-08-02 00:39",
+        "latest_time": "2024-08-06 23:35",
         "blogs": [
             {
                 "title": "微软、OpenAI、英特尔、谷歌、英伟达，成立开源大模型安全联盟",
@@ -26783,6 +26959,118 @@
                 "msgid": 1000000529,
                 "appmsgid": 2247509804,
                 "aid": "2247509804_3"
+            },
+            {
+                "title": "顶峰相见，OPENAIGC开发者大赛8月17日上海决赛开启！",
+                "create_time": "2024-08-06 09:43",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509995&idx=1&sn=a0585cf17d5e915a7f1542eb4ee2385b&chksm=cedbf9c1f9ac70d743fa2abdb1ddb10cca2741c5ddbb68005ceed02a4d15fbe1fbccc805bea5#rd",
+                "msgid": 2247509995,
+                "appmsgid": 2247509995,
+                "aid": "2247509995_1"
+            },
+            {
+                "title": "马斯克再次起诉，OpenAI、Sam Altman",
+                "create_time": "2024-08-06 09:24",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509986&idx=1&sn=d9a9fd9e33e01ef12a58b89cae9fa50d&chksm=cedbf9c8f9ac70de8445e2369d12e535a58c26e0f467b45f8591e555fa9c1aa88567018d9d96#rd",
+                "msgid": 1000000534,
+                "appmsgid": 2247509986,
+                "aid": "2247509986_1"
+            },
+            {
+                "title": "斯坦福、Salesforce等开源1万亿tokens多模态数据集",
+                "create_time": "2024-08-06 09:24",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509986&idx=2&sn=2a7ca70ed297853b288758478a56838f&chksm=cedbf9c8f9ac70de529cf33d48d5bad3d112883aa9fbe046944c483aa92b3a05f9dc75f23a9b#rd",
+                "msgid": 1000000534,
+                "appmsgid": 2247509986,
+                "aid": "2247509986_2"
+            },
+            {
+                "title": "OpenAI开发者大会开启报名，10月1日开始第一场",
+                "create_time": "2024-08-06 09:24",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509986&idx=3&sn=5d60b74a502b34f8168a34aa8b4733a0&chksm=cedbf9c8f9ac70de576954eb0a259af3b4fba573789d2c2de48c0a3612b901ee6531a945b963#rd",
+                "msgid": 1000000534,
+                "appmsgid": 2247509986,
+                "aid": "2247509986_3"
+            },
+            {
+                "title": "顶峰相见，OPENAIGC开发者大赛8月17日上海决赛开启！",
+                "create_time": "2024-08-05 07:53",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509955&idx=1&sn=058a07ad598e42fad55cb4a0cd0d3dc7&chksm=cedbf9e9f9ac70ff1b8a3382747c5e844d7f6b87a2e0d122ccc430feed670c8efa1eb36fe337#rd",
+                "msgid": 1000000533,
+                "appmsgid": 2247509955,
+                "aid": "2247509955_1"
+            },
+            {
+                "title": "Stability.ai开源3D模型，仅需0.5秒就能快速生成",
+                "create_time": "2024-08-05 07:53",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509955&idx=2&sn=7df7885ffea9c9e1aa632189641a542c&chksm=cedbf9e9f9ac70ff2d856757c9295ba562bd0574ed7f4d74b2d97de723d486f5e552189581e8#rd",
+                "msgid": 1000000533,
+                "appmsgid": 2247509955,
+                "aid": "2247509955_2"
+            },
+            {
+                "title": "英伟达因AI芯片设计缺陷，推迟产品上市时间",
+                "create_time": "2024-08-05 07:53",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509955&idx=3&sn=92fe274fc34fc3143c2e3eeb584dd25c&chksm=cedbf9e9f9ac70ff7200d4b257c68b15ae40e63c32aa29a642abcdbaaef4172f6940ccffa7a5#rd",
+                "msgid": 1000000533,
+                "appmsgid": 2247509955,
+                "aid": "2247509955_3"
+            },
+            {
+                "title": "比OpenAI的Whisper快50%，最新开源语音模型",
+                "create_time": "2024-08-04 08:22",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509932&idx=1&sn=6c5ae85a3b0e810a5bedfde846649904&chksm=cedbf986f9ac7090f586dada73f1fbcb8d9001a18e95c3570ed0fdeb810926b957ca93e8d7c1#rd",
+                "msgid": 1000000532,
+                "appmsgid": 2247509932,
+                "aid": "2247509932_1"
+            },
+            {
+                "title": "AMD发布本地文生图模型，比SD3更简单易用",
+                "create_time": "2024-08-04 08:22",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509932&idx=2&sn=2365539a46d250fc0e2c1c3303996866&chksm=cedbf986f9ac7090d27d7cf3bd53feb0d3cfa08c3d9240f4ee402536b534968b3c8d7cc95c59#rd",
+                "msgid": 1000000532,
+                "appmsgid": 2247509932,
+                "aid": "2247509932_2"
+            },
+            {
+                "title": "OpenAI支持的最强实体“ChatGPT机器人”，8月6日发布",
+                "create_time": "2024-08-03 08:33",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509902&idx=1&sn=899999a027bb18bd45a4dfba40ded838&chksm=cedbf9a4f9ac70b25bc17267401c6923a7b1909cd157a820ca34218df7369b2a5c14b136ba02#rd",
+                "msgid": 1000000531,
+                "appmsgid": 2247509902,
+                "aid": "2247509902_1"
+            },
+            {
+                "title": "Contextual AI获8000万美元，为大模型提供RAG 2.0",
+                "create_time": "2024-08-03 08:33",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509902&idx=2&sn=c0519e12aa0a8f6e2fe17641d96956f7&chksm=cedbf9a4f9ac70b24c05835798391f51dbf7e5c9ad6f3601f3dee5fb11e5e48a261ed993c56c#rd",
+                "msgid": 1000000531,
+                "appmsgid": 2247509902,
+                "aid": "2247509902_2"
+            },
+            {
+                "title": "Meta被罚14亿美元，因为非法搜集用户数据",
+                "create_time": "2024-08-03 08:33",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509902&idx=3&sn=9f349d0060b5466fdcf112d7afeab873&chksm=cedbf9a4f9ac70b20d6ccd17c6bdc25708bf2541a23f4481f3799358648ec20467a88adfab2b#rd",
+                "msgid": 1000000531,
+                "appmsgid": 2247509902,
+                "aid": "2247509902_3"
+            },
+            {
+                "title": "性能秒杀SD3、DALL·E-3，开源文生图模型杀出大黑马",
+                "create_time": "2024-08-02 07:55",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509847&idx=1&sn=8ffaf16cccf3e93f5bd483a1788cbf8d&chksm=cedbf97df9ac706b51333dae5c937593a9d9f507a0fa19e52538433cc31cc22ccd85b5317472#rd",
+                "msgid": 1000000530,
+                "appmsgid": 2247509847,
+                "aid": "2247509847_1"
+            },
+            {
+                "title": "谷歌开源Gemma Scope，更好解释大模型工作原理",
+                "create_time": "2024-08-02 07:55",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509847&idx=2&sn=f3c50ff7872bb0d4efb0ea1d8acf3ffb&chksm=cedbf97df9ac706bceb1dbca42357194a0d0a7e5b2c557e096c247918a400ca7a1fe15147ae3#rd",
+                "msgid": 1000000530,
+                "appmsgid": 2247509847,
+                "aid": "2247509847_2"
             }
         ]
     }
