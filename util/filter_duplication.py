@@ -14,7 +14,7 @@ from util import headers
 
 
 # 提取文章中的文字
-def url2text1(url):
+def url2text(url):
     '''
     提取文本方法1：直接获取对应div下的所有文本，未处理
     :param url:
@@ -22,16 +22,22 @@ def url2text1(url):
     '''
     response = requests.get(url, headers=headers).text
     tree = etree.HTML(response)
-    text_list = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]//text()')
+    p_all = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]//p')
     # 判断是博文删除了还是请求错误
-    if not text_list:
+    if not p_all:
         warn = tree.xpath('//div[@class="weui-msg__title warn"]/text()')
         if len(warn) > 0 and warn[0] == '该内容已被发布者删除':
             return '已删除'
         else:
-            text_list = url2text1(url)
-    return text_list
+            print(url)
+            return '请求错误'
 
+    text_list = []
+    for p in p_all:
+        text = ''.join([i for i in p.xpath('.//text()') if i != '\u200d'])
+        if text:
+            text_list.append(text)
+    return text_list
 
 def calc_duplicate_rate1(text_list1, text_list2):
     '''
@@ -59,9 +65,9 @@ def get_filtered_message():
             continue
 
         have_duplicate = False
-        text_list1 = url2text1(v['this_link']['link'])
+        text_list1 = url2text(v['this_link']['link'])
         for i in range(len(v['other_link'])):
-            text_list2 = url2text1(v['other_link'][i]['link'])
+            text_list2 = url2text(v['other_link'][i]['link'])
             score = calc_duplicate_rate1(text_list1, text_list2)
             v['other_link'][i]['duplicate_rate'] = score
             if score > 0.5:

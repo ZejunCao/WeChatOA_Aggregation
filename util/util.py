@@ -7,7 +7,8 @@
 # @description : 工具函数，存储一些通用的函数
 
 import os
-os.chdir('..')
+os.chdir('D:\\learning\\python\\WeChatOA_Aggregation')
+a = os.getcwd()
 import json
 from collections import defaultdict
 
