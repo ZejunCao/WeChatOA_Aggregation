@@ -21123,7 +21123,7 @@
         ]
     },
     "CVHub": {
-        "latest_time": "2024-08-06 23:33",
+        "latest_time": "2024-08-08 01:11",
         "blogs": [
             {
                 "title": "书生大模型实战营第3期正式开启！零基础带您入门大模型，免费A100算力等你开启！",
@@ -21352,7 +21352,7 @@
         ]
     },
     "AIGC Studio": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "图像创作，随心所欲！AnyControl：精准控制下的创意风暴，高质量图像一键生成！",
@@ -22489,11 +22489,75 @@
                 "msgid": 1000000172,
                 "appmsgid": 2247486862,
                 "aid": "2247486862_5"
+            },
+            {
+                "title": "ECCV2024，音频同步技术再进化！清华&百度提出ReSyncer：高质量口型同步和个性化微调！",
+                "create_time": "2024-08-07 23:02",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247487016&idx=1&sn=21b44bc59bb1944da80fdaf2218141bf&chksm=fcf6f1c9cb8178df198384b495b4b5b1075784ceddd68f27aa4da4b79d3146ac9b56b2a916b4#rd",
+                "msgid": 1000000178,
+                "appmsgid": 2247487016,
+                "aid": "2247487016_1"
+            },
+            {
+                "title": "ECCV2024，港大&牛津提出基于区域的图像编辑方法RegionDrag！",
+                "create_time": "2024-08-07 23:02",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247487016&idx=2&sn=db6979f149663f5c0e1873176c8bdfc9&chksm=fcf6f1c9cb8178df34379432c81a314ea4fe3c4979d554c4315da95fbaf65edec72dfc8deee6#rd",
+                "msgid": 1000000178,
+                "appmsgid": 2247487016,
+                "aid": "2247487016_2"
+            },
+            {
+                "title": "深度剖析Google黑科技RB-Modulation: 告别繁琐训练，引领无训练风格迁移的新时代！",
+                "create_time": "2024-08-07 23:02",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247487016&idx=3&sn=824324d78ee9242bd3d934468d560f3a&chksm=fcf6f1c9cb8178dff4c26fd04a049ec120cdb10afdc593cd2079c9e86dce49650845805cd1af#rd",
+                "msgid": 1000000178,
+                "appmsgid": 2247487016,
+                "aid": "2247487016_3"
+            },
+            {
+                "title": "AIGC大模型实践总结",
+                "create_time": "2024-08-07 23:02",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247487016&idx=4&sn=321909501dd62b2adb1d854d9a9f7e1f&chksm=fcf6f1c9cb8178dfdd830e8d686362c3f42bfb70e4ccf3c8b977bb96cca2ba5f62e028ccd4fe#rd",
+                "msgid": 1000000178,
+                "appmsgid": 2247487016,
+                "aid": "2247487016_4"
+            },
+            {
+                "title": "从“抠图”到“抠视频”, Meta上新AI工具SAM 2!",
+                "create_time": "2024-08-06 23:15",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486988&idx=1&sn=eaa17ccb3cd2f86f07567cfea2354d4e&chksm=fcf6f1edcb8178fb11ecdce87618cf5e6da522ff88c8b143017a2aaf1bcdafb7250a95dab135#rd",
+                "msgid": 1000000177,
+                "appmsgid": 2247486988,
+                "aid": "2247486988_1"
+            },
+            {
+                "title": "[ComfyUI]腾讯PhotoMakerV2,无需LoRA训练秒实现人物风格化写真!",
+                "create_time": "2024-08-06 23:15",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486988&idx=2&sn=c135eb2df3bfce541b2581ee2acab333&chksm=fcf6f1edcb8178fbe86cff577e004ea4c9a664540d2916c264f5c761ce6d986d7a48583f968c#rd",
+                "msgid": 1000000177,
+                "appmsgid": 2247486988,
+                "aid": "2247486988_2"
+            },
+            {
+                "title": "哈工大&提出Poetry2Image：专为中文古诗词图像生成，忠于原诗意境和语义。",
+                "create_time": "2024-08-06 23:15",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486988&idx=3&sn=94177cde469a03412b77f163667637a6&chksm=fcf6f1edcb8178fb183e3b3b6d2f22880a58327c8f4d7ac05bf80a56882033270bf7b136840b#rd",
+                "msgid": 1000000177,
+                "appmsgid": 2247486988,
+                "aid": "2247486988_3"
+            },
+            {
+                "title": "「视觉AI任意门」AnyDoor，只需点两下鼠标就可以实现任意场景物体交换",
+                "create_time": "2024-08-06 23:15",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486988&idx=4&sn=3bcbe156087057af6e3eb95825652c48&chksm=fcf6f1edcb8178fb322964243e4c3b63ba5d94d2228d7cc934483299b27245ae9bd9ba0f9e5a#rd",
+                "msgid": 1000000177,
+                "appmsgid": 2247486988,
+                "aid": "2247486988_4"
             }
         ]
     },
     "AIGC自修室": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "小红书低调推出自己的AI助手，问题搜索、笔记推荐、互动娱乐",
@@ -22658,7 +22722,7 @@
         ]
     },
     "小麦AIGC": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "借助AI，随便哼个调调都可以制作成音乐了",
@@ -22903,7 +22967,7 @@
         ]
     },
     "AIGC元宇宙": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "微软从Copilot Plus电脑发布中撤回其Recall AI工具",
@@ -23220,7 +23284,7 @@
         ]
     },
     "AIGC最前线": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "ClutterGen：用于机器人学习的杂乱场景生成器",
@@ -23385,7 +23449,7 @@
         ]
     },
     "慢慢学 AIGC": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "运用知识蒸馏（KD）构建小语言模型",
@@ -23590,7 +23654,7 @@
         ]
     },
     "AIGC研修社": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "Luma AI 即将推出视频编辑控制功能，视频可控性大战开始了",
@@ -23755,7 +23819,7 @@
         ]
     },
     "AIGC小白入门记": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "【LLM技术报告】Qwen2 Technical Report",
@@ -24716,11 +24780,43 @@
                 "msgid": 1000000088,
                 "appmsgid": 2247485286,
                 "aid": "2247485286_4"
+            },
+            {
+                "title": "大模型Agent的核心还是prompt？",
+                "create_time": "2024-08-06 19:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485292&idx=1&sn=1a9b1d88ad480fa72ac67a34eafa81cc&chksm=c1c23e62f6b5b774bd8edd7ff20731959adce2f439c330f0cd3ca9d7b3fe35dea939359371f5#rd",
+                "msgid": 1000000089,
+                "appmsgid": 2247485292,
+                "aid": "2247485292_1"
+            },
+            {
+                "title": "算法工程师面试题笔记",
+                "create_time": "2024-08-06 19:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485292&idx=2&sn=96eda4f897f9e3363b445fa64b7e5bd7&chksm=c1c23e62f6b5b774e810acfad1ea968c4a19a9f8d4aabffe3c73372fc0a8b958a67b5392cb48#rd",
+                "msgid": 1000000089,
+                "appmsgid": 2247485292,
+                "aid": "2247485292_2"
+            },
+            {
+                "title": "说说我的实习面试历程，也许对你有帮助",
+                "create_time": "2024-08-06 19:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485292&idx=3&sn=1166f2d3f3be686c1d9c1456c85a9994&chksm=c1c23e62f6b5b7742e4a94a91cdd112cd23527d54968a198665b405675b9a77124f429639cbc#rd",
+                "msgid": 1000000089,
+                "appmsgid": 2247485292,
+                "aid": "2247485292_3"
+            },
+            {
+                "title": "算法工程师面试常考手撕题（更新）",
+                "create_time": "2024-08-06 19:42",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485292&idx=4&sn=0d0f8a57342e85622d8bcfadfc224d3e&chksm=c1c23e62f6b5b774f41124ecf6c966837642740cc741bd7edc4062c31d2447a370a7e971efea#rd",
+                "msgid": 1000000089,
+                "appmsgid": 2247485292,
+                "aid": "2247485292_4"
             }
         ]
     },
     "AIGC启示录": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "震惊！微软蓝屏，全球大崩溃！发生了什么？",
@@ -24909,7 +25005,7 @@
         ]
     },
     "硬核AIGC": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "停更3年的公众号，一发文就被推荐流量了",
@@ -25118,11 +25214,19 @@
                 "msgid": 1000000295,
                 "appmsgid": 2659279525,
                 "aid": "2659279525_1"
+            },
+            {
+                "title": "360联合15家大模型搞了个AI全家桶，结果连鲁迅和周树人都分不清？",
+                "create_time": "2024-08-07 16:24",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzI4ODEwMzI3Nw==&mid=2659279703&idx=1&sn=9180553a2ec51d76812423a010c8940d&chksm=f0b64d55c7c1c443144c7caad20ee2d1df984332fd6ca154168b9faad5ff2ebe06aede2ee229#rd",
+                "msgid": 1000000299,
+                "appmsgid": 2659279703,
+                "aid": "2659279703_1"
             }
         ]
     },
     "AIGC学习社": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "软件开发与AI：掌握学习之道以及如何将AI融入软件开发中",
@@ -25319,7 +25423,7 @@
         ]
     },
     "AIGC智谷": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "【AIGC律师】AIGC智谷法律服务针对中小企业的法律痛点，提供全面的解决方案。",
@@ -25884,7 +25988,7 @@
         ]
     },
     "AIGC创想者": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "Github开源项目日报 | 2024-07-16 Top15",
@@ -26405,11 +26509,27 @@
                 "msgid": 1000000123,
                 "appmsgid": 2247485496,
                 "aid": "2247485496_3"
+            },
+            {
+                "title": "Github开源项目日报 | 2024-08-07 Top15",
+                "create_time": "2024-08-07 22:36",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485581&idx=1&sn=f27281b69fda2755e2bf013e9544a835&chksm=c2fdb2cdf58a3bdbe72df77d15e522c8226cb073b781110d2ba1aa3459bec845b6796eb22db8#rd",
+                "msgid": 1000000126,
+                "appmsgid": 2247485581,
+                "aid": "2247485581_1"
+            },
+            {
+                "title": "今日Github最火的10个Python项目",
+                "create_time": "2024-08-07 22:36",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485581&idx=2&sn=1b0d58fecc0b0d2fa6597f1caaa8ae22&chksm=c2fdb2cdf58a3bdb9276487fc4c9ff3b742da369ef7dd1cd14450c7045497eb8d5023f7b884b#rd",
+                "msgid": 1000000126,
+                "appmsgid": 2247485581,
+                "aid": "2247485581_2"
             }
         ]
     },
     "AIGC Research": {
-        "latest_time": "2024-08-06 23:34",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "150-A1｜指令引导图像编辑，布局到图像合成；开放域故事可视化；Logo插入的定制化生成；隐形水印，文生图扩散结构化记忆与隐私",
@@ -27274,11 +27394,75 @@
                 "msgid": 1000000191,
                 "appmsgid": 2247504187,
                 "aid": "2247504187_4"
+            },
+            {
+                "title": "163-A｜指令提示解决图像条件化中的歧义；基于LCM的文生3D，物体形状与材质生成，物体的物理属性推理与事件动态预测｜Wed",
+                "create_time": "2024-08-07 19:36",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504459&idx=1&sn=c14574d81d5c83fade3ef0d362b5a5fd&chksm=c24c5b87f53bd2919be8845eecadb6bd7d7cf37d6ef06d5bd3e6f19a83abfa860fa4d371a803#rd",
+                "msgid": 1000000195,
+                "appmsgid": 2247504459,
+                "aid": "2247504459_1"
+            },
+            {
+                "title": "163-B1｜多模态视觉任务迁移、多图像理解基准、多任务神经调优；人类视觉策略对齐的模型可解释；DM是数据挖掘工具，虚拟试衣系统",
+                "create_time": "2024-08-07 19:36",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504459&idx=2&sn=da2e0aa1e239161f3778a1bd21d0a58c&chksm=c24c5b87f53bd2917a930ca68d1fbc6e36a524c599ecfe9b719a95e45afe331e077c1a462529#rd",
+                "msgid": 1000000195,
+                "appmsgid": 2247504459,
+                "aid": "2247504459_2"
+            },
+            {
+                "title": "163-B2｜音频同步嘴唇动作视频，情感视频字幕生成；建筑表面重建；部位感知文生交互运动，语音同步手势生成｜Wed",
+                "create_time": "2024-08-07 19:36",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504459&idx=3&sn=f23907d780c5cc45ee5a772ed0b59bb2&chksm=c24c5b87f53bd29154ab8124586e2c6f4ba59863e832c7971d9fc747647a85419cc7ce24f178#rd",
+                "msgid": 1000000195,
+                "appmsgid": 2247504459,
+                "aid": "2247504459_3"
+            },
+            {
+                "title": "162-A1｜多模态自回归摄影级文生图，3D渲染增强VLM空间保真；局部注意力曼巴高效扩散；多视角全景图，提高多样创造性减少复制",
+                "create_time": "2024-08-06 23:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504396&idx=1&sn=7b0fcaccbd4de786d01cee3be2129044&chksm=c24c5bc0f53bd2d6ed88db087f336f1d36422e27f3117ac1ea3c7a81eb71ac3eee2d8d02769d#rd",
+                "msgid": 1000000194,
+                "appmsgid": 2247504396,
+                "aid": "2247504396_1"
+            },
+            {
+                "title": "162-A2｜用于文生视频、电视剧情多段视频定位的大型数据集；自回归网格生成，单图生CAD，交互式可控3D场景生成与基于指令编辑",
+                "create_time": "2024-08-06 23:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504396&idx=2&sn=9430bfa2033c16cad24f0966338e3063&chksm=c24c5bc0f53bd2d610ede1eaee17ffc2cf1be77106e1d19a3b2934c192a045b7a6b53f352e9b#rd",
+                "msgid": 1000000194,
+                "appmsgid": 2247504396,
+                "aid": "2247504396_2"
+            },
+            {
+                "title": "162-B1｜计算三色重建；人类启发的DL可解释性；3D语义属性迁移，面部交换；图像到图像模型的机器遗忘，评估图像描述化｜Tue",
+                "create_time": "2024-08-06 23:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504396&idx=3&sn=2ee6f6130d60af55659f9e72e7518afb&chksm=c24c5bc0f53bd2d676a004f3d32d240530cb395f820dc3a195d34d0b31d10a29e777fba64aeb#rd",
+                "msgid": 1000000194,
+                "appmsgid": 2247504396,
+                "aid": "2247504396_3"
+            },
+            {
+                "title": "162-B2｜视频INR，面部特征引导说话头视频；3D场景对象去除，3D姿态估计，神经表面重建系列；音频驱动面部动画化、说话头",
+                "create_time": "2024-08-06 23:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504396&idx=4&sn=293e2d408fd8a393021411e94e52b4e7&chksm=c24c5bc0f53bd2d62e879a608c98b2d0aef40bee1e7f11738745a7e84ceb4e40f93d19c52930#rd",
+                "msgid": 1000000194,
+                "appmsgid": 2247504396,
+                "aid": "2247504396_4"
+            },
+            {
+                "title": "161-A｜自回归文生图，文本驱动图像转换，2D神经场表示；文生3DGS初始化，文本引导纹理生成，草图重建纹理可控人脸｜Mon",
+                "create_time": "2024-08-06 23:58",
+                "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI5MDE0Nw==&mid=2247504396&idx=5&sn=1aafaa2dad80d3e9fff2c970b1025974&chksm=c24c5bc0f53bd2d6105732cb977976d02c46a30a0082ae5fc5c774fe18056bcd6fa67fb54aeb#rd",
+                "msgid": 1000000194,
+                "appmsgid": 2247504396,
+                "aid": "2247504396_5"
             }
         ]
     },
     "AIGC开放社区": {
-        "latest_time": "2024-08-06 23:35",
+        "latest_time": "2024-08-08 01:12",
         "blogs": [
             {
                 "title": "微软、OpenAI、英特尔、谷歌、英伟达，成立开源大模型安全联盟",
@@ -28071,6 +28255,30 @@
                 "msgid": 1000000530,
                 "appmsgid": 2247509847,
                 "aid": "2247509847_2"
+            },
+            {
+                "title": "超强实体ChatGPT机器人：语音推理、视觉识别，“终结者”来啦！",
+                "create_time": "2024-08-07 09:00",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247510082&idx=1&sn=a4896c2aa51c5e72de46907aed44e734&chksm=cedbf668f9ac7f7e782b2e8d95a5d382938712b31d76081af2a1b5b11d31aaa8a9bac74157c4#rd",
+                "msgid": 1000000535,
+                "appmsgid": 2247510082,
+                "aid": "2247510082_1"
+            },
+            {
+                "title": "火热报名中！AI Agent智能体开发大赛邀你现场Battle！",
+                "create_time": "2024-08-07 09:00",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247510082&idx=2&sn=86f576fe446b1bd7a492066ac2308962&chksm=cedbf668f9ac7f7edf8f588a622f4871f8481d0fd3dd70151c5b6f0c05a12f88461f2ba8c62a#rd",
+                "msgid": 1000000535,
+                "appmsgid": 2247510082,
+                "aid": "2247510082_2"
+            },
+            {
+                "title": "大模型云平台Groq获6.4亿美元，估值28亿美元",
+                "create_time": "2024-08-07 09:00",
+                "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247510082&idx=3&sn=7895f18c1865221a9e2b634912ae0863&chksm=cedbf668f9ac7f7ed903f3edfc967a7beaa5ae32a859d3bafea71128401b0b9c13a21cd83e90#rd",
+                "msgid": 1000000535,
+                "appmsgid": 2247510082,
+                "aid": "2247510082_3"
             }
         ]
     }

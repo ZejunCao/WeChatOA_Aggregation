@@ -10,10 +10,9 @@ import json
 import requests
 from lxml import etree
 
-from util import headers
+from .util import headers
 
 
-# 提取文章中的文字
 def url2text(url):
     '''
     提取文本方法1：直接获取对应div下的所有文本，未处理
@@ -22,9 +21,12 @@ def url2text(url):
     '''
     response = requests.get(url, headers=headers).text
     tree = etree.HTML(response)
-    p_all = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]//p')
+    div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]')
+    if not div:
+        div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       defaultNoSetting\n            "]')
+
     # 判断是博文删除了还是请求错误
-    if not p_all:
+    if not div:
         warn = tree.xpath('//div[@class="weui-msg__title warn"]/text()')
         if len(warn) > 0 and warn[0] == '该内容已被发布者删除':
             return '已删除'
@@ -32,11 +34,23 @@ def url2text(url):
             print(url)
             return '请求错误'
 
+    s_p = [p for p in div[0].iter() if p.tag in ['section', 'p']]
     text_list = []
-    for p in p_all:
-        text = ''.join([i for i in p.xpath('.//text()') if i != '\u200d'])
-        if text:
-            text_list.append(text)
+    tag = []
+    for s in s_p:
+        text = ''.join([i.replace('\xa0', '') for i in s.xpath('.//text()') if i != '\u200d'])
+        if not text:
+            continue
+        if text_list and text in text_list[-1]:
+            parent_tag = []
+            tmp = s
+            while tmp.tag != 'div':
+                tmp = tmp.getparent()
+                parent_tag.append(tmp)
+            if tag[-1] in parent_tag:
+                del text_list[-1]
+        tag.append(s)
+        text_list.append(text)
     return text_list
 
 def calc_duplicate_rate1(text_list1, text_list2):
@@ -64,19 +78,23 @@ def get_filtered_message():
         if v['co_count'] == 1:
             continue
 
-        have_duplicate = False
         text_list1 = url2text(v['this_link']['link'])
+        if text_list1 == '请求错误' or text_list1 == '已删除':
+            v['this_link']['is_delete'] = True
         for i in range(len(v['other_link'])):
             text_list2 = url2text(v['other_link'][i]['link'])
+            if text_list2 == '请求错误':
+                continue
+            elif text_list2 == '已删除':
+                v['other_link'][i]['is_delete'] = True
+                continue
+
             score = calc_duplicate_rate1(text_list1, text_list2)
             v['other_link'][i]['duplicate_rate'] = score
-            if score > 0.5:
-                have_duplicate = True
-        if have_duplicate:
-            duplicate_message[k] = {
-                'link': [i for i in v['other_link'] if i['duplicate_rate'] > 0.5]
-            }
-        v['other_link'] = [i for i in v['other_link'] if i['duplicate_rate'] <= 0.5]
+
+        link = [i for i in v['other_link'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] > 0.5]
+        if link: duplicate_message[k] = link
+        v['other_link'] = [i for i in v['other_link'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] <= 0.5]
         v['co_count'] = len(v['other_link']) + 1
 
     with open('./data/title_head.json', 'w', encoding='utf-8') as f:
@@ -93,5 +111,6 @@ if __name__ == '__main__':
     # text_list2 = url2text1(url2)
     # co_rate = calc_duplicate_rate1(text_list1, text_list2)
     # print(co_rate)
+
 
     get_filtered_message()
