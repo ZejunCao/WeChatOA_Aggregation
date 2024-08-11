@@ -10,7 +10,7 @@ import json
 import requests
 from lxml import etree
 
-from .util import headers
+from .util import headers, message_is_delete
 
 
 def url2text(url):
@@ -27,8 +27,7 @@ def url2text(url):
 
     # 判断是博文删除了还是请求错误
     if not div:
-        warn = tree.xpath('//div[@class="weui-msg__title warn"]/text()')
-        if len(warn) > 0 and warn[0] == '该内容已被发布者删除':
+        if message_is_delete(response=response):
             return '已删除'
         else:
             print(url)
@@ -72,30 +71,38 @@ def calc_duplicate_rate1(text_list1, text_list2):
 def get_filtered_message():
     with open('./data/title_head.json', 'r', encoding='utf-8') as f:
         title_head = json.load(f)
+    with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
+        delete_messages = json.load(f)
 
     duplicate_message = {}
     for k, v in title_head.items():
         if v['co_count'] == 1:
             continue
 
-        text_list1 = url2text(v['this_link']['link'])
-        if text_list1 == '请求错误' or text_list1 == '已删除':
-            v['this_link']['is_delete'] = True
-        for i in range(len(v['other_link'])):
-            text_list2 = url2text(v['other_link'][i]['link'])
+        for i in range(v['co_count']):
+            text_list1 = url2text(v['links'][i]['link'])
+            if text_list1 == '已删除':
+                delete_messages['is_delete'].append(v['links'][i]['link'])
+                v['links'][i]['is_delete'] = True
+            else:
+                break
+        for j in range(i, v['co_count']):
+            text_list2 = url2text(v['links'][j]['link'])
             if text_list2 == '请求错误':
                 continue
             elif text_list2 == '已删除':
-                v['other_link'][i]['is_delete'] = True
+                delete_messages['is_delete'].append(v['links'][j]['link'])
+                v['links'][j]['is_delete'] = True
                 continue
 
             score = calc_duplicate_rate1(text_list1, text_list2)
-            v['other_link'][i]['duplicate_rate'] = score
+            v['links'][j]['duplicate_rate'] = score
 
-        link = [i for i in v['other_link'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] > 0.5]
+        v['links'] = [i for i in v['links'] if 'is_delete' not in i.keys()]
+        link = [i for i in v['links'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] > 0.5]
         if link: duplicate_message[k] = link
-        v['other_link'] = [i for i in v['other_link'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] <= 0.5]
-        v['co_count'] = len(v['other_link']) + 1
+        v['links'] = [i for i in v['links'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] <= 0.5]
+        v['co_count'] = len(v['links'])
 
     with open('./data/title_head.json', 'w', encoding='utf-8') as f:
         json.dump(title_head, f, indent=4, ensure_ascii=False)
@@ -103,6 +110,8 @@ def get_filtered_message():
     with open('./data/dup_message.json', 'w', encoding='utf-8') as f:
         json.dump(duplicate_message, f, indent=4, ensure_ascii=False)
 
+    with open('./data/delete_message.json', 'w', encoding='utf-8') as f:
+        json.dump(delete_messages, f, indent=4, ensure_ascii=False)
 
 if __name__ == '__main__':
     # url1 = 'http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488093&idx=1&sn=4c61d43fd3e6e57f632f1fe2c29ab59e&chksm=c17d2d79f60aa46f13db4861aa9fd16eb9010759e2cd6a5887a574333badba95975f32e19e98#rd'

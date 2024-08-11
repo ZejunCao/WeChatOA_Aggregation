@@ -1,21 +1,25 @@
 {
     "基于趋势和季节性的时间序列预测实战": [
         {
+            "id": "1000000273/2247504853_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkxODI5NjE1OQ==&mid=2247504853&idx=1&sn=1f5bcf3034a122c6618734fffe285fbe&chksm=c1b110e5f6c699f3d247c4b15309d589f6971b118ef5979aaafd09deb6729f9cb76d34f09625#rd",
+            "create_time": "2024-07-12 12:00",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001086/2247549329_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549329&idx=1&sn=0a97b40e88363b68fced156e77c30c4d&chksm=cfa52151f8d2a84773cde013070ff326aaf266af3e5b3fc44277ed4aff13cf90607a52754269#rd",
             "create_time": "2024-07-12 14:18",
             "duplicate_rate": 0.9924176144648585
         }
     ],
-    "XGBoost和LightGBM时间序列预测对比": [
-        {
-            "id": "1000001959/2247583332_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583332&idx=2&sn=9620b9148ae5799517ed45ad3e37f03e&chksm=fb3b236fcc4caa79bf05b9cfd14f994755db44dd9a97ed5fe29d16900b52bb01dc9489661239#rd",
-            "create_time": "2024-07-11 14:09",
-            "duplicate_rate": 0.9926408151712426
-        }
-    ],
     "5 个 Pandas  超级好用的隐藏技巧": [
+        {
+            "id": "1000001345/2247582509_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247582509&idx=1&sn=bfb7495a62153a30603e9958e578b5c1&chksm=c358de87f42f5791cb6410498b5b453c11340636034c6442de869d53c5601baaad35888a3fa9#rd",
+            "create_time": "2024-07-23 09:32",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001717/2247533246_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzUyOTAwMzI4NA==&mid=2247533246&idx=1&sn=1e5c6ac880bd82db13897d953ee8760e&chksm=fa65a4c5cd122dd38cc87e5ecf9dd1cb3c90ce683381c56bfa263641be3223e3fad04b3b823c#rd",
@@ -25,13 +29,41 @@
     ],
     "两次全球蓝屏，祸首竟是同一人？": [
         {
+            "id": "1000002467/2247563516_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563516&idx=2&sn=fd77651bc6cb3e100d0a9cba9021fdd8&chksm=976d5d61a01ad47796c9a28bd6973fd20652b793295b7e54ca23412e041b751bc3756b27199f#rd",
+            "create_time": "2024-07-24 10:44",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001716/2247533235_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzUyOTAwMzI4NA==&mid=2247533235&idx=1&sn=86b9efcb9c63e8fea5f9e5ddbb118dd1&chksm=fa65a4c8cd122dde94bd312cf633a7dded0168ede9872eef81fc8c7e18112104f52393f3376e#rd",
             "create_time": "2024-07-29 21:16",
             "duplicate_rate": 0.9598136284216657
         }
     ],
+    "2024 毕业生薪酬排行榜发布！": [
+        {
+            "id": "1000002473/2247563697_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563697&idx=1&sn=cb9b507435d13e43e3ac889af816c0cf&chksm=976d5c2ca01ad53aaaed42cc4a9463500bd33334d77e2ec9e64b4ea58dcc6df84b6829f94cfb#rd",
+            "create_time": "2024-07-30 16:02",
+            "duplicate_rate": 1.0
+        }
+    ],
+    "大模型集体失智！9.11和9.9哪个大，几乎全翻车了": [
+        {
+            "id": "1000002257/2648988983_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988983&idx=2&sn=0037b47ca4d6f2414d38c78d1ec12831&chksm=8793cf1db0e4460b335683c8788e7129fcdeb68b8a3aeb0c202fad5b13b80e765fda0951dd1b#rd",
+            "create_time": "2024-07-17 09:49",
+            "duplicate_rate": 1.0
+        }
+    ],
     "收藏了！Git 核心操作图解": [
+        {
+            "id": "1000001092/2247549484_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549484&idx=2&sn=29c45d08f23c868693760d04004280e0&chksm=cfa522ecf8d2abfa7a0cc4ffd1ba7aeb65d5bb7a711277505f211d13f9cba2fd066a4cbf97d3#rd",
+            "create_time": "2024-07-18 19:23",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001936/2247519656_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519656&idx=4&sn=6432ada48299aba08418509ca6a2920e&chksm=97070614a0708f02fbcbbb1b3fb4d7dd07d75ed1898db0629cc4291007abf2fbc88e71fe936f#rd",
@@ -40,6 +72,12 @@
         }
     ],
     "如何向10岁小孩解释XGBoost回归算法": [
+        {
+            "id": "1000000104/2247488093_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488093&idx=1&sn=4c61d43fd3e6e57f632f1fe2c29ab59e&chksm=c17d2d79f60aa46f13db4861aa9fd16eb9010759e2cd6a5887a574333badba95975f32e19e98#rd",
+            "create_time": "2024-07-14 10:03",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001961/2247583380_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583380&idx=1&sn=2012d63e329772944cb049faaabb8252&chksm=fb3b239fcc4caa897165255144c92f624623acd73086ae7538dbc13ee092e04a372c10ff50cd#rd",
@@ -61,6 +99,12 @@
     ],
     "博士刚毕业，颠覆整个AI界！": [
         {
+            "id": "1000001975/2247541780_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2NDExMzE5Nw==&mid=2247541780&idx=1&sn=e8c9c16b88be9877e4bdbc859df8ee12&chksm=fc4d9e56cb3a17400c90fa4d13713733a629e0f1cff1b8f4af2c7363bc4224a2837150073a7b#rd",
+            "create_time": "2024-07-10 00:01",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001089/2247549362_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549362&idx=1&sn=07bcf35606d29a7608c5684c151f0f9b&chksm=cfa52172f8d2a86476522610bd6e8364112238f564fcb702e5c287917adf1e2923cecac9ac6b#rd",
             "create_time": "2024-07-15 18:47",
@@ -68,6 +112,12 @@
         }
     ],
     "随时撸代码，愉快滴在手机上玩Python！": [
+        {
+            "id": "1000001456/2247527953_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247527953&idx=1&sn=9ac2bb8f71608bb4683ca7b213950208&chksm=f90e2a4fce79a3598d84ce74385f7ad03d0a75124218fcea6d2ee07c0812c9e1ba4f5c1ba547#rd",
+            "create_time": "2024-07-13 00:09",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001087/2247549339_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549339&idx=1&sn=ba16ef9e9bbe0b83590fe17e8f792dc2&chksm=cfa5215bf8d2a84d0eaf4fe77a97e6b76a7bc61626db1a600898039fdf8e25d11061f7a878da#rd",
@@ -77,6 +127,12 @@
     ],
     "啥是卷积核？动画演示": [
         {
+            "id": "1000002252/2648988847_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988847&idx=2&sn=aeb14e7f6402eb6f1dba49fee7ee55ac&chksm=8793ce85b0e447934c39a38be866b6ebc61ec73c0638e3ada510442c71749db71b11a3a558c2#rd",
+            "create_time": "2024-07-12 11:29",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001087/2247549339_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549339&idx=2&sn=710bfb6e39608ae9903d0045f910f691&chksm=cfa5215bf8d2a84df97807e4c593728a5fc020f6a41f4d2d16a791e79abd81b5e6b1c96e10ca#rd",
             "create_time": "2024-07-13 18:17",
@@ -84,6 +140,12 @@
         }
     ],
     "两行代码即可应用 40 个机器学习模型": [
+        {
+            "id": "1000001328/2247581622_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247581622&idx=1&sn=787880efd3b66503345dd18a183d6e57&chksm=c358e21cf42f6b0a2e5de4688fe500e67ba9c7fb5d425cc63607977ec4c640b44605f3bcb3b7#rd",
+            "create_time": "2024-07-03 11:30",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002243/2648988518_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988518&idx=1&sn=551b499627f7d674f8ced5f5f06650b2&chksm=8793c94cb0e4405aa4e0ad007f896e7ec5cd8028b3e4e7650969616317cedebc44bf477bf5c0#rd",
@@ -111,6 +173,12 @@
     ],
     "裁员为什么先裁技术人员？网友一针见血": [
         {
+            "id": "1000000734/2247490865_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI0OTU3ODA3OA==&mid=2247490865&idx=1&sn=e3be06942044c4f4820569185bebb30f&chksm=e98e0a00def983161c2cb5b74c4af88c1d3d315d5696b8c72c0de29444fb76b999c122efe8e1#rd",
+            "create_time": "2024-06-18 21:14",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001082/2247549266_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549266&idx=1&sn=7f165b77effa58dda266708541631cd3&chksm=cfa52192f8d2a88416219412fdca4284bb13b38cd3598dd51cab6f037ac38d3bbb09c16d9b6a#rd",
             "create_time": "2024-07-04 20:47",
@@ -135,7 +203,27 @@
             "duplicate_rate": 1.0
         }
     ],
+    "神器 Jupyter 的可视化 Debug！": [
+        {
+            "id": "1000001081/2247549157_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549157&idx=2&sn=5dfebe5c1d4f16ff908b2a03469407ce&chksm=cfa52025f8d2a933373c21677cb3aada30e5b95caa7d1b4f6ed59f6b1974d544608526324ba3#rd",
+            "create_time": "2024-07-03 14:04",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000000589/2247518464_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518464&idx=2&sn=7bf2191abaa820a810b18eddb52253b4&chksm=ceeec159f999484f9b1db32f6b09db308579e9a8742cec02161abc60b23c4cc9f38046443bd5#rd",
+            "create_time": "2024-08-11 18:47",
+            "duplicate_rate": 1.0
+        }
+    ],
     "吴恩达新书《Machine Learning Yearning》完整中文版pdf下载": [
+        {
+            "id": "1000001080/2247549120_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549120&idx=2&sn=a693cb1330bdb5d603dc99a6bbd9fb46&chksm=cfa52000f8d2a916ab9a8c817663c57db9dbe497c3e97560dab77fe60612b2b2d29ff1b0a9a8#rd",
+            "create_time": "2024-07-01 20:06",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000573/2247517931_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247517931&idx=2&sn=7adfaa08108c4ba107815df887adcf61&chksm=ceeeceb2f99947a4416c0b3e8297fa737c2052f7b25a1a15f125d4413d187a351f07475fd6ed#rd",
@@ -151,6 +239,12 @@
     ],
     "漫谈图神经网络模型（GNN)：从图到图卷积": [
         {
+            "id": "1000001079/2247549049_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549049&idx=2&sn=0bc983879a59cc003944b507a7e1d8ca&chksm=cfa520b9f8d2a9af39091f05d981f21624c8de61f4f72e613a079597cf8fed5411cf9de1986b#rd",
+            "create_time": "2024-06-29 22:19",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002215/2247621337_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621337&idx=2&sn=3889bfd5fd43da9af83d51552382e103&chksm=fb54f835cc237123949c744f2cba52b14f06097e07eb935b04b8d1f4c913ecb2623ff15192c3#rd",
             "create_time": "2024-07-22 21:23",
@@ -158,6 +252,12 @@
         }
     ],
     "为什么现在很多人想读博了？": [
+        {
+            "id": "1000002211/2247621212_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621212&idx=1&sn=281659ab3dc127477e26368d2913df99&chksm=fb54f8b0cc2371a6531e91cbec7e89384ecdf6580f969ede66d3215cab3a0610ecd46393f782#rd",
+            "create_time": "2024-07-19 10:40",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001093/2247549541_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549541&idx=1&sn=14f27b162dc4d7beafa563cc749ab281&chksm=cfa522a5f8d2abb3316fb65df7c293f0adf0045eb8d82e454663cdedcc4aec9eee2c00799e23#rd",
@@ -167,6 +267,12 @@
     ],
     "卷积核的基本概况": [
         {
+            "id": "1000001956/2247583278_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583278&idx=2&sn=6e795a37dd75ef9d3f263ad3acf5221f&chksm=fb3b2325cc4caa33efe6c66322fadada4b7803ac771bb15265a029c31a4d9672e7fbb6d01b62#rd",
+            "create_time": "2024-07-06 18:25",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001093/2247549541_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549541&idx=2&sn=6b6016bfdd24516db56714fa9cb11c0e&chksm=cfa522a5f8d2abb3c2617976a2696a0e4cc2a5d57c86d8c371f0c2661d010b507e8eeee9c778#rd",
             "create_time": "2024-07-20 22:24",
@@ -174,6 +280,12 @@
         }
     ],
     "程序员都干过哪些很刺激的事情？": [
+        {
+            "id": "1000001933/2247519570_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519570&idx=1&sn=b09c86ca219cefae8f69702a9561d5ee&chksm=970706eea0708ff8185fdfed1aa0e60932d5372d2959f4159822e4e1fd11ab381dd108af8174#rd",
+            "create_time": "2024-07-17 12:02",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001964/2247583565_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583565&idx=1&sn=2b9e8cac0e5303fc13594a792191fe92&chksm=fb3b2246cc4cab5033ec38daeb45d11950bd31197e17e9f6de42dbf292bf40dbbdb38972f301#rd",
@@ -201,6 +313,12 @@
     ],
     "9 月生效！微软：全部中国员工禁止使用华为、小米安卓设备办公！网友解读：原因真不是系统歧视！": [
         {
+            "id": "1000002467/2247563516_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563516&idx=1&sn=99601d689bf4b4746c9bbab9015f39ba&chksm=976d5d61a01ad4777317bca68da3bf924444f0ca1c194ce34473c941a64949fb3f375dd91600#rd",
+            "create_time": "2024-07-24 10:44",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001098/2247549980_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247549980&idx=1&sn=2c3d5557dc92df69fc65f50f0209da25&chksm=cfa524dcf8d2adcacc240b24308fa36199929783e46383de0ceb52b7888c41349a48b5f28145#rd",
             "create_time": "2024-07-26 13:05",
@@ -227,6 +345,12 @@
     ],
     "Kaggle经验--时间序列预测真的需要深度学习模型吗？": [
         {
+            "id": "1000001100/2247550036_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550036&idx=2&sn=8223eef8d8bc40951192c01f16807d01&chksm=cfa52494f8d2ad8241db90314f3692467c31a2adb3c1b2715808c93d1045b963faf0f79cca03#rd",
+            "create_time": "2024-07-29 21:32",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000584/2247518357_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518357&idx=2&sn=bf64a9e5184d7680067d608390c69e38&chksm=ceeec0ccf99949dab1ff3a87ebbd57a82af5226850e33b195f275568bdf3c3a92e34a837f0ca#rd",
             "create_time": "2024-08-04 09:08",
@@ -235,6 +359,12 @@
     ],
     "Nature：好导师的16个标准": [
         {
+            "id": "1000001099/2247550005_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550005&idx=1&sn=9fdd9bbb0b0d51ebac2e3251cee5de90&chksm=cfa524f5f8d2ade374af0eb0ee5f6111b9dc27f61a768f81095da90db77537374b5cc6b05334#rd",
+            "create_time": "2024-07-27 22:09",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001945/2247519864_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519864&idx=3&sn=df2cbba93890ed01b98bc5629d4b4844&chksm=970705c4a0708cd2f83ff20a093adc135e1b1ae0bd8e2087c5fec59f3e52a8fc69ee23375698#rd",
             "create_time": "2024-07-30 08:46",
@@ -242,6 +372,12 @@
         }
     ],
     "AI\"一键去衣\"，伪造了近7000张淫秽图片，很刑！": [
+        {
+            "id": "1000001970/2247583952_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583952&idx=1&sn=06ae23709e43c1185dae5c3b1e8155bc&chksm=fb3b2ddbcc4ca4cdb2a0ff76005cce6f98a88a3d0b002fa82469c693567187318665ea102c05#rd",
+            "create_time": "2024-07-26 12:59",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001102/2247550065_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550065&idx=1&sn=44fe6f7cc12b9501c48bd3c5d7550c62&chksm=cfa524b1f8d2ada77771defe4f6f5bade9aa9f4696efca5ace90a4a2758d80ce11e16554b34a#rd",
@@ -257,6 +393,12 @@
     ],
     "50个常用的 Numpy 函数详解": [
         {
+            "id": "1000001958/2247583315_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583315&idx=2&sn=24fb2391b7c7b3fcd3d23ede8a96e39d&chksm=fb3b2358cc4caa4e1f5c844368a639d6428a812770eaf851ab297d102fcf8ba147ff424d672f#rd",
+            "create_time": "2024-07-09 08:32",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001102/2247550065_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550065&idx=2&sn=90657efc0455249b22608e98580a341d&chksm=cfa524b1f8d2ada7195327236548e72b71f2eba9cf8245cc162c02b7401e45f0d3ac108af886#rd",
             "create_time": "2024-07-31 20:50",
@@ -264,6 +406,12 @@
         }
     ],
     "吴恩达团队新作！": [
+        {
+            "id": "1000001968/2247583792_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583792&idx=1&sn=2e12166320cde13951df3255ba1497cf&chksm=fb3b2d3bcc4ca42d3effc4021a652bffbba3b9dc8a30ca23718f0155cac3547abd445141ce37#rd",
+            "create_time": "2024-07-23 20:17",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000579/2247518122_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518122&idx=1&sn=0b7d12bb942ca5b0a882f421a3a3ffe1&chksm=ceeecff3f99946e5f5ebf574d6e4ea65346d49e1f4e464e84951c2ee280c069e52fbd1771148#rd",
@@ -281,9 +429,21 @@
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563854&idx=2&sn=73d250d14d3ae79805abdbdd04090056&chksm=976d5fd3a01ad6c5d5e2f3d63e85d3b53f004280c991c57f5cca42aa7eb20976ff99de72ca2e#rd",
             "create_time": "2024-08-07 10:46",
             "duplicate_rate": 0.9900221729490022
+        },
+        {
+            "id": "1000001954/2247520120_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247520120&idx=2&sn=7b3277099e9e63c5d254890cada3b107&chksm=970704c4a0708dd22058d9ca02a1911a67871294a40af5316d952a701961b886737d68fccffb#rd",
+            "create_time": "2024-08-09 00:02",
+            "duplicate_rate": 0.9900221729490022
         }
     ],
     "一文读懂遗传算法工作原理（附Python实现）": [
+        {
+            "id": "1000001973/2247584120_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584120&idx=3&sn=887068bc04a5f518ca90070b4f45e181&chksm=fb3b2c73cc4ca565ee76608437fb6b915833419008e08d7d4f23e5aa71700dd768e9279c36d4#rd",
+            "create_time": "2024-07-30 20:39",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001104/2247550151_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550151&idx=2&sn=79be69b267b6d0484dbc26aeb1098c9b&chksm=cfa52407f8d2ad11e9053944bdb2db4e33599e9372a26bf54bd3b93ef471bcf002369d49445d#rd",
@@ -292,6 +452,12 @@
         }
     ],
     "浅谈频率学派和贝叶斯学派": [
+        {
+            "id": "1000000576/2247518105_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518105&idx=2&sn=8c263cd503725b965f7809cbbcf9052d&chksm=ceeecfc0f99946d6c68a78de77f5750b393376121a8c360d1ed9f08091a04d3795a0765dbce3#rd",
+            "create_time": "2024-07-20 22:14",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001103/2247550098_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550098&idx=2&sn=b4ad36a3982a5b45bf19b4126ebd203b&chksm=cfa52452f8d2ad4404ff19cf09a39d52152cd0d6b296ea452ad720a3d7b9e64109bd6e9d7060#rd",
@@ -307,6 +473,12 @@
     ],
     "全网独一份！AI大模型学习训练资源...（限时免费领）": [
         {
+            "id": "1000001165/2247530421_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg5NzgyNTU2Mg==&mid=2247530421&idx=1&sn=09ae228f386f512f9f083587322c89bc&chksm=c069d9c0f71e50d6ec7f160ea4ee9f8c770688a34dd0a7a24774c76832fb09ccfd12f2cbd86a#rd",
+            "create_time": "2024-07-16 22:57",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000607/2247496917_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzAxMTk4NDkwNw==&mid=2247496917&idx=1&sn=dd939f9eaf5d1be1af33bdee6f6b8da7&chksm=9bba7db1accdf4a767f347a624398740354c375ecf8488e572be47d84ed924347477e871d898#rd",
             "create_time": "2024-08-01 22:55",
@@ -319,7 +491,115 @@
             "duplicate_rate": 0.9515347334410339
         }
     ],
+    "搞懂Transformer结构，看这篇PyTorch实现就够了": [
+        {
+            "id": "1000001106/2247550226_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550226&idx=2&sn=30c3da340c44b9fc2ea84ad9b245a516&chksm=cfa525d2f8d2acc4104f4f0078eaddb72e98a00a9ed856ff2d0733e95be402aa4e57b41459d4#rd",
+            "create_time": "2024-08-07 14:08",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001979/2247584399_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584399&idx=2&sn=e99af59217733d504d8b7459aee4c28e&chksm=fb3b2f84cc4ca69259253b647c32093a32dbb8f47cefb50d372ee6899042bb8dda041b1b0d25#rd",
+            "create_time": "2024-08-09 12:42",
+            "duplicate_rate": 1.0
+        }
+    ],
+    "不要再在pandas循环中使用 loc/iloc 了！": [
+        {
+            "id": "1000001360/2247584281_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247584281&idx=1&sn=f35715e79a6509813083f1fe9830dbc6&chksm=c358d7b3f42f5ea59a3bdaca1f5a23638347968e3d92ebe95e293cc442d1c45c1225d91a7098#rd",
+            "create_time": "2024-08-09 11:12",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001109/2247550345_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550345&idx=1&sn=e0ea98d0102a0951a65d14c0ea4979c7&chksm=cfa52549f8d2ac5fc00ad3e6d1a9064104ec8d3eafa401df3e3af48886fa16c9a132e016eac4#rd",
+            "create_time": "2024-08-10 19:57",
+            "duplicate_rate": 0.9701492537313433
+        }
+    ],
+    "独自一人，怒发顶会！": [
+        {
+            "id": "1000002207/2247621107_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621107&idx=1&sn=f204aa8eb0b84768b0102af375a9d102&chksm=fb54fb1fcc237209b2de6a6582799d1271746832b7ff4063dadb82bbe4492d71cc86c997ac0c#rd",
+            "create_time": "2024-07-14 21:29",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001108/2247550324_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550324&idx=1&sn=1f1adf741e32452060eb3df89c0b9535&chksm=cfa525b4f8d2aca20e06d3d5fbfb55604fd6c5a0aad62af016d85b5549eb7443e9e12ced8d3c#rd",
+            "create_time": "2024-08-09 12:45",
+            "duplicate_rate": 1.0
+        }
+    ],
+    "十分钟理解Transformer": [
+        {
+            "id": "1000002224/2247621690_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621690&idx=3&sn=cbd7e04bfcb93239b7667c383328edf8&chksm=fb54fed6cc2377c07707f2d55d92068995495f9b1de993c6b47517833977707ab3be825c5430#rd",
+            "create_time": "2024-08-01 08:36",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002275/2648989244_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989244&idx=2&sn=ee323474b33d6c08ab82a7811e6a4d96&chksm=8793cc16b0e445008643cf3ce809455a71989cd03860dd0fc00b393f52550a3515ea5729e3fb#rd",
+            "create_time": "2024-08-03 12:51",
+            "duplicate_rate": 0.8485660680782632
+        },
+        {
+            "id": "1000001108/2247550324_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550324&idx=2&sn=0524c09319991020d64bbccf7d3f2593&chksm=cfa525b4f8d2aca2408b6c3358d4eed892adaab4d95c59e9093f9e532ddb4546b164764d4642#rd",
+            "create_time": "2024-08-09 12:45",
+            "duplicate_rate": 0.8485660680782632
+        }
+    ],
+    "北大韦神大变样！山大论坛热烈鼓掌，手机竟成亮点": [
+        {
+            "id": "1000001950/2247520007_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247520007&idx=1&sn=8d6539531821ace893283667348e1701&chksm=970704bba0708dad2fe879c71dd69aec51ca4ade300ad659bd582e332133257763593f0e4e2f#rd",
+            "create_time": "2024-08-05 09:57",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001976/2247584247_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584247&idx=1&sn=e1641d50f5ed6c2aef92aefcd550c991&chksm=fb3b2cfccc4ca5ea91de4d922f1f10ab1ad1e8f604bdf07ddb29b03a248c4b7fd9f482529715#rd",
+            "create_time": "2024-08-05 21:14",
+            "duplicate_rate": 0.6781750924784217
+        },
+        {
+            "id": "1000001107/2247550271_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NTUzNzE5OQ==&mid=2247550271&idx=1&sn=e39438731ba9066b83420175dc175e9f&chksm=cfa525fff8d2ace9571d0566b2c62b7714a959855c081730850e8d4f2d34ee3fe4ac5632770c#rd",
+            "create_time": "2024-08-08 20:53",
+            "duplicate_rate": 0.6781750924784217
+        },
+        {
+            "id": "1000002484/2247563959_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563959&idx=1&sn=12a06ca26f5ff41c94119221d6159cce&chksm=976d5f2aa01ad63c1e48eb6e5fc18130e3ddacd9ce4ea44b08773d656c3c6d5b3dbc831f7e90#rd",
+            "create_time": "2024-08-10 10:35",
+            "duplicate_rate": 0.6781750924784217
+        },
+        {
+            "id": "1000000588/2247518427_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518427&idx=1&sn=673fc89b52ea66a0e9adaeec38ea5571&chksm=ceeec082f999499431ababfe6294fe9ae3cffd849ae371b4d5671a7e386e7a4266cc6736a844#rd",
+            "create_time": "2024-08-10 20:05",
+            "duplicate_rate": 0.6781750924784217
+        }
+    ],
+    "【源头活水】顶刊解读！IEEE T-PAMI （CCF-A，IF 23.6）2024年46卷第二期": [
+        {
+            "id": "1000001993/2247604974_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604974&idx=1&sn=6ba4100fe61d6d5f9ab5bef63b003f1a&chksm=e8d02d35dfa7a42370bbb6dfa6fea61a4e0feccd010819ae55875ddc7d92c21d65b4ca6f13b0#rd",
+            "create_time": "2024-07-18 18:06",
+            "duplicate_rate": 1.0
+        }
+    ],
     "【综述专栏】大型视觉语言模型攻击综述：资源、进展与未来趋势！": [
+        {
+            "id": "1000001990/2247604685_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604685&idx=2&sn=30d15c2855055f57842280162f357308&chksm=e8d02e16dfa7a70086490bfd00acbead7c3318f78f99454e1226108d84f144a2e413b795dd49#rd",
+            "create_time": "2024-07-15 18:00",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001992/2247604817_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604817&idx=1&sn=f4d9d0ff1843aaf4ad5e5b8075ae4cea&chksm=e8d02d8adfa7a49c8649fc80a7ac9b532f5d8b1a632f7e3c4fe1e6340f97d5ff5bb738d3c03a#rd",
@@ -335,13 +615,39 @@
     ],
     "全新注意力范式！清华黄高团队提出Agent Attention：无缝集成Softmax和Linear的注意力机制": [
         {
+            "id": "1000001988/2247604634_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604634&idx=1&sn=af6d879ed0d41eb031a4752390051baf&chksm=e8d02e41dfa7a7573613d1e2d4bc9a5f87f4b4f4c8e1b85f48f6088e5695ef511ca52a673ada#rd",
+            "create_time": "",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001975/2247603877_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247603877&idx=2&sn=ddd7ca663fbdf67fd61697abb036520b&chksm=e8d0217edfa7a8686a114197e8e1de2e342958937df59e8894f37fa01abaed01821b736eb988#rd",
             "create_time": "2024-07-01 20:35",
             "duplicate_rate": 1.0
         }
     ],
+    "开源3D医学大模型SAT，支持497类器官，性能超越72个nnU-Nets，上交大团队发布": [
+        {
+            "id": "1000001174/2247501768_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247501768&idx=1&sn=4b9df3faa24a31a33dc8254bda9e5a2f&chksm=eb31fae6dc4673f0a4201053e5fa19928b8049c99ba472d6c499c33f0063a5dc765e19952904#rd",
+            "create_time": "2024-07-09 11:50",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001987/2247604632_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604632&idx=2&sn=c626fecdec884f9ea019ae249debcd88&chksm=e8d02e43dfa7a7550296dcff258033bb5ca01ffd28c9fb1b1455731e7a6ddd0f94d5144e8114#rd",
+            "create_time": "2024-07-12 18:06",
+            "duplicate_rate": 1.0
+        }
+    ],
     "发paper必备82个即插即用缝合模块！附下载": [
+        {
+            "id": "1000002202/2247620970_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620970&idx=1&sn=cdab27d139966b2105436d2ffaafc053&chksm=fb54fb86cc23729098fc48ca96245a57d44aaa3df3fdaf80cf2b9bc6bd3070df1317feedcd0a#rd",
+            "create_time": "2024-07-10 09:18",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001986/2247604577_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604577&idx=1&sn=21fc8165292c03b23e1ec1439964ac82&chksm=e8d02ebadfa7a7ac7f5b9a99111f40704d26e13bd15639b2167c65e43f69d5e813e72182cba3#rd",
@@ -351,6 +657,12 @@
     ],
     "6月最新16个领域200个新思路，含开源代码": [
         {
+            "id": "1000002241/2648988323_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988323&idx=1&sn=113ea4f9ec0272254872b469f7308fdd&chksm=8793c889b0e4419fb8588ee7fe59533155bb127c9b574b0f773dde5723708eeac2facfec49d0#rd",
+            "create_time": "2024-07-01 22:27",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001978/2247604117_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604117&idx=1&sn=ebbac06bc5bf1290563706e079d8f38a&chksm=e8d0204edfa7a958d30f5d930f90b2d54853d38f7383a1f1e8e2ecb8734ff4dbe09d5fbf28f5#rd",
             "create_time": "2024-07-04 18:02",
@@ -358,6 +670,12 @@
         }
     ],
     "【源头活水】ICML 2024 | GLWS: 一个通用高效的框架统一弱监督学习": [
+        {
+            "id": "1000001994/2247604975_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247604975&idx=2&sn=ee4f2efc652746a6c427db47f6a3f939&chksm=e8d02d34dfa7a4226ca64546539d8180fb19fbe7761e149775ddee003c8ea5aabecbee1f2d5a#rd",
+            "create_time": "2024-07-19 09:13",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001995/2247605002_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247605002&idx=1&sn=e3308893ed97ea661083999694ed0465&chksm=e8d02cd1dfa7a5c7a1ae35743f4a37beba1efd154a7ceab92f51cf87917145d5e89bfb52a4c7#rd",
@@ -367,6 +685,12 @@
     ],
     "ECCV 2024  | Arc2Face：身份条件化的人脸生成基础模型，高一致性高质量的AI人脸艺术风格照生成": [
         {
+            "id": "1000001998/2247605208_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247605208&idx=2&sn=d4a56404751b069368343d5887ee4c8b&chksm=e8d02c03dfa7a515ed7a9a7d36e73e3e5753a6eb489062f2f2263adc8f8ca9a249fabb51d6ab#rd",
+            "create_time": "2024-07-22 22:13",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000164/2247486692_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486692&idx=2&sn=a827ef43a032f9dd00c5766e3f122681&chksm=fcf6f305cb817a13b7b2ce7f61003766f299d65650645edc63f43f4f5cac6107020aa0716842#rd",
             "create_time": "2024-07-25 21:09",
@@ -374,6 +698,12 @@
         }
     ],
     "[ECCV 2024] [复旦]RECE：扩散模型概念移除，只需3秒即可充分移除风险概念！": [
+        {
+            "id": "1000000163/2247486670_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486670&idx=1&sn=11ab2fb1a5629c4ba3189248236168a1&chksm=fcf6f32fcb817a394b8da5ecfb865b34bf2304b077abdfed3f390fa654a4dc9c7d9bef9fd220#rd",
+            "create_time": "2024-07-24 21:46",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002002/2247605391_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247605391&idx=2&sn=d7f717b0805b59a6a84708be002066c7&chksm=e8d02b54dfa7a2421c3abc156a8630b0ef449ac333a7032f5fa0d16fc229fb4dc776b4b7bb7b#rd",
@@ -383,6 +713,12 @@
     ],
     "小白收藏！顶会审稿人的论文写作投稿攻略": [
         {
+            "id": "1000002008/2247605577_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIzNjc0MTMwMA==&mid=2247605577&idx=1&sn=34089ad013c93a8e1075c10926b9d818&chksm=e8d02a92dfa7a3840b378b643283581e0771bf3937fa82c36993cbe8f9c82f638c615dbd8edf#rd",
+            "create_time": "2024-08-01 07:43",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002273/2648989228_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989228&idx=1&sn=ae44441e0424f5f16b6af2a99385c6c7&chksm=8793cc06b0e44510bb57541a13b1e0a12c29e402bca82c64e6f66f1503dad14645ac0e533d85#rd",
             "create_time": "2024-08-01 11:37",
@@ -390,6 +726,12 @@
         }
     ],
     "智能进化：具身智能系统基础模型的技术路线 | 新程序员": [
+        {
+            "id": "2247580871/2247580871_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580871&idx=1&sn=e642faf96fd02b1a95129a86ef974ca5&chksm=cfbb59a9f8ccd0bf12125e2a0f3e51b01dc1632c7d6d9791eb85b0e5e2f5eb5108b6690cb3cc#rd",
+            "create_time": "2024-07-18 11:24",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002390/2247580891_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580891&idx=1&sn=abcea8b6dd159196b9c1bbaab2e06b10&chksm=cfbb59b5f8ccd0a39f63bf07042981e448861a7f5ce74d93c82172968d6e5fa532a2d432eecb#rd",
@@ -399,6 +741,12 @@
     ],
     "出走半生终投身于“真正的工作”！Karpathy创立Eureka Labs，拥抱AI教育尤里卡时刻": [
         {
+            "id": "2247580868/2247580868_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580868&idx=1&sn=73d9bee5981b57a8405af3b2c1482894&chksm=cfbb59aaf8ccd0bcdb3ffc30d052c8137523005ba00eefd2533a65241205d05930abe288b84e#rd",
+            "create_time": "2024-07-17 17:15",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002390/2247580891_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580891&idx=2&sn=e297451c162d6076d2979109c0d3fc35&chksm=cfbb59b5f8ccd0a3d14aae52abe2dff9b2d9255ce5e8294e86150275cffb032ac7e0ddc94ed8#rd",
             "create_time": "2024-07-18 18:06",
@@ -406,6 +754,12 @@
         }
     ],
     "大模型时代的产品该怎么做，这里有答案！": [
+        {
+            "id": "1000002389/2247580851_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580851&idx=1&sn=c0fa15afc2713e17ecc7c7be60a6cbff&chksm=cfbb59ddf8ccd0cbd5c13c3d08a4d1e92fdc7d79bdb4668afccd367303d5aa49bcab02774f88#rd",
+            "create_time": "2024-07-17 16:27",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000003000/2247541344_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI4MjMyNA==&mid=2247541344&idx=2&sn=0076621457def7e3118e2c60ac78da44&chksm=c24cb51bf53b3c0d298dd3f3f643995b54fc800cc96d2e06809d9259692530e62fc8b621708d#rd",
@@ -415,6 +769,12 @@
     ],
     "苹果新系统测试版没有Apple Intelligence功能；Meta一周后或将发布Llama 3 405B | AI头条": [
         {
+            "id": "2247580705/2247580705_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580705&idx=1&sn=70f36d8dded6eb49b3609647af4907c5&chksm=cfbb594ff8ccd0596791b296b5529176076e42fed632cf335cd0fb5d069c376f7b688fa28dac#rd",
+            "create_time": "2024-07-16 11:54",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002388/2247580776_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580776&idx=2&sn=ca13638485b8c07fe6cc0b7e593d1790&chksm=cfbb5906f8ccd010df850f2c3ae4fee4b25dd6cce7f0d2b0ad7a2ed8e55cd3a6d541bfa3c261#rd",
             "create_time": "2024-07-16 17:23",
@@ -422,6 +782,12 @@
         }
     ],
     "OpenAI秘密项目曝光；​奥尔特曼：AI将成为健康领域的信仰 | AI头条": [
+        {
+            "id": "2247580647/2247580647_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580647&idx=1&sn=87f4902d3ac1d149fa62d74737b1e06b&chksm=cfbb5e89f8ccd79ff11079de16d537316eaa9735be6011a383c66a55c4133ed39beec94be770#rd",
+            "create_time": "2024-07-15 10:36",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002387/2247580681_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580681&idx=2&sn=9a2f8ee839252034f498e01e04223d93&chksm=cfbb5967f8ccd07155d353ac0ae3cac2c105a384daebd5c8ab80a4318a4a5d1a8652964ad55f#rd",
@@ -431,6 +797,12 @@
     ],
     "OpenAI 表示 AI 五个级别目前公司已接近第二级；马斯克：未来机器人的数量将远远超过人类 | AI头条": [
         {
+            "id": "2247580489/2247580489_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580489&idx=1&sn=2ca40ce99ebe169e91a86d8e3082e4a4&chksm=cfbb5e27f8ccd73186ec5c8af765c03772dc5d80dc539d2fc48f2615525338bb57a7a9190385#rd",
+            "create_time": "2024-07-12 11:48",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002386/2247580644_3",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580644&idx=3&sn=0df354336a8a43c18486d70afcbd20f2&chksm=cfbb5e8af8ccd79ca56d946863bb1693235f35a14ab5914c4c8b02ad7b3afcd7e42eb1fa32df#rd",
             "create_time": "2024-07-12 16:09",
@@ -438,6 +810,12 @@
         }
     ],
     "GPTs危！Claude Artifact功能现支持直接分享；谷歌视觉模型PaliGemma论文今晚发布 | AI头条": [
+        {
+            "id": "2247580401/2247580401_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580401&idx=1&sn=8f043a2df9761a4d8ee2a905d13f1a57&chksm=cfbb5f9ff8ccd68902217e8641c6a6fe066561973bb39d8cd3819c4d9ee6a86edf2106729b87#rd",
+            "create_time": "2024-07-11 11:19",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002385/2247580469_3",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580469&idx=3&sn=c65b8c6db66303628f4280aa18b6b6ff&chksm=cfbb5e5bf8ccd74de5a052e22c4b6307ef164d47549de2d0e06d09d632db133605d8d0a26e27#rd",
@@ -447,6 +825,12 @@
     ],
     "实习期间创下 Transformer，他说：当年整个 AI 圈都无法预见我们今天的高度": [
         {
+            "id": "1000002383/2247580340_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580340&idx=1&sn=2d84f31571cc3ae555fb8f0bb60cb4fd&chksm=cfbb5fdaf8ccd6cc49a09846b33fa1c751e2935e1cc8cbe6040bd73f6b28fcf0ca2ee3b434c7#rd",
+            "create_time": "2024-07-09 17:29",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002806/2650009540_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009540&idx=3&sn=e97f2aa3a08728460ca246772cc0c51e&chksm=8f7e8f03b80906155be3968bb2bda3f53792fdb9f6a1724bf71830a75afdb612148bf509445c#rd",
             "create_time": "2024-07-09 18:14",
@@ -454,6 +838,12 @@
         }
     ],
     "中国AI大模型论文数量全球第一；苹果智能家居将首推桌面机器人 | AI头条": [
+        {
+            "id": "2247580339/2247580339_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580339&idx=1&sn=e1bf5f824b97c36c690af771d2418e3a&chksm=cfbb5fddf8ccd6cb759d54d7e3332af43380a6aef5328868786c24c59ab81e545bb2208f8cd0#rd",
+            "create_time": "2024-07-09 10:31",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002383/2247580340_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580340&idx=2&sn=84f0c8f8ddf4b50895ef5e879751f1f5&chksm=cfbb5fdaf8ccd6cc58e515529982ea39eebb9ff86ea718169b38ee10f68e3dc4c37b96e06515#rd",
@@ -463,6 +853,12 @@
     ],
     "DeepMind CEO：AI可以发现室温超导；Llama 3.1算对9.9>9.11 | AI头条": [
         {
+            "id": "2247580970/2247580970_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580970&idx=1&sn=3c62af2d589f83feb3d3ae86081b143a&chksm=cfbb5844f8ccd1528934566b51c26e53c23ad33b118103152eb26d6fa87f37b5cab0a5bef013#rd",
+            "create_time": "2024-07-22 10:39",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002392/2247580992_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580992&idx=2&sn=d5ece80acf3baf5aba2a7431b40eeb5e&chksm=cfbb582ef8ccd1383bd4074af6e3286422b3fcfd8d6b72fcae546fb692e8f4eb9c735b25ce87#rd",
             "create_time": "2024-07-22 17:22",
@@ -470,6 +866,12 @@
         }
     ],
     "Llama-3.1 405B开源模型提前泄露，超越GPT-4o；Notion突破1亿用户里程碑 | AI头条": [
+        {
+            "id": "2247580997/2247580997_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247580997&idx=1&sn=3ddbde683e0702756a91ca4ab3ed3acc&chksm=cfbb582bf8ccd13dba68b7bb2a42173e5341f7098272b02b3c634bb9275fea798cc79aba0d82#rd",
+            "create_time": "2024-07-23 10:18",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002393/2247581005_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247581005&idx=2&sn=5404bca324fc9378245f4ee4204fc04d&chksm=cfbb5823f8ccd13513efa594406962cb1edde3c20c09617cd522ed770a903a96e90484806063#rd",
@@ -479,6 +881,12 @@
     ],
     "Mistral AI发布新一代开源模型Mistral Large 2；OpenAI今年亏损50亿美元 | AI头条": [
         {
+            "id": "2247581018/2247581018_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247581018&idx=1&sn=18956a3dd8878454e547189b6b3f685c&chksm=cfbb5834f8ccd122692735d546c8db74aa1acd223badb3993592c093969ea0ff45010e6f8b5d#rd",
+            "create_time": "2024-07-25 10:22",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002395/2247581053_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247581053&idx=2&sn=99963e627095923f99a972599b3c16f6&chksm=cfbb5813f8ccd1057c3e1fd2c2d28a2a32d282bdcc0d549c1f500a31e9ef794fa3750cddf755#rd",
             "create_time": "2024-07-25 18:43",
@@ -486,6 +894,12 @@
         }
     ],
     "最强模型 Llama 3.1 如期而至！扎克伯格最新访谈：Llama 会成为 AI 界的 Linux": [
+        {
+            "id": "1000002394/2247581016_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247581016&idx=1&sn=77779e127825725b966e753c09a7600f&chksm=cfbb5836f8ccd120a6166fb9eced9d6ba08624a177977646ad0b3e182df38b0f1bd032ac8ce5#rd",
+            "create_time": "2024-07-24 11:52",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002821/2650010857_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010857&idx=1&sn=0715e3d09e4db7292524fed86f69e64e&chksm=8f7e942eb8091d3893912db8bb2ec4e2a80e3521ff5fdabb602e0318a75cf820f564bb15389d#rd",
@@ -495,13 +909,33 @@
     ],
     "Kaldi 之父：AI 最终会破坏它触及的一切 | 新程序员": [
         {
+            "id": "1000002403/2247581377_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247581377&idx=1&sn=5f44128a258c2fbe087466e6f17e65ae&chksm=cfbb5baff8ccd2b92a3074438163d1d07b9b7a4908776a3ecfd2210c44315aee85b407907f93#rd",
+            "create_time": "2024-08-06 18:03",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002835/2650012010_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650012010&idx=3&sn=04d0025ace57ed47c9f2b2bf1e28127a&chksm=8f7e99adb80910bb7a518bb98adb944fa240c143bdb53d7e834f40fea00a99d27fa518842933#rd",
             "create_time": "2024-08-07 17:54",
             "duplicate_rate": 1.0
         }
     ],
+    "一文搞懂大模型！基础知识、 LLM 应用、 RAG 、 Agent 与未来发展": [
+        {
+            "id": "1000002405/2247581412_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4NDQwNTI0OQ==&mid=2247581412&idx=1&sn=1e0655f132be25cd9f4fc21781a05938&chksm=cfbb5b8af8ccd29c6f8fec5645c37c33d375660a03f5a78d076de71db7b104b7ab040964fb20#rd",
+            "create_time": "2024-08-08 11:02",
+            "duplicate_rate": 1.0
+        }
+    ],
     "ML如何推动结构生物学的发展？哈佛科学家用AI在最小尺度上研究人类发育": [
+        {
+            "id": "1000001184/2247501923_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247501923&idx=2&sn=60b13f442ad7c2b488dce7ac6124e2d1&chksm=eb31f54ddc467c5b75281ef624fd202e1cc8df8bfa5d0a98aa4db1090d979131660a1bc22516#rd",
+            "create_time": "2024-07-19 11:48",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002816/2650010507_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010507&idx=1&sn=da6a443ee533d47f82099cc8392d132a&chksm=8f7e934cb8091a5ad03f6fe2b72d2854a77235c6f5535eae43bce664785c60953d53ac205c13#rd",
@@ -509,15 +943,13 @@
             "duplicate_rate": 0.9463022508038585
         }
     ],
-    "OpenAI凌晨发布新研究成果！证明者和验证者无限套娃，大模型黑盒变可解释又近一大步！": [
-        {
-            "id": "1000001935/2247519620_3",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519620&idx=3&sn=dce7d047155025f0aaa203b1e33e0933&chksm=97070638a0708f2ea98f77e46f4550c623f9668df074ea4ff333bfe73fade07dd0bcdede0c4c#rd",
-            "create_time": "2024-07-19 12:02",
-            "duplicate_rate": 1.0
-        }
-    ],
     "哈佛教授发文警告：我们现在就需要控制AI智能体了": [
+        {
+            "id": "1000002803/2650009313_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009313&idx=1&sn=145a7be1822cefeaff8e0039073b8e4a&chksm=8f7e8e26b8090730adfc85261f9ccf5eeb04fd5b5ad8fe563f93a0e483d7995501953b172633#rd",
+            "create_time": "2024-07-06 15:39",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002810/2650010011_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010011&idx=1&sn=367f43f048ce0b3843d40dcae7dd9533&chksm=8f7e915cb809184a6f11005334004b774437d3c3ca20b84a077f3a8fcdc461a47ca93172da8d#rd",
@@ -526,6 +958,12 @@
         }
     ],
     "OpenAI Lilian Weng万字长文解读LLM幻觉：从理解到克服": [
+        {
+            "id": "1000002959/2650926061_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650926061&idx=2&sn=483fddb895606ca244a5dd2c962e4166&chksm=84e42f93b393a6855cd843350ad01eac1ba293f47d34c68ab3bba6e8cabe58a525c68a4038b7#rd",
+            "create_time": "2024-07-13 11:31",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002810/2650010011_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010011&idx=2&sn=5c70b7c1c3aadfaccd6a92302f906095&chksm=8f7e915cb809184ae53ebfe36ff388a3b44b0a172996e028e0674a161088776ceb9c6125049f#rd",
@@ -541,6 +979,12 @@
     ],
     "清华类脑计算模型登Nature子刊，受大脑启发的人工树突网络，实现高能效AI": [
         {
+            "id": "1000001177/2247501820_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247501820&idx=1&sn=c01c773493f50ac734c0ffbb330c5da9&chksm=eb31fad2dc4673c4ecf7c8d5fcc3a882dfad7e1ef1ad2c41f4a0f7ffec28d4e3383f62e3587b#rd",
+            "create_time": "2024-07-12 11:51",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002809/2650009908_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009908&idx=2&sn=a57a8977d21e8bb17ac3ef1f8cd29811&chksm=8f7e91f3b80918e5ee81b903779557aab75d369efb12531dd440811a837c0283d2929391f040#rd",
             "create_time": "2024-07-12 17:17",
@@ -548,6 +992,12 @@
         }
     ],
     "生成式AI之父Jürgen Schmidhuber：机器学习编年史与宇宙未来丨智源独家": [
+        {
+            "id": "1000000888/2247550886_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU5ODg0MTAwMw==&mid=2247550886&idx=1&sn=399a6a861c5d78559bc9c6ad39f19bac&chksm=febc4462c9cbcd7427079d8e0c4e68121ae6e123a2a23fb5abdacdea9a00db0ea9dc04b28d62#rd",
+            "create_time": "2024-07-11 11:47",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002808/2650009870_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009870&idx=2&sn=e5c178f431d7ac95c6db44e1f180b1d8&chksm=8f7e91c9b80918dfc9d50fea1af615e8efdb83a43d42f4fea2daa485d6c1c65a1a401a1c75e7#rd",
@@ -557,6 +1007,12 @@
     ],
     "大语言模型的前世今生：万字长文完整梳理所有里程碑式大语言模型（LLMs）": [
         {
+            "id": "1000002042/2650443410_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443410&idx=3&sn=eed3bd9b06513441dae43055e1beb96e&chksm=becd08c889ba81de01284330d6e89e2ceca751857032689b13ac46213f886cfe9120691deb48#rd",
+            "create_time": "2024-07-06 20:30",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002807/2650009714_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009714&idx=1&sn=15eab5aea3bfdd13c17a1e2ed3ac50fa&chksm=8f7e90b5b80919a3c9da1dacca8650ab6689eda16f0cda3edc33a1ae5f906fd21d04fb37192d#rd",
             "create_time": "2024-07-10 17:56",
@@ -564,6 +1020,12 @@
         }
     ],
     "赛尔笔记 | 具身大模型研究综述": [
+        {
+            "id": "1000002046/2650443471_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443471&idx=4&sn=019961eec14f5171b45e7847c7f09db9&chksm=becd089589ba8183aa7a0e030eed39c431acf3f241c62b568f7678d3aa640efe7f44a99960e6#rd",
+            "create_time": "2024-07-10 09:36",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002807/2650009714_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009714&idx=2&sn=b95f1744699ecf479697ed021fd2e9bb&chksm=8f7e90b5b80919a383fa63af41e875777a162c54ef0b996823a71b5640474ad79552a3d9729f#rd",
@@ -573,6 +1035,12 @@
     ],
     "AlphaFold 3 向解码分子行为和生物计算迈出重要一步，Nature 子刊锐评": [
         {
+            "id": "1000001175/2247501799_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247501799&idx=2&sn=34f24b47f9f7bc92a7a022b517abfb78&chksm=eb31fac9dc4673dff3f0b500fea8b466e0272b078e747ef83882e3de95e442d84fe31d4b3bdf#rd",
+            "create_time": "2024-07-10 11:54",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002807/2650009714_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009714&idx=3&sn=9976130776ecd6bb540d7f0dd68bb068&chksm=8f7e90b5b80919a362b492f2bb2bfd53250d3f043bbbdb3719f260244bb2bdb3511a9de41e0e#rd",
             "create_time": "2024-07-10 17:56",
@@ -580,6 +1048,12 @@
         }
     ],
     "不只是 AlphaFold！一文读懂蛋白质折叠的前世今生：从“不可能”到“轻而易举”": [
+        {
+            "id": "1000002800/2650009042_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009042&idx=2&sn=f29fc77ccdc43357067d58e4ca361631&chksm=8f7e8d15b809040309aaa906db1a6caae58e1e8a574600e745ae7d3c0eb91266314e2ea78300#rd",
+            "create_time": "2024-07-03 16:51",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002803/2650009313_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009313&idx=3&sn=8a9b527d6049bad278545009a2d4025e&chksm=8f7e8e26b8090730a1c660e71edd10925b656d05e08db0fe29cf4b7cfa2f40b9608f29c2e246#rd",
@@ -589,6 +1063,12 @@
     ],
     "从动物群体行为到大脑空间决策，复杂性如何启发智能探索？": [
         {
+            "id": "1000002803/2650009313_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009313&idx=4&sn=df08e6134731d8b6298c68fa639ff8a7&chksm=8f7e8e26b80907301878e5b737cb99578718e73f19671f5e4e150268c805c6cad0778c8757cb#rd",
+            "create_time": "2024-07-06 15:39",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002817/2650010616_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010616&idx=1&sn=1389c855d1f417d01f24f1fc00aa6789&chksm=8f7e933fb8091a29e704b6ebc260e3e3231894fdb1171419474e6fc1f93a5eefb1e5f28deddd#rd",
             "create_time": "2024-07-20 17:58",
@@ -596,6 +1076,12 @@
         }
     ],
     "人工智能全球治理上海宣言（全文）": [
+        {
+            "id": "1000002802/2650009171_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009171&idx=3&sn=ea44684c556fce59ddac6d9068cbd6f6&chksm=8f7e8e94b8090782da808a486826c71abcd76cd0c8393998aa73b988e0c05003c8a8a6d70c18#rd",
+            "create_time": "2024-07-05 16:29",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001924/2247519305_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519305&idx=3&sn=5867280b79709abe95b75b8a13886916&chksm=970707f5a0708ee3f54121f434964df9a541b848b9cf44143c8fff75207cc210a2bdadfada9e#rd",
@@ -605,13 +1091,33 @@
     ],
     "仅几秒，准确推断蛋白动力学信息，山大、北理工等AI模型RMSF-net登Nature子刊": [
         {
+            "id": "1000001171/2247501716_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247501716&idx=1&sn=0f3387bb2a40cafb04bc4e35cbfbb058&chksm=eb31fabadc4673acf82667ec8b0a43f5fb3d4c72bc3e01ef23384491733c125805780bb4368f#rd",
+            "create_time": "2024-07-05 11:50",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002802/2650009171_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650009171&idx=4&sn=43912d7dff9db78d170a5c35b844afd8&chksm=8f7e8e94b8090782b0e436565599ed429b77daf338bed0c002d3caa31cd2dbf7db9a77a8f5df#rd",
             "create_time": "2024-07-05 16:29",
             "duplicate_rate": 0.9341054313099042
         }
     ],
+    "Nature、Science首页推荐！北航发布世界上最轻、最小的太阳光驱动微型飞行器！": [
+        {
+            "id": "1000002817/2650010616_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010616&idx=2&sn=50d5a6c04158293cc9292eee7839a03e&chksm=8f7e933fb8091a29cb32f1189ef9ca877d582a1e48481d3633a9150e790b3c3402998e108fc4#rd",
+            "create_time": "2024-07-20 17:58",
+            "duplicate_rate": 1.0
+        }
+    ],
     "从 OpenAI 收购实时分析数据公司看未来数据库长什么样？": [
+        {
+            "id": "1000003533/2247619541_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&mid=2247619541&idx=2&sn=ee6b4163bbee409205dff5bf829ef982&chksm=fbebaa1acc9c230c6b9aabb94fca4c775eb84896c80ef683804afe92126d81e7284e0a65b87a#rd",
+            "create_time": "2024-07-21 12:09",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002818/2650010668_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010668&idx=3&sn=4136911b5d1be2cd63b11086ebc919aa&chksm=8f7e94ebb8091dfd44ca395c48b704743ccc1bdf7f71fd05bd9503d444e64108cd4ffa79fb98#rd",
@@ -620,6 +1126,12 @@
         }
     ],
     "神经网络也有空间意识！学会在Minecraft创建地图，登上Nature子刊": [
+        {
+            "id": "1000002969/2650927161_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650927161&idx=2&sn=380b6e138e083ccabf1d1b0d9984fec6&chksm=84e43447b393bd5155b4496ed5c772e8b9d1383910bed5229b2e876eaf9a5cf4c369f90a8806#rd",
+            "create_time": "2024-07-23 09:15",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002820/2650010796_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010796&idx=2&sn=6216961b4f3a4e0443ef0153177974ac&chksm=8f7e946bb8091d7d53bed1fe21cb364698d612c7e87bdbee911122d0ef07f060c077198a1374#rd",
@@ -635,6 +1147,12 @@
     ],
     "强过「黄金标准」，快3,500倍，成本低10万倍，物理建模融合AI，谷歌天气模型登Nature": [
         {
+            "id": "1000001187/2247501981_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247501981&idx=1&sn=52d8c3245d6a5f8028ee7563ab8a92b5&chksm=eb31f5b3dc467ca5c923f8e47baeb62ca51059d336b251a5c204459b0c136e4628d673f19258#rd",
+            "create_time": "2024-07-23 12:25",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002820/2650010796_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010796&idx=3&sn=3fc2a6033bd2590dd315fad9ef3ffd5e&chksm=8f7e946bb8091d7d342e253b9c9ba5d6df418fc71a2d3407c52c578eb626e2afcbd16b6bbf19#rd",
             "create_time": "2024-07-23 17:27",
@@ -643,6 +1161,12 @@
     ],
     "「机器学习之父」Mitchell 撰文：AI 如何加速科学发展，美国如何抓住机遇": [
         {
+            "id": "1000001193/2247502041_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247502041&idx=1&sn=68d6fca3e8cc2f4dd06c45c639bd609d&chksm=eb31f5f7dc467ce191077952b0913eeeed056080ab0fd5745ab95b496eef8873a31dd571c5c2#rd",
+            "create_time": "2024-07-29 11:53",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002826/2650011193_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650011193&idx=1&sn=ee0aeb786a80de0fea91123e33ce24cb&chksm=8f7e96feb8091fe85ca53db03d61d74b8ac50bbe2014fa87903e9155c2db09b437baa7c4d9f3#rd",
             "create_time": "2024-07-29 18:28",
@@ -650,6 +1174,12 @@
         }
     ],
     "OpenAI向Google宣战，重磅推出AI搜索引擎SearchGPT，却被网友发现已翻车？": [
+        {
+            "id": "1000002823/2650010994_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010994&idx=1&sn=1825936afe18ea8eb04b61de88cf10a1&chksm=8f7e95b5b8091ca3f838839e0b86cfd2340abe297b8c039e95f96bb38fde6ab3b3fb969762d8#rd",
+            "create_time": "2024-07-26 17:19",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000003003/2247541408_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkzMzI4MjMyNA==&mid=2247541408&idx=1&sn=66978e12a218c98aa731d70fb0aa1c44&chksm=c24cb5dbf53b3ccdc1a119de760c2128a8fbdeeed80b481efc95ece2d64d828d083f4f92a34e#rd",
@@ -665,6 +1195,12 @@
     ],
     "无需任何系统的物理知识，美国阿贡国家实验室AI制造材料「指纹」": [
         {
+            "id": "1000001192/2247502029_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247502029&idx=1&sn=baf4c5184bfdf1c26e65f9b793bbf21b&chksm=eb31f5e3dc467cf59c5fca7167da470c58216a83ab2c9a2aafb214863fa8a7099a3bc1825238#rd",
+            "create_time": "2024-07-27 12:37",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002824/2650011039_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650011039&idx=3&sn=31010bcaf64d2b5877180e566963e594&chksm=8f7e9558b8091c4e23ad359739f0bda4760ee513009a1b1952f9e3bf926286dfa014d3ca9a03#rd",
             "create_time": "2024-07-27 16:00",
@@ -672,6 +1208,12 @@
         }
     ],
     "两天内，Meta 和 Mistral 两款主流大模型打擂台！已经不仅卷性能了，谁更便宜就用谁？": [
+        {
+            "id": "1000003537/2247619950_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&mid=2247619950&idx=1&sn=5da309c404f9effc95fe8cca5e686701&chksm=fbebaca1cc9c25b742b3d7ba23cf9391146b2a96a8393e0e73bc86e979bd9fde76af6c2e6981#rd",
+            "create_time": "2024-07-25 13:42",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002822/2650010921_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010921&idx=2&sn=16b7c20f9c0ac24ab8c77eabd6d1698e&chksm=8f7e95eeb8091cf8da22dd2599bf39d17cb7634b082af6577382a9455e39dc3edd0ddf9cf317#rd",
@@ -681,6 +1223,12 @@
     ],
     "万字长文，腾讯、清华等多位生物大模型作者专访，畅谈AI生物学，解析大型细胞模型技术": [
         {
+            "id": "1000001189/2247502003_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247502003&idx=1&sn=77a02e448b2b707ef0a4a8d6825f7e28&chksm=eb31f59ddc467c8b22f5653130982659f65ac640824aeab6135423d524b0953a5a11a4007cb3#rd",
+            "create_time": "2024-07-25 12:02",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002822/2650010921_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650010921&idx=3&sn=91149a27e6fb8ca4767c6fe0cfc27292&chksm=8f7e95eeb8091cf8cbd064da9d6c8a3ecbc01b7b22ed0e04a8e9366e430aeca698351bae513f#rd",
             "create_time": "2024-07-25 16:38",
@@ -688,6 +1236,12 @@
         }
     ],
     "如何让细胞进行计算？国内四高校提出生物计算元器件设计全新方法，登Cell": [
+        {
+            "id": "1000001196/2247502118_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247502118&idx=1&sn=72de011072d1a240e1c48675b9fea6d9&chksm=eb31f408dc467d1e1415d44f963ae86fa48d2ac26d6729d5f8d76ce6f363e561359ea2025e85#rd",
+            "create_time": "2024-08-01 12:19",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002829/2650011365_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650011365&idx=1&sn=166bbe1e2c88da9cff422e126d7ea787&chksm=8f7e9622b8091f342137904df9e4dce9381c712b669df1f09476bd0ca18ddac1a856d0d1fff7#rd",
@@ -697,6 +1251,12 @@
     ],
     "可解释性终极追问，什么才是第一性解释？20篇CCF-A+ICLR论文给你答案": [
         {
+            "id": "1000002981/2650928905_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650928905&idx=2&sn=9d8108a722346a6f47456a22adaa774c&chksm=84e43377b393ba61f4977f4806a58dba72fc7900a0bc339164dc1231e756d8f6be99cd020517#rd",
+            "create_time": "2024-08-04 12:11",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002832/2650011855_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650011855&idx=3&sn=aead274229640632b31e14317ada55d5&chksm=8f7e9808b809111e4fb98aa68c2475bc2d4081b299dabcbbf7919a3a6a0dad808ccc24b8f41e#rd",
             "create_time": "2024-08-04 17:42",
@@ -705,13 +1265,59 @@
     ],
     "【优先发布】全球视野下人工智能战略布局与未来展望": [
         {
+            "id": "1000002831/2650011539_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650011539&idx=4&sn=314a22e796d429ffa02a0c36eafc2489&chksm=8f7e9754b8091e42be79c6343de3aa9e2e8bfa1c603c83a09b337bd1fd3de8bfb0c8e5fbfb13#rd",
+            "create_time": "2024-08-03 16:24",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002835/2650012010_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650012010&idx=2&sn=e68e52daaa7b18304e093d953dbc0236&chksm=8f7e99adb80910bb8579458e72f5248a4c0787fa9437fa7388bccd499f07d923c084f1540c85#rd",
             "create_time": "2024-08-07 17:54",
             "duplicate_rate": 1.0
         }
     ],
+    "“从头开始训练模型，几乎没有意义”": [
+        {
+            "id": "1000003556/2247621293_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&mid=2247621293&idx=2&sn=6270e07a621eb72f511992f77f757add&chksm=fbeba362cc9c2a7499279a97d6d3cf37512594cab49283d246191bfefd4ce224130498e3e1c8#rd",
+            "create_time": "2024-08-11 11:28",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002839/2650012319_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650012319&idx=4&sn=7b499e4bf56288be7187000bdbd29626&chksm=8f7e9a58b809134e8dd6be8ecdb13b55f02ae984cb69ab461cc62802201d83f75504584711f8#rd",
+            "create_time": "2024-08-11 17:55",
+            "duplicate_rate": 0.9008450704225353
+        }
+    ],
+    "2.5天完成1年的MD计算？DeepMind团队基于欧几里得Transformer的新计算方法": [
+        {
+            "id": "1000001204/2247502235_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247502235&idx=1&sn=6a6e3ce8c224a264060be5cd42a859ad&chksm=eb31f4b5dc467da32427676aeaba7b435c74cd1f53c01ef42f391f203c1496e2861c9841717a#rd",
+            "create_time": "2024-08-09 11:29",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002837/2650012138_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTA1MDAyNA==&mid=2650012138&idx=4&sn=63291b46210058f832707b9d0218c261&chksm=8f7e992db809103b957a76dc3ec3678b8732f6399edba9a25ab7da0de382f8575d7eedb9a626#rd",
+            "create_time": "2024-08-09 17:30",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002987/2650929810_5",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650929810&idx=5&sn=38a4f9c9e13895f274ae09da03a326e0&chksm=84e43eecb393b7fa2985e4d68d8eac736b1fb663684220b537b046964f76f9785b9a7ac151bb#rd",
+            "create_time": "2024-08-10 12:58",
+            "duplicate_rate": 1.0
+        }
+    ],
     "首次！实至名归！清华包揽顶会最佳论文！": [
+        {
+            "id": "1000001966/2247583621_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583621&idx=1&sn=dcc105abbcb655b13dc05dca8797b2d3&chksm=fb3b228ecc4cab9899741a2785aa6306b57248fed7414a61817bfc3c7a582d58e7b2bebced8a#rd",
+            "create_time": "2024-07-19 23:04",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001986/2247542041_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2NDExMzE5Nw==&mid=2247542041&idx=1&sn=946c297a405ee3d37519d269a3d4a189&chksm=fc4d9f5bcb3a164d21f99576f882982d2a38a9b58db0cd7abd7b4f8a39e790a8d5b85ad77595#rd",
@@ -721,6 +1327,12 @@
     ],
     "时间序列预测方法汇总：从理论到实践（附Kaggle经典比赛方案）": [
         {
+            "id": "1000001966/2247583621_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583621&idx=2&sn=5045af1ac8279736a59d9c3b3bb87d51&chksm=fb3b228ecc4cab988805e73554a9b614a1a61c4e831c5dcdb753cc689f202e746a9eef483222#rd",
+            "create_time": "2024-07-19 23:04",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000580/2247518154_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518154&idx=2&sn=3712efc26c7a615b40ccc556a1e8ca66&chksm=ceeecf93f9994685b8d916f99431e20e6afb3904e988e8b36cee9067bc695bfd7b47ec7785cc#rd",
             "create_time": "2024-07-25 14:38",
@@ -728,6 +1340,12 @@
         }
     ],
     "60个“特征工程”计算函数（Python代码）": [
+        {
+            "id": "1000001963/2247583412_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583412&idx=2&sn=fa290fd39f1023fc80371bc0f0ffbce9&chksm=fb3b23bfcc4caaa96c752fe8fdfa9742fe50dbb083f00feccb506f2722f16dc7d1ca55779929#rd",
+            "create_time": "2024-07-16 14:07",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001969/2247583807_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583807&idx=3&sn=9340b4bfb996e90dbaf8dc756b79bae9&chksm=fb3b2d34cc4ca4224354b4b5f13d23865d75d711f2e2c30d34153471c98d713d9b17c3f9b4c8#rd",
@@ -737,6 +1355,12 @@
     ],
     "《图解线性代数》中文版.PDF": [
         {
+            "id": "1000002196/2247620813_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620813&idx=1&sn=336840a93feca3c67ce679428fad2122&chksm=fb54fa21cc23733736f8bfb4f3f13c3882825799fc6bd4998bb62772d7b7e0b2ee1068176d62#rd",
+            "create_time": "2024-07-03 23:18",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001962/2247583394_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583394&idx=2&sn=56dd8a7f67614f9b5068a9389d619c60&chksm=fb3b23a9cc4caabf2f04eb62d94f6ee4268f8aa629bfbf8600fb8d7575ea5e00065772e93363#rd",
             "create_time": "2024-07-15 17:39",
@@ -744,6 +1368,12 @@
         }
     ],
     "《深度学习入门》中文版pdf下载": [
+        {
+            "id": "1000002199/2247620897_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620897&idx=1&sn=65efcde2c44663f5bb69ccc71a396153&chksm=fb54fbcdcc2372dbc8ec21f8d13e9c4151bf30da2b697b7d889f488e82451ab6335c3d89e25e#rd",
+            "create_time": "2024-07-07 09:01",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001960/2247583342_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583342&idx=2&sn=25678756b35fa5ebc2092349c0c77b88&chksm=fb3b2365cc4caa733188215733372adf9a004aff36976d52d9a6a1f04fffbac246d0173eccd8#rd",
@@ -753,6 +1383,12 @@
     ],
     "【深度学习】xLSTM成功杀入医学图像分割领域，取代Mamba成为新SOTA！": [
         {
+            "id": "1000001924/2247519305_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519305&idx=2&sn=f5ff27ba7a95e235ff24a14c8a39c445&chksm=970707f5a0708ee3390e820d6bb68aeca568f5223caad210e7a0a1290b6b711a037d6f2d0ccf#rd",
+            "create_time": "2024-07-06 12:02",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001957/2247583292_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583292&idx=3&sn=c58cfbd08583e0aa18fcca4ff1222349&chksm=fb3b2337cc4caa21b7a65bdba00a5b01a8de3e4ef09482c3eac5cdca035e72747aa37dbd5764#rd",
             "create_time": "2024-07-07 14:42",
@@ -760,6 +1396,12 @@
         }
     ],
     "导师和研究生真实演绎名场面：徒儿以后惹出事端，别说我是你师父": [
+        {
+            "id": "1000001919/2247519157_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519157&idx=1&sn=fe8a0db1c7a93e0384000d41a7f3bd25&chksm=97070009a070891f417981c3a0bd3c05ecabb38f7e4942efeb0d0b15573c3c71aaf71215c2a0#rd",
+            "create_time": "2024-07-01 12:01",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001955/2247583225_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583225&idx=1&sn=4ca1329110b40c9423b2171f70f56742&chksm=fb3b20f2cc4ca9e4b2dac1286c33e532b1499efb97b563ba2891b5c6a61add4f7d618d115d4b#rd",
@@ -775,6 +1417,12 @@
     ],
     "解决 Transformer 根本缺陷，CoPE 论文爆火：所有大模型都能获得巨大改进！": [
         {
+            "id": "1000001955/2247583225_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583225&idx=2&sn=da217daa9206b6de64069a6967a1f6c2&chksm=fb3b20f2cc4ca9e490cee37a7db0966f6c5b1cd60b898ba68f929c74ba5c493fe1abd7f9a2d5#rd",
+            "create_time": "2024-07-04 20:32",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000571/2247517878_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247517878&idx=2&sn=947301896eb8f630d92090578f8a8fc6&chksm=ceeeceeff99947f9a1ccf7fdc41b2fc356ea6eaa663cfe3bd755b32836648c2ff11ac5e91fdf#rd",
             "create_time": "2024-07-13 18:20",
@@ -782,6 +1430,12 @@
         }
     ],
     "华为编程语言正式发布！": [
+        {
+            "id": "1000001954/2247583215_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583215&idx=1&sn=e983ad40da0d22c316aea7d1ac1adb5e&chksm=fb3b20e4cc4ca9f249b642ce3a9542b99b249b3639281c4b1859f4f0f4e4d800ba3d02a40440#rd",
+            "create_time": "2024-07-03 14:25",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002447/2247562748_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247562748&idx=2&sn=990dbe877df69c0ebbb528f69dfa0c41&chksm=976d5061a01ad9776ffb09b80d3dc0096d9180c7ce99c2378fa9937b449fc8b9ae0b3d4a5358#rd",
@@ -791,13 +1445,39 @@
     ],
     "GPU多卡并行训练总结（以pytorch为例）": [
         {
+            "id": "1000001953/2247583205_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583205&idx=2&sn=323b34deff5c606fd939ac89a661d52f&chksm=fb3b20eecc4ca9f81afe8778b83ccfc23108a17bc0f058606ce837ee29cf10c5d6a25c3b3343#rd",
+            "create_time": "2024-07-01 20:01",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000566/2247517735_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247517735&idx=1&sn=572a80751d9440575f47fdce447bc687&chksm=ceeece7ef9994768ac606429dbc3da994daeb9ef384ddc1af9183c45ae291911133db76acc67#rd",
             "create_time": "2024-07-06 18:30",
             "duplicate_rate": 1.0
         }
     ],
+    "超强图解 Pandas 18 招！": [
+        {
+            "id": "1000001967/2247583717_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583717&idx=1&sn=0cb4d4876219249784be19bb6bfd7bc9&chksm=fb3b22eecc4cabf82f988a63180e8a12c67c639dec6d06e00934a26062891d4e6234422bdf13#rd",
+            "create_time": "2024-07-21 23:15",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001974/2247584130_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584130&idx=2&sn=996a80c6be0615a2683104d50a1d2507&chksm=fb3b2c89cc4ca59f75bbdd880d1019cb06e55c1273465c3dfdb716549040a53afefa856f87c4#rd",
+            "create_time": "2024-07-31 20:47",
+            "duplicate_rate": 1.0
+        }
+    ],
     "图神经网络从入门到入门": [
+        {
+            "id": "1000001968/2247583792_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583792&idx=2&sn=6fea0a5c1992aa630abedf653e8bec27&chksm=fb3b2d3bcc4ca42de28befbd9fbc9412e0a9100de8283a80bfdabd1478f01120f3830af1c92c#rd",
+            "create_time": "2024-07-23 20:17",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000581/2247518235_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518235&idx=2&sn=df656e0d90b77a011650c12b3f1d94bc&chksm=ceeec042f999495433ca6746810d4bec7faa5e0f77ed1a590d3d757ac755203b20c2b76d4e9c#rd",
@@ -805,7 +1485,27 @@
             "duplicate_rate": 0.6386759157843496
         }
     ],
+    "无人报考！多所大学，倒闭！": [
+        {
+            "id": "1000002472/2247563670_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563670&idx=1&sn=29856f47263e63005bccf5d3747c7520&chksm=976d5c0ba01ad51dad21969551872ad2a16dcfde79562cf98c980cf88fd4b73fdffacb7230c9#rd",
+            "create_time": "2024-07-29 15:50",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001973/2247584120_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584120&idx=1&sn=6dc24864eb5cdf62aa8a30573712519c&chksm=fb3b2c73cc4ca56532e97cbcdb7ea15786173fc1fd3a20c8a5bb8eef270333a515ad55ea16e8#rd",
+            "create_time": "2024-07-30 20:39",
+            "duplicate_rate": 0.9380234505862647
+        }
+    ],
     "《一书解决几乎所有机器学习问题》.PDF下载": [
+        {
+            "id": "1000002210/2247621186_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621186&idx=1&sn=b21a4622c9137426f26110d967da126d&chksm=fb54f8aecc2371b88386f5abaf5390cbd90e1fc6d6cb5b1980f70d617a5f234cd8a15d3c13a2#rd",
+            "create_time": "2024-07-18 09:35",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001973/2247584120_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584120&idx=2&sn=44ffb9ea0a182693c37dca5225f4daa8&chksm=fb3b2c73cc4ca5654b4cbec1ddb7b161e8e4db9f0c9ce39685da1e7338674fa757cf08941f60#rd",
@@ -821,6 +1521,12 @@
     ],
     "如何向10岁小孩解释PCA（主成分分析）算法": [
         {
+            "id": "1000000113/2247488435_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488435&idx=1&sn=935302d7e5dba1093ff7e7704630e11f&chksm=c17d2c97f60aa581ce995dbf572d0df1f5d661dfa72e0857055cda65de2b23f89ac87ef253f4#rd",
+            "create_time": "2024-07-24 08:08",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001972/2247584024_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584024&idx=2&sn=85b498d8c737512afded3412a11206ad&chksm=fb3b2c13cc4ca50511f2ee2dcc933a967bc8164af4be610e42a3b8f6df851daa871c799f189b#rd",
             "create_time": "2024-07-29 21:38",
@@ -835,6 +1541,12 @@
     ],
     "【网传】工资到账了，比亚迪某博士实发工资曝光....": [
         {
+            "id": "1000001940/2247519745_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519745&idx=1&sn=eddd1e8b2e85bda32da654e80df0cd41&chksm=970705bda0708cab0612bf5224424ca207008c5b6c196b023bd22bb62217659069e340d76904#rd",
+            "create_time": "2024-07-24 11:29",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001971/2247583997_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247583997&idx=1&sn=41dfc3d51c82cea9b3b2ad772e0f22ed&chksm=fb3b2df6cc4ca4e09979e9011911a75a73a68a5c1898c3c073df7bcb0222604a0fb916ca96e4#rd",
             "create_time": "2024-07-28 12:11",
@@ -842,6 +1554,12 @@
         }
     ],
     "腾讯宣布全员调薪了...": [
+        {
+            "id": "1000002062/2650443846_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443846&idx=1&sn=6d8272b34fe553d453cb4df0027256a7&chksm=becd161c89ba9f0accde568b78a7bfdbafe3bc00e53f50d2aa96ff320fb72e43ddc7388588f2#rd",
+            "create_time": "2024-07-28 19:25",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000582/2247518301_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518301&idx=1&sn=44b26895b810e7ccd209342879764232&chksm=ceeec004f9994912141ce3aea0cd4b4e929cbe50e347632cc1aee960e2ec8ed1259013e6a325#rd",
@@ -873,15 +1591,21 @@
             "duplicate_rate": 0.8278008298755186
         }
     ],
-    "北大韦神大变样！山大论坛热烈鼓掌，手机竟成亮点": [
+    "有哪些话一听就知道一个博士生是个水货？知乎600+万热议！": [
         {
-            "id": "1000001976/2247584247_1",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584247&idx=1&sn=e1641d50f5ed6c2aef92aefcd550c991&chksm=fb3b2cfccc4ca5ea91de4d922f1f10ab1ad1e8f604bdf07ddb29b03a248c4b7fd9f482529715#rd",
-            "create_time": "2024-08-05 21:14",
-            "duplicate_rate": 0.6781750924784217
+            "id": "1000001941/2247519771_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519771&idx=2&sn=1700c2c6b3eb9d14192fae83c2c7b717&chksm=970705a7a0708cb1a9b408fbf66e319abbdeaaa59f0e31510dc70b8b2567ad6a0c5eab319875#rd",
+            "create_time": "2024-07-24 20:24",
+            "duplicate_rate": 1.0
         }
     ],
     "27 个Python数据科学库实战案例 (附代码)": [
+        {
+            "id": "1000001976/2247584247_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584247&idx=3&sn=ba9751d6897f8a723c40afd8a9936159&chksm=fb3b2cfccc4ca5ead084bb8e28e5c8f10cd679c1f6178fbbe5e6a2a835e0cfdf9201a015c399#rd",
+            "create_time": "2024-08-05 21:14",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001952/2247520074_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247520074&idx=3&sn=0d71bce493fbe850ee176444aff193a3&chksm=970704f6a0708de0e60092ba30f2a1c05018353d760ba4297cdc23335aa27009f4be642eca66#rd",
@@ -890,6 +1614,12 @@
         }
     ],
     "2024毕业生薪酬排行榜发布！": [
+        {
+            "id": "1000001944/2247519836_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519836&idx=1&sn=9ea52146ce6abcc399f3af2e89bba967&chksm=970705e0a0708cf64e6084797db6a69d7ee6e180934ba0f40e01f69b9f6f8b0185b224886052#rd",
+            "create_time": "2024-07-29 01:01",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002223/2247621666_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621666&idx=1&sn=0f8bc14a2c7a46bd48671ac753c2e52e&chksm=fb54fececc2377d83a3557b33fe193553d77df5d177a5b5ea2bb96e72bddbb0b85d94ce4ada0#rd",
@@ -909,7 +1639,43 @@
             "duplicate_rate": 0.6734926052332195
         }
     ],
+    "Python 中的 if __name__ == '__main__' 到底是什么鬼？": [
+        {
+            "id": "1000002483/2247563920_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563920&idx=2&sn=69e8009c1386035cc0ed6b598fe000b2&chksm=976d5f0da01ad61b5c1381e37a736fc112b5a191d4319889622dd727f360231965dca25a01da#rd",
+            "create_time": "2024-08-09 10:25",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001980/2247584422_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0MDQ1NjAzNg==&mid=2247584422&idx=1&sn=31fc2be4c05b6e548aabd56352d0eb0a&chksm=fb3b2fadcc4ca6bb3ed04f2bb8a8ccdf3360ad088e43f6ce1596fca434446042c7067c8921b3#rd",
+            "create_time": "2024-08-10 20:01",
+            "duplicate_rate": 0.8946126622099883
+        }
+    ],
+    "应届生年薪炒到61.8w！真心建议大家冲冲这个新兴领域": [
+        {
+            "id": "1000001952/2247520074_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247520074&idx=1&sn=745ce734b75c8f3d05a79ba694e7c6e0&chksm=970704f6a0708de01247bbd953ad12acd0b4dc1242162bb7985d6e4937a346e9b954721ecfd8#rd",
+            "create_time": "2024-08-07 11:27",
+            "duplicate_rate": 1.0
+        }
+    ],
+    "卷积神经网络数学原理解析": [
+        {
+            "id": "1000002216/2247621364_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621364&idx=3&sn=dddfc19c596a4477a9b8a4ebc541183f&chksm=fb54f818cc23710efc1b8a042d0f42f967d1104817422dd26e70e1843b0c4292f4230af83756#rd",
+            "create_time": "2024-07-23 20:42",
+            "duplicate_rate": 1.0
+        }
+    ],
     "Kaggle赛题总结：LLM Prompt Recovery": [
+        {
+            "id": "1000001195/2247505996_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDA5NDYzNA==&mid=2247505996&idx=1&sn=65718f5498a064024c441ed7f7a790b6&chksm=96c7f589a1b07c9fa127818eae3898d87b11e3f21569bddba8624fa520717bfb8185d5b55a43#rd",
+            "create_time": "2024-07-08 13:40",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001496/2247511458_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NDE5Nzg1Ng==&mid=2247511458&idx=2&sn=3f3d6da7689e27c59aa4fd1c9fc07ee4&chksm=c32ab42df45d3d3b9821333f937832bb4761a5088d9a06b79ce6a7ed56f08d13e9865c7774c6#rd",
@@ -918,6 +1684,12 @@
         }
     ],
     "深度学习 vs 机器学习模型：时间序列预测中的GBRT与DNN的性能对比": [
+        {
+            "id": "1000001213/2247506361_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDA5NDYzNA==&mid=2247506361&idx=1&sn=03327695dfd05cb7b27379c829754e6d&chksm=96c7f47ca1b07d6a8e3aa544a51228d5df18433d83ecb6b90450271a320fb0a20b9dad9e9657#rd",
+            "create_time": "2024-07-31 10:49",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001515/2247511669_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NDE5Nzg1Ng==&mid=2247511669&idx=1&sn=a926bd84bb7f268b92de95a00d66f28e&chksm=c32ab7faf45d3eec5ea7cc291373d7ee5ea397536306575e35ec5563e80063b9094ae4b8cb9c#rd",
@@ -933,13 +1705,33 @@
     ],
     "开源仅 1 天就斩获近万星！超越 RAG、让大模型拥有超强记忆力的 Mem0 火了！": [
         {
+            "id": "1000003531/2247619436_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&mid=2247619436&idx=1&sn=e66a4842625742fdcb9418298b40d609&chksm=fbebaaa3cc9c23b53e436766603eb4128233e490178cd0bb88d2d843f7dad063fbe4713d7a6d#rd",
+            "create_time": "2024-07-19 12:11",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002466/2247563496_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563496&idx=2&sn=6923aabdc00d7391096693da6d4320ba&chksm=976d5d75a01ad463993ba9704fb563aabf82f1cfee9ff9d882d0ee811c2ccff2a2c4060decff#rd",
             "create_time": "2024-07-23 10:41",
             "duplicate_rate": 0.7454697518817953
         }
     ],
+    "全网祝贺！Andrej Karpathy官宣创业：是自己热爱的AI+教育": [
+        {
+            "id": "2650926577/2650926577_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650926577&idx=1&sn=84fbb8fdfaf783c181736a696ce4110f&chksm=84e4298fb393a09998a83d36d63cc8b0e56e8cb30aafe4730c23714f011fbd66f9723245a5a3#rd",
+            "create_time": "2024-07-17 08:54",
+            "duplicate_rate": 1.0
+        }
+    ],
     "刚刚，Meta开源「分割一切」2.0模型，视频也能分割了": [
+        {
+            "id": "1000002976/2650928134_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650928134&idx=1&sn=7855c453083236c5c5d121d3b4fb955e&chksm=84e43078b393b96ed88a6a5a7ea0aaf950e3257bae24b5cd957041b4f338920d3c84013dfc92#rd",
+            "create_time": "2024-07-30 10:45",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000680/2247497205_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIyNTY1MDUwNQ==&mid=2247497205&idx=1&sn=29171269e3e2396b6f6e338c644bf004&chksm=e87ec7d3df094ec5cb194845854013fa9396c848f27c985c66203418117010e5fb49681f3ea4#rd",
@@ -949,13 +1741,53 @@
     ],
     "全球首篇！调研近400篇文献，鹏城实验室&中大深度解析具身智能": [
         {
+            "id": "1000002972/2650927597_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650927597&idx=3&sn=b000973dedd3e5ec015a6bace5b69157&chksm=84e43593b393bc8594a0e850ba0b9d6844217878b4b6124f6143121588d2ee5e6aadf6e36460#rd",
+            "create_time": "2024-07-26 11:19",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000682/2247497244_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIyNTY1MDUwNQ==&mid=2247497244&idx=1&sn=fcf7e52c592b1b9fd8a859ef7b239f4f&chksm=e87ec43adf094d2c6b9e7f2b6f22d413a55b21dad488051bb609444b8db806cf40e6df4e4b25#rd",
             "create_time": "2024-08-02 18:51",
             "duplicate_rate": 0.9330543933054394
         }
     ],
+    "李飞飞亲自撰文，数十名科学家签署联名信，反对加州AI限制法案": [
+        {
+            "id": "1000002984/2650929304_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650929304&idx=2&sn=b443b9da3c0a4037551d9079d0670492&chksm=84e43ce6b393b5f0d46d612dd2ce1d0f09e875c767f2be130e8d7a459903f058ae93853118c2#rd",
+            "create_time": "2024-08-07 12:17",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002004/2247542599_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2NDExMzE5Nw==&mid=2247542599&idx=3&sn=3744ca0def9011448fe8c53211518ae0&chksm=fc4d9d05cb3a14135cd8ea5476490dc50799bc83bbbf5458f3f8f807745a09adc180b5234819#rd",
+            "create_time": "2024-08-07 22:07",
+            "duplicate_rate": 0.983577564426478
+        }
+    ],
+    "八问八答搞懂Transformer内部运作原理": [
+        {
+            "id": "1000002984/2650929304_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650929304&idx=3&sn=c67b38ec4c8973f9df3447a254a7f5ef&chksm=84e43ce6b393b5f0d8e88e9933ad6ad7a647ada1ee5e95cfdd8d63285658f7e98ab21ad83588#rd",
+            "create_time": "2024-08-07 12:17",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000000686/2247497285_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIyNTY1MDUwNQ==&mid=2247497285&idx=1&sn=8c8838d7e33dbcb1e6b307a52557bc4c&chksm=e87ec463df094d7566968d6ffb7285756bca51532f9e6f9f6a63a63ab24d938ad48dc495b1a0#rd",
+            "create_time": "2024-08-08 19:00",
+            "duplicate_rate": 0.9833203023195205
+        }
+    ],
     "准确率达60.8%，浙大基于Transformer的化学逆合成预测模型，登Nature子刊": [
+        {
+            "id": "1000001201/2247502175_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3MjM3ODk0NQ==&mid=2247502175&idx=1&sn=fac5e04223e4d591fce495b0d99ae1e8&chksm=eb31f471dc467d67bb173e896d9d3a3016e9b583a7e51806ab6a9b737d406c2b3de3ce13cd56#rd",
+            "create_time": "2024-08-06 11:07",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002984/2650929304_5",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650929304&idx=5&sn=13c79f70d75a4c654688dc245af2a8c1&chksm=84e43ce6b393b5f0ed3d05527cb86959162dd5fa9d5ee351e2a3fcbbaee2fe1f5a1594387f86#rd",
@@ -965,6 +1797,12 @@
     ],
     "详解基于调整RoPE旋转角度的大模型长度外推方法": [
         {
+            "id": "1000000042/2247484826_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MTgwODE1Ng==&mid=2247484826&idx=1&sn=8935f0bcb2e09f438cbf3ae63825d671&chksm=9f26a069a851297f568ba7cd111082e603108716928b8444a253457233f24d09d3a18447d6b9#rd",
+            "create_time": "2023-12-04 10:31",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000041/2247484950_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkwNzY3ODU5MA==&mid=2247484950&idx=1&sn=c10ed92ab19edf40876197540baa3176&chksm=c0d4c007f7a34911e918a4ae443fa3447a0adf6e6cc97855306a11fd573e9d54b28a6538f3df#rd",
             "create_time": "2024-06-11 20:27",
@@ -972,6 +1810,12 @@
         }
     ],
     "微软开源了可视化工具SandDance": [
+        {
+            "id": "1000001453/2247527917_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247527917&idx=1&sn=d839c68fee48e1d1885bf17fcd42ee02&chksm=f90e29b3ce79a0a55d4652af102585fe345b3822c28ce93f5e89f2fb12840fe3c6d964d085ca#rd",
+            "create_time": "2024-07-10 00:25",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001338/2247582220_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247582220&idx=1&sn=be9eeead98e79139fcba1c514a0cb67e&chksm=c358dfa6f42f56b0b8b4ce4ae40dbd15e3fce5c638219c48627ff1a70231de5120196bb8d5e8#rd",
@@ -981,6 +1825,12 @@
     ],
     "增强RAG：选择最佳的嵌入和重排模型": [
         {
+            "id": "1000001331/2247581957_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247581957&idx=2&sn=fbcdd5175ec4feba4104a2d53e3706e4&chksm=c358dcaff42f55b9d7e0422b3b8ef6a23a67a054283b5b4dedf6b685a2e5425ff9416bafa010#rd",
+            "create_time": "2024-07-06 21:30",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001351/2247582818_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247582818&idx=2&sn=cd6d5c06654741824981cad227dedf28&chksm=c358d9c8f42f50de6c277369fe420914623d2fc1975d39bc4603edc617a506ea6a2cd98e1819#rd",
             "create_time": "2024-07-28 22:49",
@@ -988,6 +1838,12 @@
         }
     ],
     "2025年最好发论文的方向!": [
+        {
+            "id": "1000001329/2247581736_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247581736&idx=1&sn=ee0edd00405c01793d5e1d55968c91d1&chksm=c358dd82f42f54944d0f46046a47fd779657e587b99a3b8b0e126f9e73804dab086b3778c83e#rd",
+            "create_time": "2024-07-04 11:30",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001347/2247582615_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247582615&idx=1&sn=d691db14a1a646ba945967218b96b124&chksm=c358de3df42f572bb6582aa78bb65eeea180c623e517cb96956ef81d74bdf595a6e66a51e54f#rd",
@@ -997,13 +1853,39 @@
     ],
     "2024高校毕业生就业数据报告，计算机依然热门": [
         {
+            "id": "1000001350/2247582765_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247582765&idx=1&sn=d1ebc2a6ab0f6a3dbe1f5a89ca55b944&chksm=c358d987f42f50919e8a00244e5f89fcae39911dfe4d3ae8591b8c14fc493b0796cdc3c625c2#rd",
+            "create_time": "2024-07-27 23:36",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000584/2247518357_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518357&idx=1&sn=e284c500b8f6e9420c18cd0fc86b8b74&chksm=ceeec0ccf99949da1059c0dfe0e29a9362fcf730d28912dd0d4895ae56ca5c44f812a2e85bfe#rd",
             "create_time": "2024-08-04 09:08",
             "duplicate_rate": 0.9478957915831663
         }
     ],
+    "vLLM竞赛入门案例-含完整代码": [
+        {
+            "id": "1000001509/2247511607_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NDE5Nzg1Ng==&mid=2247511607&idx=1&sn=4d6a817a865e10cd3b44ce9bf6756b94&chksm=c32ab7b8f45d3eae2f6d60d273571d4e84a6b32d538ca745fe4f014d6807aacdf31e04a61df5#rd",
+            "create_time": "2024-07-24 23:51",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000001359/2247584255_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0OTI1OTQ2MQ==&mid=2247584255&idx=2&sn=a58ac0b1fef2adaaeeabf1964f24aeb6&chksm=c358d455f42f5d43cee17af6fcd4120330d92df1ca07ab6b340071069665e8c3cbf03154535c#rd",
+            "create_time": "2024-08-08 11:15",
+            "duplicate_rate": 0.8564476885644768
+        }
+    ],
     "机器学习入门基础：机器学习实践": [
+        {
+            "id": "1000001934/2247519606_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519606&idx=2&sn=f16924ba9b4a693fdd2f713fcc89eade&chksm=970706caa0708fdc296ddc7e9bc21e5d93110340301f4670173293de4919d01151c78a443bb1#rd",
+            "create_time": "2024-07-18 12:02",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001950/2247520007_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247520007&idx=2&sn=4babc9a13bb8ee37a6509d526ac6d2c5&chksm=970704bba0708dad0c67fafe2873f82471e3c9734a5181fe5c1d75ffd6a961813dff48bb6360#rd",
@@ -1013,6 +1895,12 @@
     ],
     "【深度学习】深度学习代码规范": [
         {
+            "id": "1000001934/2247519606_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519606&idx=3&sn=43568f5c62ead54779b4b36cc66c4990&chksm=970706caa0708fdca6fa7052e1b3ad8298690a88507d16f76dce3605d00723cd6b7857e33970#rd",
+            "create_time": "2024-07-18 12:02",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001950/2247520007_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247520007&idx=4&sn=56460af74bf19faaf9934800b10f35f4&chksm=970704bba0708dad9f289209563a42216664bf76b8a32788d66001ec392c193e05723500993a#rd",
             "create_time": "2024-08-05 09:57",
@@ -1020,6 +1908,12 @@
         }
     ],
     "【深度学习】6种卷积神经网络压缩方法": [
+        {
+            "id": "1000001933/2247519570_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519570&idx=3&sn=652617009f3ae39df8df44920b71693c&chksm=970706eea0708ff84481640d60df50e70a95fe2fc25d6740cef30681aec4d21870cf34efde3d#rd",
+            "create_time": "2024-07-17 12:02",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002259/2648989018_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989018&idx=2&sn=746ace8e056d923e9bee64a338017d4f&chksm=8793cf70b0e446662579ab383ac1b3cfe44af0cc39705c21cba6ec317cc61b9290327b5c44b6#rd",
@@ -1029,6 +1923,12 @@
     ],
     "非常适合大学生自学人工智能的几个原创公众号": [
         {
+            "id": "1000001930/2247519469_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519469&idx=2&sn=3c9c9436682143f923045cb7ec03cc0d&chksm=97070751a0708e4758cec9ef70045b0f30411087ed99485321cbd74363ba2c9adc960ac17212#rd",
+            "create_time": "2024-07-14 12:01",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001979/2247541839_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2NDExMzE5Nw==&mid=2247541839&idx=2&sn=6ca079ddc08b02aa98b7382b504999f3&chksm=fc4d9e0dcb3a171b779319268bee1d20b58d677b279ff09e34ef1a5faae00c59466bae73b67c#rd",
             "create_time": "2024-07-15 00:23",
@@ -1037,6 +1937,12 @@
     ],
     "我是真的后悔从国家电网离职了。。": [
         {
+            "id": "1000001929/2247519433_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519433&idx=1&sn=d532a58d32ad870971ba366aa8746fdc&chksm=97070775a0708e63b08a73148f788b35b5a3e24aff5875478b7098ae4dfd27fa25787cb62a48#rd",
+            "create_time": "2024-07-12 12:00",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002458/2247563226_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563226&idx=1&sn=8abf992a1ff60dd6c463bd2529058822&chksm=976d5247a01adb511955a7bf59995c7ce5412490f98ced604980b0dc1e984cf9fafff302ab93#rd",
             "create_time": "2024-07-15 10:41",
@@ -1044,6 +1950,12 @@
         }
     ],
     "室友用这个中文教程入门了LLM！": [
+        {
+            "id": "1000002249/2648988693_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988693&idx=1&sn=790a8d363cfae3335c0138ad4759fe06&chksm=8793ce3fb0e4472946194851c9489989124717a110bdd3717f4e4a81176046e05306294aef58#rd",
+            "create_time": "2024-07-09 14:02",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001928/2247519395_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519395&idx=1&sn=e9e9d6f0ac32e3ae1e9a059fd8f071fb&chksm=9707071fa0708e0924bb21fe92aa2525a1d5469104d3136058ab72dc1da86e2ea313622eaadf#rd",
@@ -1059,6 +1971,12 @@
     ],
     "为啥本科生都能发顶会，而博士一篇都没有？": [
         {
+            "id": "1000002445/2247562711_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247562711&idx=1&sn=40a431adf0e2819e73fc0867fbcd7fa0&chksm=976d504aa01ad95c5c8aae9dd19fb4e3a79d726041c9325cc76ce452d4c83aa560348f45e55e#rd",
+            "create_time": "2024-07-02 10:41",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001926/2247519344_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519344&idx=1&sn=0fdb02b73289fe60210e9e490ee888ae&chksm=970707cca0708eda139148579083ced30e2af7d3b1e28be79848fcaa505f61c98d39e58b3943#rd",
             "create_time": "2024-07-09 12:01",
@@ -1073,6 +1991,12 @@
     ],
     "科技部通报：多位国家杰青、长江学者，因请托、抄袭，被处理！": [
         {
+            "id": "1000001937/2247519692_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519692&idx=1&sn=bac9118ffb99e6071b6c15540763393e&chksm=97070670a0708f663aa002b28f0dd183e4b22fa0b96f16b772faea9db3617569dae936df86b3#rd",
+            "create_time": "2024-07-22 11:10",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002471/2247563636_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563636&idx=1&sn=72e4d05ec4fc3907f6dba6bfae93a17e&chksm=976d5ce9a01ad5fff692dfacecedc23646ea6337650399da6e4edbc0b3b9bb3b8d6002846403#rd",
             "create_time": "2024-07-28 10:14",
@@ -1080,6 +2004,12 @@
         }
     ],
     "京东健康·全球医疗AI创新大赛火热进行中，立即参与，共创医疗新纪元！": [
+        {
+            "id": "1000001938/2247519715_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519715&idx=1&sn=9a1c4de2a063103e9719b3ce20c68b5b&chksm=9707065fa0708f49d9dbfb70fa1a347ac3d51feb81174f40d371e65a00be081fbf8bb2e1c358#rd",
+            "create_time": "2024-07-22 23:29",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002265/2648989059_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989059&idx=1&sn=52fef1855d1cf36156e8eb85245f76ba&chksm=8793cfa9b0e446bfcbe0fa69397ac51aaeb2466bef628582a5da42d7f869d674f1ce46b316c9#rd",
@@ -1089,6 +2019,12 @@
     ],
     "11 岁男孩写 600 行代码发射火箭！可以安心延迟退休了": [
         {
+            "id": "1000002473/2247563697_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563697&idx=2&sn=d52d7977c1bac51a8c91fa3b5aa9d158&chksm=976d5c2ca01ad53af0dc82a3683196bfe77a59a58e360bfa92487f395ce99e7312757c2b985a#rd",
+            "create_time": "2024-07-30 16:02",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001946/2247519897_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519897&idx=4&sn=6f8e1d3cbc449fec2e58ee89b9684984&chksm=97070525a0708c33867c23f785aad0a3b5785781043e919c015740ac86ef2fdc873d26cf68cb#rd",
             "create_time": "2024-07-31 11:44",
@@ -1097,13 +2033,39 @@
     ],
     "955神仙外企公司列表(2024年)": [
         {
+            "id": "1000002471/2247563636_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563636&idx=2&sn=b12e13a28ca8862ff8b473bc604f65da&chksm=976d5ce9a01ad5ff34b127723389cc51c0a8bb685617e83aa41c81174c102300684879e67d56#rd",
+            "create_time": "2024-07-28 10:14",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001944/2247519836_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519836&idx=3&sn=ea48871c39a6795051782dc61cbbfc6a&chksm=970705e0a0708cf6c18e15cbe042cc3fbd01e885cf7dcdcc99c5d7d79ecf94fc8f24a98de620#rd",
             "create_time": "2024-07-29 01:01",
             "duplicate_rate": 0.7843822843822844
         }
     ],
+    "应届生有多难，看看快手今年的16万份简历": [
+        {
+            "id": "1000001943/2247519813_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwODI2NDkxNQ==&mid=2247519813&idx=2&sn=05f63a2a41f25c75bcc193e58adf2e54&chksm=970705f9a0708cefc4c160259520d7d551dc6c54cea1958ada8ae69c784323070ff33b6ee09e#rd",
+            "create_time": "2024-07-28 09:29",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002234/2247622171_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247622171&idx=1&sn=9a83d989fb7d4e334a2cd5739ad87836&chksm=fb54fcf7cc2375e1da6a0989b337e3d75e425e7d673f50de2ba722a9608b0ee344573c85d4a7#rd",
+            "create_time": "2024-08-10 10:36",
+            "duplicate_rate": 0.7537022603273578
+        }
+    ],
     "从0到1实现神经网络（Python）": [
+        {
+            "id": "1000000097/2247487703_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247487703&idx=1&sn=420388b1defd9715d2e779ac3dfbd2dc&chksm=c17d2ff3f60aa6e58fae4ef36dd85d077eb70692be821418c510aea629411cba226f8d0c7d28#rd",
+            "create_time": "2024-07-01 20:46",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000575/2247517973_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247517973&idx=1&sn=db09ca8a513638b7f5d66a7d480801d0&chksm=ceeecf4cf999465ab7820baa9350a218138e9a6c2a8aa1207bae525d936a139e1eaf65550967#rd",
@@ -1112,6 +2074,12 @@
         }
     ],
     "看完这篇文章还不懂K-means聚类算法，就来找我": [
+        {
+            "id": "1000000110/2247488211_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488211&idx=1&sn=4605d106fa21da0796a0a7a0876ee10f&chksm=c17d2df7f60aa4e1ee1ad6d3268edf291d05a876bcca67a333ed2b5bca2337f454bb74c19ace#rd",
+            "create_time": "2024-07-19 23:34",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000577/2247518111_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518111&idx=1&sn=8b4c08696f8dc0510cf40fd9a147ad7c&chksm=ceeecfc6f99946d039b5d61ecfc89bb281f201c0201b8b07181781457b96e0a7a6c80ea81bef#rd",
@@ -1125,7 +2093,27 @@
             "duplicate_rate": 1.0
         }
     ],
+    "超全！李航《统计学习方法》读书笔记": [
+        {
+            "id": "1000000093/2247487520_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247487520&idx=1&sn=6acd40e16c0a3fbd82bad07d0317ceca&chksm=c17d2f04f60aa61211307f8acc6eb75676733ee2a2f1fe1d064005c08a28391a61a3d9fb288b#rd",
+            "create_time": "2024-06-15 21:10",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000000587/2247518413_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518413&idx=1&sn=45c67db4c8e5770ef8b155a4e99d741f&chksm=ceeec094f9994982afa4b8fe56ac67d0a51f401369993c698efd0866d12f0be9e421d9e76cc2#rd",
+            "create_time": "2024-08-08 20:46",
+            "duplicate_rate": 1.0
+        }
+    ],
     "CVPR 2024 录用数据出炉！这些方向是大趋势！": [
+        {
+            "id": "1000001969/2247541591_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2NDExMzE5Nw==&mid=2247541591&idx=1&sn=4672791c5517c56b32117377e76db78a&chksm=fc4d9915cb3a1003186eeb50029ab6e7a0ed0a706768c36ab673557799530d781f4dc582f036#rd",
+            "create_time": "2024-07-04 22:42",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002200/2247620920_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620920&idx=1&sn=8c75cca7308de61df64f0bb7d26a9eab&chksm=fb54fbd4cc2372c20db8cb2f9f07b35c47613ac9162f1b7ce73a082f0abcf1103cb04b78b99d#rd",
@@ -1147,6 +2135,12 @@
     ],
     "科技部最新通报！多位国家杰青因请托、抄袭被处理": [
         {
+            "id": "1000001991/2247542185_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2NDExMzE5Nw==&mid=2247542185&idx=1&sn=ba100c01b2cee92e7ae1b6d351bf0401&chksm=fc4d9febcb3a16fd647d23eafd3a63e6ba7691940fa1582cd8c0640629385debcde40d20c5bf#rd",
+            "create_time": "2024-07-26 14:31",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001999/2247542453_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2NDExMzE5Nw==&mid=2247542453&idx=2&sn=6d29ba11ce89792d3fe79944ad72935a&chksm=fc4d9cf7cb3a15e1a3f93886033283ecb7769fa70707ab8ce96e0e9c3a42476448490992dfae#rd",
             "create_time": "2024-08-02 22:08",
@@ -1154,6 +2148,12 @@
         }
     ],
     "2024 互联网公司工作时长排行榜出炉！": [
+        {
+            "id": "1000002066/2650443942_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443942&idx=2&sn=67dcfd14dd7d5d5e19576a9750b9abff&chksm=becd16fc89ba9fea1f7f131cb82f1714fa67aa53b93bfbb07b0cd9f8d9303ad2591a12deba77#rd",
+            "create_time": "2024-08-03 11:18",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002478/2247563805_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563805&idx=1&sn=ba832a6580bb341331a328ecb2c3aaf6&chksm=976d5f80a01ad69660edbf4abddce70c38aea45513ed8ba558572edd5a24099c96bdcff2b2db#rd",
@@ -1169,6 +2169,12 @@
     ],
     "只懂线性回归？来看看贝叶斯回归和高斯过程回归": [
         {
+            "id": "1000000568/2247517796_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247517796&idx=2&sn=1682675c331e27abb494298c7173ab89&chksm=ceeece3df999472b77bb7b127bdf35a0d88d48a81ab1de2c4e073bc217169c74c237c5d5d35b#rd",
+            "create_time": "2024-07-09 21:22",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000574/2247517942_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247517942&idx=2&sn=d04fe401df180fea10cf02edd7471163&chksm=ceeeceaff99947b9e542526ed01f1d4b04365f78719504eecd9e5752e11a95c784deabaa7e75#rd",
             "create_time": "2024-07-16 19:42",
@@ -1177,6 +2183,12 @@
     ],
     "基础卡尔曼滤波": [
         {
+            "id": "1000002200/2247620920_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620920&idx=2&sn=08e4056fcbccfd604df498dd9bc76365&chksm=fb54fbd4cc2372c24ac33f5c02c9a668dd5c88f394644e60d75843e720759fef2b91c0c911ab#rd",
+            "create_time": "2024-07-07 23:23",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000583/2247518326_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3MjY1MzExMA==&mid=2247518326&idx=2&sn=ebafce2fd23a1068f614032bc8308f71&chksm=ceeec02ff99949392a258c32d2ce5931dc31a87e9a4a1e5b78c7ed864afa90ea59400d2511fd#rd",
             "create_time": "2024-07-31 20:54",
@@ -1184,6 +2196,12 @@
         }
     ],
     "搭建机器学习开发环境及Python基础，108页PDF": [
+        {
+            "id": "1000000326/2649625013_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA5Njg3NDU0Nw==&mid=2649625013&idx=1&sn=6e9f12730cfa200bf2e3809d30330fd3&chksm=88b3c8e9bfc441ff5a38ac2a086ecb122e6b6c4ebaf675e18a40473ac097cf0d1d6f38c37ac7#rd",
+            "create_time": "2024-05-28 17:35",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000337/2649625106_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA5Njg3NDU0Nw==&mid=2649625106&idx=2&sn=a39247f1ebda7c6076124732e4a41afd&chksm=88b3cb4ebfc4425882698369566840a5409331e7f68f7f6a534f153d72740065424807c03135#rd",
@@ -1199,6 +2217,12 @@
     ],
     "上海交通大学-动手学大模型-课件.zip": [
         {
+            "id": "1000000336/2649625105_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA5Njg3NDU0Nw==&mid=2649625105&idx=1&sn=55ea10cdf67a1edc30db746a8da75bd2&chksm=88b3cb4dbfc4425b6f3d169c65a5ec12c9386ab4d9fa9e1c15f28d498aeebb7f2c2e4abe56ea#rd",
+            "create_time": "2024-07-05 19:48",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002246/2648988669_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988669&idx=1&sn=1f6533c86b664b31f982f02febb27a79&chksm=8793c9d7b0e440c17033f0f972fbf6e08dc9e5fca793e17922a35be54d7274eec3322100f1e7#rd",
             "create_time": "2024-07-07 18:23",
@@ -1207,13 +2231,39 @@
     ],
     "Pandas 加速150倍！": [
         {
+            "id": "1000002241/2648988323_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988323&idx=2&sn=d46af6d123e43304d63425ac22fbb32c&chksm=8793c889b0e4419fa0968532dd208ad72921fb34ca3a17c28a2623da0ce7ee7555e3c04b9a93#rd",
+            "create_time": "2024-07-01 22:27",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000335/2649625077_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA5Njg3NDU0Nw==&mid=2649625077&idx=1&sn=d9086a78dd41766a3e0baf2a0a20bc5c&chksm=88b3c8a9bfc441bf2ab9e04eceee2c2d25443f4abea88f9111b14e5eb5dab771a818f2cb1766#rd",
             "create_time": "2024-07-02 14:13",
             "duplicate_rate": 1.0
         }
     ],
+    "大模型的竞争方向是小模型": [
+        {
+            "id": "1000000339/2649625113_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA5Njg3NDU0Nw==&mid=2649625113&idx=1&sn=380b3e68fb24507ef548fcb55b0cd522&chksm=88b3cb45bfc44253b5327aaa5b47b51ad64f78cd8de7a9d76073a3398e2f67477f9cca673ed1#rd",
+            "create_time": "2024-07-20 21:56",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002262/2648989034_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989034&idx=2&sn=da416c46785270ed8cbaff41ef0de877&chksm=8793cf40b0e44656eae1f81728357ac8cecf7d25dd31ba6bea46026bd28411cf77fd33fde101#rd",
+            "create_time": "2024-07-21 21:31",
+            "duplicate_rate": 1.0
+        }
+    ],
     "116页PDF小册子：机器学习中的概率论、统计学、线性代数": [
+        {
+            "id": "1000000323/2649624991_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA5Njg3NDU0Nw==&mid=2649624991&idx=1&sn=ae889d41926f4b01f015ffd0266d1487&chksm=88b3c8c3bfc441d5639b74c4af9379693cbaf27ba6ef325efbfd5ed21449e3ac82a1f79b1b31#rd",
+            "create_time": "2024-05-20 16:33",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002267/2648989086_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989086&idx=4&sn=01a73e7c6634c42ed93db76e96b47975&chksm=8793cfb4b0e446a2a7f368fea0e4b59a07664dff9d111cc703cd630eab44ac4fcbc1293098ab#rd",
@@ -1223,6 +2273,12 @@
     ],
     "导师诚不欺我!大模型时代最好发论文的方向！": [
         {
+            "id": "1000002197/2247620848_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620848&idx=1&sn=a8f95f4495e8af8c33f0aa72a6d0cba4&chksm=fb54fa1ccc23730aac9eaf2041eff99701d9d57fbab0aedb2fc177b279afc23e6be34148ed5e#rd",
+            "create_time": "2024-07-05 10:01",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002258/2648988989_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648988989&idx=1&sn=a9c0f29ece7f30028cb59735c4a58fc8&chksm=8793cf17b0e44601945886b6af56a5569f3de39ac2db17a0790840b1d503dc732921db677f8b#rd",
             "create_time": "2024-07-17 15:49",
@@ -1230,6 +2286,12 @@
         }
     ],
     "轻松、有趣的掌握梯度下降！": [
+        {
+            "id": "1000001465/2247528265_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247528265&idx=2&sn=fb41e90ec04b6a1f8ffa3e0a0e22df9d&chksm=f90e2b17ce79a201119adf953feced3e90c62cd0809ded82a1d0d16cd18714e9a136992b7d6d#rd",
+            "create_time": "2024-07-21 22:36",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002264/2648989050_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989050&idx=1&sn=5297ed37e010f5524b06355e09aa88a8&chksm=8793cf50b0e44646160c027319bcc97cb4295fd20a23374d48f12f5fbab05a7b0ae358b747b9#rd",
@@ -1239,21 +2301,25 @@
     ],
     "统计学神书，中文版，来了": [
         {
+            "id": "1000002267/2648989086_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989086&idx=3&sn=25f9e3169f2edfe0c575a39ed56e0634&chksm=8793cfb4b0e446a2279c635b08e36bcf6b4003c347582dd3dbf0f9a7834511a224733be18a5f#rd",
+            "create_time": "2024-07-26 19:48",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002270/2648989112_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989112&idx=2&sn=ea539b4c53f93725d73ce84e3195d43f&chksm=8793cf92b0e446849d5d5a5588e9eae2105dbfdc4b428bb45266235cdc26b9ab72fcc127ef55#rd",
             "create_time": "2024-07-29 17:24",
             "duplicate_rate": 1.0
         }
     ],
-    "十分钟理解Transformer": [
-        {
-            "id": "1000002275/2648989244_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989244&idx=2&sn=ee323474b33d6c08ab82a7811e6a4d96&chksm=8793cc16b0e445008643cf3ce809455a71989cd03860dd0fc00b393f52550a3515ea5729e3fb#rd",
-            "create_time": "2024-08-03 12:51",
-            "duplicate_rate": 0.8485660680782632
-        }
-    ],
     "35岁，成功转行机器学习工程师？国外小哥，教你18个月转行": [
+        {
+            "id": "1000001481/2247528568_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247528568&idx=1&sn=c77ba17299ba445449bfeb9fc32c5b04&chksm=f90e3426ce79bd30d2ff34fe696a14dd0d45e405c174847cb1debfeb514874e5ad48ad351c00#rd",
+            "create_time": "2024-08-02 11:12",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002274/2648989241_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989241&idx=2&sn=4ce3463d190fec8dc17a198db567bead&chksm=8793cc13b0e44505c655a0d7afc99e7ddbef6b31884e7a49ee05b8b4a301677f7793c4c16c73#rd",
@@ -1261,7 +2327,27 @@
             "duplicate_rate": 0.9590097402597403
         }
     ],
+    "最近爆火的全中文LLM教程，实战企业落地项目": [
+        {
+            "id": "1000001518/2247511687_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NDE5Nzg1Ng==&mid=2247511687&idx=1&sn=eb31e488ab339c15159f33efd2c4f918&chksm=c32ab708f45d3e1e221cff7579d92235a5352a715493133409b0b3e69deb6c75d4d68c313061#rd",
+            "create_time": "2024-08-05 23:58",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002280/2648989354_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA4MjYwMTc5Nw==&mid=2648989354&idx=1&sn=e76bf0053054ff1f30fcef0f36941d82&chksm=8793cc80b0e44596cb2f0f3bb7ac9bc238388075e4a513862251809f562b6177e6a8112539d9#rd",
+            "create_time": "2024-08-08 11:00",
+            "duplicate_rate": 1.0
+        }
+    ],
     "复旦教授：当初脑子一定被驴踢了，不然怎么会上这帮龟孙子的当": [
+        {
+            "id": "1000002457/2247563206_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563206&idx=1&sn=81215355132a4c00183414b0ea883c67&chksm=976d525ba01adb4d3bb3d8a4f16317d20597b9015ea3182dd565554993ca8fa53c070d637d4e#rd",
+            "create_time": "2024-07-14 16:20",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001463/2247528233_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzUwOTg0MjczNw==&mid=2247528233&idx=1&sn=3ba1b54f7312573604b6a1b39322c759&chksm=f90e2b77ce79a261cd0a8a9e6bdf690f9d53285f220ce4b3314dbe54c71989de6ecaf70045ae#rd",
@@ -1270,6 +2356,12 @@
         }
     ],
     "现在LLM 的大小为什都设计成6/7B、13B和130B几个档次？": [
+        {
+            "id": "1000001762/2247528169_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528169&idx=1&sn=bfbeb224fe3630cef5aa5c7cb7642351&chksm=eb537a7adc24f36c778f6e49185a0e3b281d42e8a094eeac86bb0c97b315709a9f37f4cf4827#rd",
+            "create_time": "2024-06-25 10:44",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002049/2650443564_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443564&idx=1&sn=beaacddbf02a0761587743ffb5887413&chksm=becd097689ba806079c1d00785a89c5480d1d0f9f5560b828eb0a1acff17a962bd5f932ac856#rd",
@@ -1285,6 +2377,12 @@
     ],
     "从零训练的 1B 以下小模型汇总": [
         {
+            "id": "1000001767/2247528332_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528332&idx=1&sn=2653cce98931bf651931f61aab35fa5b&chksm=eb537b1fdc24f209828e160941121d5fe41f4b2a7b8623cc980fd0bd1f0bb540cbb9f5322657#rd",
+            "create_time": "2024-07-06 22:34",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000332/2247489517_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDY1NTU5Mg==&mid=2247489517&idx=1&sn=be0c72ffef16b6f648dbf9a17ebac892&chksm=973d896aa04a007c1bc6954cea429ca5bd506e642b4238ca25009686c8f5ffdcbc19b60b53cf#rd",
             "create_time": "2024-07-07 08:14",
@@ -1295,15 +2393,15 @@
             "link": "http://mp.weixin.qq.com/s?__biz=MzIyNTY1MDUwNQ==&mid=2247496954&idx=1&sn=28e6221638dfdd6fb5932c0396e3c52f&chksm=e87ec6dcdf094fca6b86e979ae23e55a4be62c42fa2c064aedc670bd6ab13acafe593a82737d#rd",
             "create_time": "2024-07-09 12:29",
             "duplicate_rate": 0.9589905362776026
-        },
-        {
-            "id": "1000002048/2650443538_1",
-            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443538&idx=1&sn=08bda0f2acf072c4805ebb2b2325052e&chksm=becd094889ba805eba562381201c600cbae09ec4bf1817c7df3d834d1f1ee384bda7ef3232ce#rd",
-            "create_time": "2024-07-13 22:01",
-            "duplicate_rate": 0.9589905362776026
         }
     ],
     "黄仁勋预言成真了！！": [
+        {
+            "id": "1000000663/2247496948_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIyNTY1MDUwNQ==&mid=2247496948&idx=1&sn=386d51b89380c3d131306fba2516264b&chksm=e87ec6d2df094fc4e0e2375d3bd4997caea24132af3fcab0c4c95f22bc50d642985a5c0edfea#rd",
+            "create_time": "2024-07-08 11:16",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002452/2247562868_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247562868&idx=1&sn=71d316a4afe7bbbb014078429dd0c513&chksm=976d53e9a01adaffc194e966c8d380cb63a9f0dea26cd06493e1fcb85ae7107030ed53aaa735#rd",
@@ -1319,6 +2417,12 @@
     ],
     "OpenAI 联合创始人预言成真！": [
         {
+            "id": "1000000674/2247497123_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIyNTY1MDUwNQ==&mid=2247497123&idx=1&sn=f697eec75aac49aa7e42bf5ff11dc4c9&chksm=e87ec785df094e932d6cda0690d1cf39b05eeef7fa8336ce87bce9d21a83920779d1ef346e95#rd",
+            "create_time": "2024-07-22 10:22",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002214/2247621310_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621310&idx=1&sn=c9551f66cc268895709f59b58b2837b8&chksm=fb54f852cc2371446709be4daca231777e35f1397e114fe89edee80056578c4372bf9d92cd07#rd",
             "create_time": "2024-07-22 13:08",
@@ -1326,6 +2430,12 @@
         }
     ],
     "多模态杀疯了，ChatGPT版「Her」突然开放": [
+        {
+            "id": "1000002067/2650443960_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443960&idx=1&sn=16aeaa94ca744840e4a5be47213d69ef&chksm=becd16e289ba9ff4f14cff3b7705e5e9d73fd4f80be0534571abab700e73fc0fb3bcb6c4c222#rd",
+            "create_time": "2024-08-05 10:11",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000684/2247497269_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIyNTY1MDUwNQ==&mid=2247497269&idx=1&sn=d005b4b6db068bd79c85034309571a6b&chksm=e87ec413df094d051467443f9ec28016d3c9408cece47558433ee4a80f6d76345c0e52b06d23#rd",
@@ -1335,6 +2445,12 @@
     ],
     "变天了！硕士学历停止发放生活及租房补贴。。。": [
         {
+            "id": "1000002456/2247563191_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563191&idx=1&sn=c46c98df543846056d8d582e2e080627&chksm=976d522aa01adb3c93490142a76526bb01a176bf74a0a4a1d5e8f7991c0cbd72b38e3942a9f3#rd",
+            "create_time": "2024-07-13 15:42",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002207/2247621107_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621107&idx=2&sn=187f97b2c363da22610249c547040eb6&chksm=fb54fb1fcc237209d1374bb0ec9e12fb1d97626cd2fc9efbabb6168cd03bd745492df8bd95f6#rd",
             "create_time": "2024-07-14 21:29",
@@ -1342,6 +2458,12 @@
         }
     ],
     "即将毕业，论文还没写完初稿怎么办？": [
+        {
+            "id": "1000002195/2247620770_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620770&idx=1&sn=f23a676f8a1fab5bb195046249c4a0f8&chksm=fb54fa4ecc23735800f0985d260e8af12b05ceb67b266fb9e754811de1992e633483d8c14d8a#rd",
+            "create_time": "2024-07-03 08:48",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002446/2247562730_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247562730&idx=1&sn=4486c2750f25940553eaf96815562b62&chksm=976d5077a01ad961a35ae05ae138d729514b70b5fd1c69a674ef81a20330c1bd60003311a325#rd",
@@ -1351,13 +2473,33 @@
     ],
     "被 GPT-4o 的价格劝退了！": [
         {
+            "id": "1000002464/2247563420_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563420&idx=3&sn=8e8f0c0b3d14f065e07f003b120d19d0&chksm=976d5d01a01ad41706787e476076746c4141f494efdd257f5d1bc3bdf543909726806b25cb67#rd",
+            "create_time": "2024-07-21 15:58",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002476/2247563754_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563754&idx=2&sn=a2b4bb869f44afc87da0878977b6ca9e&chksm=976d5c77a01ad56149abcf45d54eb27787012a842dec49d90b57e7813d98bad9f77f3a493fc1#rd",
             "create_time": "2024-08-02 10:35",
             "duplicate_rate": 1.0
         }
     ],
+    "导师放养，偷偷发了顶会。。。": [
+        {
+            "id": "1000002475/2247563719_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247563719&idx=1&sn=ecea921f3146314f148a543a9f6c3a36&chksm=976d5c5aa01ad54cd44837163125ffc1b4484e8418a28441ec3d7b97e0f0216335c5d8b8a084#rd",
+            "create_time": "2024-08-01 10:42",
+            "duplicate_rate": 1.0
+        }
+    ],
     "海外博士一般朝九晚五，国内博士动辄十几个小时科研时间。为什么普遍认为海外博士水平比较高？": [
+        {
+            "id": "1000002203/2247620992_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247620992&idx=1&sn=a8f087aaacc35c49edbd062526b6dd61&chksm=fb54fb6ccc23727a11e063a4f81efd104041a77f30783b8837364bbfa1077945d530bb42ec21#rd",
+            "create_time": "2024-07-10 23:03",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001177/2247530728_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg5NzgyNTU2Mg==&mid=2247530728&idx=2&sn=29a8ab746033a321e546915cef92fc47&chksm=c069d69df71e5f8b464263609df33af84fc74c32964375d13fedb556251c1ab6a9cda285012a#rd",
@@ -1367,13 +2509,53 @@
     ],
     "10分钟掌握异常检测": [
         {
+            "id": "1000002220/2247621502_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621502&idx=3&sn=01eb7afe14304218398eac7f74c77357&chksm=fb54f992cc237084af00831b1d21ad666d0f504c301112dd68fb88e8f0d561113ec1ba67d49b#rd",
+            "create_time": "2024-07-28 09:45",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002228/2247621934_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU0NjgzMDIxMQ==&mid=2247621934&idx=4&sn=2a155fcc176859728bb41aa5d8b78e87&chksm=fb54ffc2cc2376d42674b11d44aebe7b2bd366a59b83161b9b212c7384bd01c5df1a9e903c17#rd",
             "create_time": "2024-08-04 09:30",
             "duplicate_rate": 0.9798573227024758
         }
     ],
+    "大模型Infra这些年，从黑铁时代到黄金时代再到白银时代": [
+        {
+            "id": "1000002052/2650443613_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443613&idx=2&sn=fad70357f9a0ae0fbf7c5c278f6bb3ec&chksm=becd090789ba80116b1837fb674fd0f1d6b8c12d1a241d25b60d362329bea8260bc4b527b5f5#rd",
+            "create_time": "2024-07-17 09:40",
+            "duplicate_rate": 1.0
+        }
+    ],
+    "超越DPO之Step-DPO": [
+        {
+            "id": "1000000603/2247496776_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzAxMTk4NDkwNw==&mid=2247496776&idx=1&sn=3a543434a9ea65a3249ffa030dd64e2e&chksm=9bba7d2caccdf43a8f68abc5a1b165be887b451e7e9ff67245084cb509b12c057ae309b33fc8#rd",
+            "create_time": "2024-07-08 22:23",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000000334/2247489600_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDY1NTU5Mg==&mid=2247489600&idx=2&sn=a1a6d6a8205b203ca8858f84fd2644c3&chksm=973d86c7a04a0fd1961bae201934d180ee6b70c389aeaffc5cf19936d6323d4f862310462d16#rd",
+            "create_time": "2024-07-09 09:28",
+            "duplicate_rate": 0.9602875727490585
+        },
+        {
+            "id": "1000002051/2650443593_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443593&idx=2&sn=281d4711062a6769e0ed9501ef85aba2&chksm=becd091389ba8005095a514a4ff93628acc02cf90ab40be7dc53cec835319a62116712a57be4#rd",
+            "create_time": "2024-07-16 09:32",
+            "duplicate_rate": 0.9760356042451215
+        }
+    ],
     "从零预训练LLAMA3的完整指南：一个文件，探索Scaling Law": [
+        {
+            "id": "1000002050/2650443573_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443573&idx=2&sn=f241d39c8c52a1a84332013c3c5e45d6&chksm=becd096f89ba8079ba0fb5eb9271aa27085a0e9c65ebb8fa7731792e2e841c6c5c369d72bac7#rd",
+            "create_time": "2024-07-15 09:39",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001772/2247528578_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528578&idx=2&sn=50b208443a7a323a16c9d0c82a72df4a&chksm=eb536411dc24ed0760276216b814830081b1e184204500e6cb00952b0cde949cee4fea379787#rd",
@@ -1383,6 +2565,12 @@
     ],
     "DPO真比PPO更优吗？": [
         {
+            "id": "1000000049/2649231879_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwNjAxNjMzOA==&mid=2649231879&idx=1&sn=b6700020c9c03c17a9b9d230e0825a58&chksm=8f34a83ab843212cfa80e0ac1a5bcb428c4bc3d466899966182e97be1b69b7fc1beebe9e43f0#rd",
+            "create_time": "2024-07-13 19:45",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002050/2650443573_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443573&idx=3&sn=2472ecdefeb5f77c0e5084f5ff283c35&chksm=becd096f89ba8079de88cb4cbaef597406ed10f6b3f7b9d4a3a57b043d716ad857ec6f645be0#rd",
             "create_time": "2024-07-15 09:39",
@@ -1390,6 +2578,12 @@
         }
     ],
     "保姆级 LLM 中文教程，来了！": [
+        {
+            "id": "1000002045/2650443455_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443455&idx=1&sn=8166c0817bbc23d726fec15e4dce7e87&chksm=becd08e589ba81f37a49135fad894b727c72b98f59fe959c0d50986103a900bdd28e0b85e8a0#rd",
+            "create_time": "2024-07-09 09:30",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002068/2650443977_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443977&idx=1&sn=f5b147b1659634e90bec4f4ff3d63a9c&chksm=becd169389ba9f85eb10c5da9af194a83737eb730c9f411a6729214860767ffeba64347cd4c1#rd",
@@ -1399,6 +2593,12 @@
     ],
     "Qwen知识蒸馏小试牛刀，在MT-Bench与AlpacaEval 2.0的表现大幅提升": [
         {
+            "id": "1000000060/2247485143_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MTgwODE1Ng==&mid=2247485143&idx=1&sn=efc4a8dc98d40c78ae7b944979671f89&chksm=9f26a324a8512a32872c02959bba2246aac33205cfeff461a65e9e1d8df9ddc78d4c7923b6b2#rd",
+            "create_time": "2024-07-08 12:02",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002045/2650443455_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443455&idx=3&sn=958e26c44eb3e909b58b51f3e284961c&chksm=becd08e589ba81f304b4f0bb919c959595a6f29815fa8ccf140ebc1779a6b97922e75bbcc751#rd",
             "create_time": "2024-07-09 09:30",
@@ -1406,6 +2606,12 @@
         }
     ],
     "ACL 2024 ｜“我的回答是C\": 在指令微调语言模型中，第一个token概率与文本答案不匹配": [
+        {
+            "id": "1000002044/2650443445_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443445&idx=3&sn=4e2d93c30f50996f9109af6c7e913f1d&chksm=becd08ef89ba81f93e17fb51e890db3da74cfcd6486da99ae0dc0d3354775853bdd5ab573cfc#rd",
+            "create_time": "2024-07-08 21:36",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001768/2247528362_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528362&idx=3&sn=f2f5d7a842f16508b78fe51474a633c4&chksm=eb537b39dc24f22f8f7acfe20c9b57bdab42217d0a69222703afd53c4391a0e8ab91141c6bd2#rd",
@@ -1415,6 +2621,12 @@
     ],
     "ACL 2024 | GNNavi：用图神经网络引导大模型的信息流动": [
         {
+            "id": "1000002042/2650443410_5",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443410&idx=5&sn=659c2a02a0517bd4ec62d6e6475b5092&chksm=becd08c889ba81dec2f7ce540da4aec69197548a299a0c7bbfb0bbab03a0e08a81d4eb4ef3f6#rd",
+            "create_time": "2024-07-06 20:30",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001767/2247528332_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528332&idx=3&sn=9d7a46138236baeca3928970b7e47a29&chksm=eb537b1fdc24f2093a58f6cc2a011ed6f114ad7e9a214f7eb354378a3b549b9f2f883e8b1af2#rd",
             "create_time": "2024-07-06 22:34",
@@ -1422,6 +2634,12 @@
         }
     ],
     "大模型上下文长度扩展中的检索增强技术简述": [
+        {
+            "id": "1000001765/2247528293_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528293&idx=2&sn=927ac126683b1dc8f6da506d5df48a9e&chksm=eb537bf6dc24f2e0123012387a102b5112f2e5b29582fbf9fd50262b64d8a2870ec2e9a9b6ae#rd",
+            "create_time": "2024-06-30 15:40",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002039/2650443346_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443346&idx=3&sn=80005f3bd3c1c8280744450af0d41ce3&chksm=becd080889ba811e2fb20622d970ea981c3154ba70ea23ba31f3bba96d65f4035be4f654c0e0#rd",
@@ -1437,6 +2655,12 @@
     ],
     "Multi-task Hybrid Loss Training：因地制宜，充分利用数据信息": [
         {
+            "id": "1000000147/2247485268_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NzMwNjU5Nw==&mid=2247485268&idx=1&sn=c1469ded2bd03b4144abbe47a645f3b0&chksm=c379ae5ef40e27481f3d5fcbc9804957d0da88d072d0aaab827a7f0e8fb6787e4e8c21388a7a#rd",
+            "create_time": "2024-06-29 18:20",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002038/2650443336_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443336&idx=4&sn=50cc9b707353fdc001400cd192d70bc6&chksm=becd081289ba8104bff3283f3b4c56bc46092e13495479fbff9f0c5d819eb4af63d469fa6c58#rd",
             "create_time": "2024-07-01 22:01",
@@ -1444,6 +2668,12 @@
         }
     ],
     "用最酷的LR，训最猛的模型": [
+        {
+            "id": "1000000598/2247496626_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzAxMTk4NDkwNw==&mid=2247496626&idx=1&sn=4ba786f28cd4f55d69ed91effe3e82fd&chksm=9bba7ad6accdf3c029fb26bada4ef8866c8bc9e9028447200e6a7734b1845366b7106c9a3eea#rd",
+            "create_time": "2024-06-04 23:53",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002056/2650443695_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443695&idx=1&sn=657606cbbd17a24cb424fc871f5ef578&chksm=becd09f589ba80e3a69263f055cdd38417f0bd00620ecd89fde1ba7ff4defe11420b0c2eb1d4#rd",
@@ -1453,6 +2683,12 @@
     ],
     "对话AI科学家何晓冬老师：大模型时代的业务探索和个人发展": [
         {
+            "id": "1000001772/2247528578_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528578&idx=3&sn=81f13b1bd3893682e49f00e7cf6e219d&chksm=eb536411dc24ed07dcf949b5e74cbec0109246389262a4a7f20943068c57ae28d8927b2a3066#rd",
+            "create_time": "2024-07-19 23:37",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002057/2650443733_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443733&idx=3&sn=fddd1944c345250332114348c3a89355&chksm=becd098f89ba8099ee94809fe4b1387442a228318ab201439081ad1a1da93732d292ee68ed67#rd",
             "create_time": "2024-07-21 17:30",
@@ -1460,6 +2696,12 @@
         }
     ],
     "语言模型之text embedding（Decoder_only篇）": [
+        {
+            "id": "1000000148/2247485273_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NzMwNjU5Nw==&mid=2247485273&idx=1&sn=195f198ebcfd05ec0fd41eeb2b32258c&chksm=c379ae53f40e2745be0437716b46647fc385d7cae38a07be0e7fb959965c71fcc9eebb946670#rd",
+            "create_time": "2024-07-28 11:45",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002063/2650443872_5",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443872&idx=5&sn=80d40eca682034aa6dd59a963612ae67&chksm=becd163a89ba9f2c5ce2b6ed76794ab35e736cd67194f8ce0263676dfea8aa2ab51ba96da7bf#rd",
@@ -1469,6 +2711,12 @@
     ],
     "为视觉语言多模态模型进行偏好优化": [
         {
+            "id": "1000001772/2247528578_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528578&idx=4&sn=6ff7c4d3286b0e1292e89d12d47beb8a&chksm=eb536411dc24ed076d097bfd6e0cf35e73840380b5e9ec79616fbe80e06422f0edca315e77ed#rd",
+            "create_time": "2024-07-19 23:37",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002061/2650443819_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443819&idx=4&sn=bb87c87e799ad014a1ecc3450c8cc3fe&chksm=becd167189ba9f67e1e6aec08d06f95894b885851b7902ae00f172cc7bf423c82ad3302185a9#rd",
             "create_time": "2024-07-26 21:50",
@@ -1476,6 +2724,12 @@
         }
     ],
     "LLama 405B 技术报告解读": [
+        {
+            "id": "1000000342/2247489688_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDY1NTU5Mg==&mid=2247489688&idx=1&sn=5a843c9afd7fd8a6906b83995b93b698&chksm=973d861fa04a0f0966712c0a3f2bd5f9e7806bd4521266f0995c6ba70053914f268efbe692af#rd",
+            "create_time": "2024-07-24 21:31",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000002060/2650443806_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443806&idx=2&sn=2b7d1f7dc00fabfbf71dc57e125bb9cb&chksm=becd164489ba9f52a533b041b6cd96c6ee969d1e6411f80715c260f30779dac36fbf0e97200a#rd",
@@ -1485,13 +2739,53 @@
     ],
     "大模型，再一次爆发！": [
         {
+            "id": "1000001149/2247530089_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg5NzgyNTU2Mg==&mid=2247530089&idx=1&sn=529a538429c324b9864b33c985e982dc&chksm=c069d81cf71e510af6f18b01456944bccc790e7ba64551956ae0c552916bff1e5e752202012a#rd",
+            "create_time": "2024-07-03 23:18",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000002066/2650443942_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650443942&idx=1&sn=02f941c7acf24f4fea07bc7812a0bf0b&chksm=becd16fc89ba9feaae8b016171d582936396095a9ea7e2ea583bff3379ad689e181ae67e5e4f#rd",
             "create_time": "2024-08-03 11:18",
             "duplicate_rate": 0.7559893522626442
         }
     ],
+    "Qwen2-Math开源，包含1.5B/7B/72B三种参数规模的数学模型": [
+        {
+            "id": "1000000063/2247485168_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzA3MTgwODE1Ng==&mid=2247485168&idx=1&sn=d96c0fb443d3cd8df48101c41b21144b&chksm=9f26a303a8512a154948d4699a42be78d1f0b52c0d72b8a601c84c17f014d1b6e85838704086#rd",
+            "create_time": "2024-08-09 00:34",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002071/2650444034_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650444034&idx=2&sn=a191f7d22de2c0862d4995343dbe77a2&chksm=becd175889ba9e4ecdc8998a94afbdfff83fee32e167945e465027bd42b0285163d632b24adb#rd",
+            "create_time": "2024-08-09 09:03",
+            "duplicate_rate": 0.9770428015564202
+        }
+    ],
+    "大模型Agent的核心还是prompt？": [
+        {
+            "id": "1000000089/2247485292_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485292&idx=1&sn=1a9b1d88ad480fa72ac67a34eafa81cc&chksm=c1c23e62f6b5b774bd8edd7ff20731959adce2f439c330f0cd3ca9d7b3fe35dea939359371f5#rd",
+            "create_time": "2024-08-06 19:42",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000002070/2650444018_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MjM5ODkzMzMwMQ==&mid=2650444018&idx=3&sn=2a5e7e8a074582ef0893bf25fb7776a5&chksm=becd16a889ba9fbea80ba68316fb5fd5695f9f8657ab000fe48db725210ca389af6f0ead26c0#rd",
+            "create_time": "2024-08-08 09:39",
+            "duplicate_rate": 1.0
+        }
+    ],
     "大模型Infra发展路径盘点": [
+        {
+            "id": "1000000340/2247489664_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzIwNDY1NTU5Mg==&mid=2247489664&idx=2&sn=a487fa45d3e7214e75b996fb468e60b0&chksm=973d8607a04a0f1111ed9982e1b11bc8be5cb10ea7bae4d03c8a3ef912f580560a838d8a9395#rd",
+            "create_time": "2024-07-17 08:52",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001776/2247528730_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528730&idx=3&sn=dbe5f9aeb53fdf0e612370891cdfbc26&chksm=eb536589dc24ec9f542d8930a9608ef40bd714b09d9e6d1c5600af4b72a7192bd18c4faff19e#rd",
@@ -1507,6 +2801,12 @@
     ],
     "直播｜Meta新工作，350M小模型压缩部署移动端（MobileLLM, SpinQuant）性能比肩7B LLaMA-v2": [
         {
+            "id": "1000000892/2247551030_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU5ODg0MTAwMw==&mid=2247551030&idx=4&sn=45ddc1876c276f634458d8ddc59490ed&chksm=febc4bf2c9cbc2e4f64bd49ba9a4120887d3a8b9abf81be26cab2b6019ef69638fa11afa84d5#rd",
+            "create_time": "2024-07-27 21:13",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000893/2247551060_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU5ODg0MTAwMw==&mid=2247551060&idx=2&sn=bcb28e3abe62dfe2309dc3efe71de605&chksm=febc4b90c9cbc286014fa216327c0ac9f2fd65b8fa753cb01d18ce0fd4bf3581c4db6d26ddae#rd",
             "create_time": "2024-08-04 12:52",
@@ -1514,6 +2814,12 @@
         }
     ],
     "大模型如何优化GNN推荐系统？": [
+        {
+            "id": "1000000700/2651697626_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI0MTI1Nzk1MA==&mid=2651697626&idx=1&sn=6211e21e205a0e0ed5c73b63df0638bb&chksm=f2f74d6bc580c47d1f91f6df5ea89aae467d24dfe8de9120bc1dc775aebca666f972cea18de2#rd",
+            "create_time": "2024-06-18 22:29",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000701/2651697629_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzI0MTI1Nzk1MA==&mid=2651697629&idx=1&sn=4df2a4804eaa6860e74d685773df7d31&chksm=f2f74d6cc580c47abe073dd32c23ebcdf140fba4ddd482846b8847126e2296d08dfca187c344#rd",
@@ -1523,6 +2829,12 @@
     ],
     "NICE分享 | 如何加速大语言模型推理？万字长文综述大语言模型高效推理技术": [
         {
+            "id": "1000001766/2247528305_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528305&idx=1&sn=638e3234d5952476076cdfea240207f6&chksm=eb537be2dc24f2f435d435fa079975b08135a5e8aa3a0f22ebd46cc4dac4f4cfa26145301490#rd",
+            "create_time": "2024-07-03 17:35",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001767/2247528332_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528332&idx=2&sn=1e608da9cbfa192b58eb185183a9ca4b&chksm=eb537b1fdc24f209c37dc1c4ffaf7da98b93cc499508512391891143ca7979b96fdac87e097c#rd",
             "create_time": "2024-07-06 22:34",
@@ -1530,6 +2842,12 @@
         }
     ],
     "NICE分享 | 大模型时代下非自回归模型的多层次能力提升：媲美自回归模型的探索之路": [
+        {
+            "id": "1000001757/2247528021_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528021&idx=1&sn=9b6d17b30e4033fd49dcd9590c090ec9&chksm=eb537ac6dc24f3d0214a34380db5838fc3b023fa115cc4462cfd4c53da3bd8150343f770c33d#rd",
+            "create_time": "2024-06-11 17:50",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000001759/2247528076_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzI3ODgwODA2MA==&mid=2247528076&idx=2&sn=2c44986008beb8dd27e1195413208254&chksm=eb537a1fdc24f3092d4b544fa71fd51ac218914386c1db213e83cf87ab1ff5f8ac933c57897a#rd",
@@ -1539,6 +2857,12 @@
     ],
     "动态库和静态库有什么区别？": [
         {
+            "id": "1000000270/2247488560_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4OTYzODM4Mw==&mid=2247488560&idx=1&sn=494024bb873ab0f9272c36dec5e5b949&chksm=cfe988b0f89e01a6054c348beb6cb9143a282ac6538fa05b6f4dbe9d0e5328755d1f91cdf39d#rd",
+            "create_time": "2024-06-19 08:22",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001221/2247530908_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzAwODc2ODgzMw==&mid=2247530908&idx=1&sn=f4765d6b5955e8fe01f602a7a5842714&chksm=9b6be5b2ac1c6ca4a0bc20f30d68a51365fa8add5053699b119226b39e10bedef689367c1886#rd",
             "create_time": "2024-06-21 17:32",
@@ -1547,6 +2871,12 @@
     ],
     "动态链接库的实现原理是什么？": [
         {
+            "id": "1000000268/2247488502_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg4OTYzODM4Mw==&mid=2247488502&idx=1&sn=1e378084c1f031828b4e660a0b9fd639&chksm=cfe98f76f89e06605959936f14db99953fb8869d2e2269f950a54ccbae10b89259eb36e2d4ce#rd",
+            "create_time": "2024-06-05 08:31",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000001216/2247530882_1",
             "link": "http://mp.weixin.qq.com/s?__biz=MzAwODc2ODgzMw==&mid=2247530882&idx=1&sn=9cd26bc159866ec0950e386a013f6a84&chksm=9b6be5acac1c6cbaf5b772d70e753526a727c2c255c2744f04c1dd62862cf4c008ba91f56946#rd",
             "create_time": "2024-06-11 10:29",
@@ -1554,6 +2884,12 @@
         }
     ],
     "往期公众号文章": [
+        {
+            "id": "1000000132/2247485138_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NzMwNjU5Nw==&mid=2247485138&idx=2&sn=e55b70cebe93b640eb140253be79b99a&chksm=c379afd8f40e26ce21d5eeb5eefe2fb5b6ce47efd830bf04115c7433a6bd713aeada90f9bc1c#rd",
+            "create_time": "2024-02-03 17:28",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000141/2247485226_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzk0NzMwNjU5Nw==&mid=2247485226&idx=2&sn=b4554359b565d7eae36abf69a91cf6a0&chksm=c379ae20f40e27363ab199045f372ab253a8933ac8cea4a6e670d2b2268548f1bbdf469689f6#rd",
@@ -1569,6 +2905,12 @@
     ],
     "图像创作，随心所欲！AnyControl：精准控制下的创意风暴，高质量图像一键生成！": [
         {
+            "id": "1000000158/2247486537_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486537&idx=1&sn=52b66df702e610452fda67820121baca&chksm=fcf6f3a8cb817abe57a58fae58c1aa2c7eb718818cce9be281b54cc4877bdde3102e83e1a364#rd",
+            "create_time": "2024-07-20 00:28",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000168/2247486794_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486794&idx=3&sn=c1fb9d86b8193cefbf9140778b3412fe&chksm=fcf6f2abcb817bbd7e2a5138a01f2f7c0fe609506017c20efb3004c1637c41d89b10f8bae8e2#rd",
             "create_time": "2024-07-29 22:17",
@@ -1577,6 +2919,12 @@
     ],
     "科技赋能时尚！IMAGDressing-v1:虚拟试衣与人像合成更加真实！": [
         {
+            "id": "1000000158/2247486537_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486537&idx=2&sn=c9e1fa1ffc3a946d3ab84cd9043fd3ba&chksm=fcf6f3a8cb817abe0a6ef5bd60987d2155c5b5e5995129f3e65af6d104fa60b3a57c73c2dd7e#rd",
+            "create_time": "2024-07-20 00:28",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000168/2247486794_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486794&idx=4&sn=49f0548ace0f011b13540a1fbb25deb7&chksm=fcf6f2abcb817bbd7b12a340bc222695b3ddaec726f7c7bce8bf94286a714d754f525b629841#rd",
             "create_time": "2024-07-29 22:17",
@@ -1584,6 +2932,12 @@
         }
     ],
     "蚂蚁集团放大招！EchoMimic来袭，音频+面部标志，让你的肖像“活”起来，直呼效果逼真！": [
+        {
+            "id": "1000000153/2247486517_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486517&idx=1&sn=70574385b6dbaaea7a0e80d1fe3df725&chksm=fcf6f3d4cb817ac21c0ca2678c61fa46902ec8f8e80e897ac5d651621591afa6c57083d4dd91#rd",
+            "create_time": "2024-07-15 20:36",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000158/2247486537_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486537&idx=3&sn=78d8d436db94a96488ca6dee7d5d049f&chksm=fcf6f3a8cb817abecc0dddfbebfc3cbd977670c43d14f3ec0c9d61ce9b774548f7b281c57211#rd",
@@ -1599,6 +2953,12 @@
     ],
     "(CVPR2024)DragGAN作者新作DiffMorpher：可以实现两张图像间的平滑变形": [
         {
+            "id": "1000000153/2247486517_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486517&idx=2&sn=333dd348576f27d33577990ef05772b3&chksm=fcf6f3d4cb817ac2d03f4aab0397c9a7193c4fb4831ab1465d7d1305c872e511618e616d6c7d#rd",
+            "create_time": "2024-07-15 20:36",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000158/2247486537_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486537&idx=4&sn=e4f4fa0cb53e8336cc48da0838cb1439&chksm=fcf6f3a8cb817abe39b80a1ef8384c33f508ffb2f211dab926ea4978d8c650430e810e18da0e#rd",
             "create_time": "2024-07-20 00:28",
@@ -1606,6 +2966,12 @@
         }
     ],
     "Fal开源力作, AuraFlow图像生成模型亮相！ComfyUI&Diffusers已支持，开启AI绘画梦想之旅!": [
+        {
+            "id": "1000000157/2247486521_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486521&idx=1&sn=73194339437de852aa5ce9dc5ffc1d64&chksm=fcf6f3d8cb817aceb0a0d23079122192c65fe7da44bf84c1b7792bb6f811d7bfbf971bd6da63#rd",
+            "create_time": "2024-07-19 04:52",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000176/2247486964_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486964&idx=2&sn=dc6960401248726aaabc60190003c4d3&chksm=fcf6f215cb817b03a9cbe07e2a239f3feece9c2cb4e80845e8e81262de995df88c8c47011091#rd",
@@ -1615,6 +2981,12 @@
     ],
     "AtomoVideo：阿里推出高保真图像到视频生成开源模型，具有更好的运动强度和一致性": [
         {
+            "id": "1000000157/2247486521_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486521&idx=2&sn=a4a74bded30e0bf4ad155fc2e9207f0e&chksm=fcf6f3d8cb817ace95811037c5b7972c35c6b0d8c4c82b811a53016df3564e7be5ae3a8674dd#rd",
+            "create_time": "2024-07-19 04:52",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000168/2247486794_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486794&idx=2&sn=8516832c3da915f4d2b04e8a60fc9096&chksm=fcf6f2abcb817bbd55f5c1fcd2df1cc60d05e0bdcf549651e7554dab4b7cb0e11f9232b1edf2#rd",
             "create_time": "2024-07-29 22:17",
@@ -1622,6 +2994,12 @@
         }
     ],
     "StableDrag：一种基于Diffusion模型的图像编辑，可一键拖拽生成，DragGAN被革新了！": [
+        {
+            "id": "1000000157/2247486521_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486521&idx=3&sn=215c405e216566ac29b0bf3637a02178&chksm=fcf6f3d8cb817acedbef40c27825463a61abae6c717a28b959a556f3c2b89ada450d703ed811#rd",
+            "create_time": "2024-07-19 04:52",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000167/2247486767_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486767&idx=3&sn=882a34f9079282c77bc5d0b871a2ff58&chksm=fcf6f2cecb817bd8a7ca1a948fc6cc98e1de58759390b4e0565045047d540f3b9072297ec8cd#rd",
@@ -1631,6 +3009,12 @@
     ],
     "Poetry2Image：专为中文古诗词图像生成，忠于原诗意境和语义。": [
         {
+            "id": "1000000155/2247486519_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486519&idx=2&sn=29ed534c040112b224f8d37c8309c556&chksm=fcf6f3d6cb817ac0495fb92678955bb44f41545ca9c3fd1328b5a548fcce6c32742a7332d352#rd",
+            "create_time": "2024-07-17 20:01",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000083/2247485228_6",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485228&idx=6&sn=bf8eb6e405a6e5c28b0a047a858984aa&chksm=c1c23e22f6b5b73468b95f7ebfc77a6ffa93d34698b9c28297e15a39ffc644928a8686e06d86#rd",
             "create_time": "2024-07-18 21:02",
@@ -1638,6 +3022,12 @@
         }
     ],
     "效果新SOTA！中山大学&字节提出虚拟试穿框架-MMTryon，输入服装+文本，一键试穿！": [
+        {
+            "id": "1000000149/2247486402_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486402&idx=1&sn=f1e88530fa3f921bca91ff6c3de8b462&chksm=fcf6f423cb817d3540ff4b8d660494331559e1cc837dde68b009ed2d1517822604fe27fb868f#rd",
+            "create_time": "2024-07-12 00:07",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000155/2247486519_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486519&idx=3&sn=8abf0becab0fe1619f1bad0be8d78e5d&chksm=fcf6f3d6cb817ac0809e979ff5e065bc2fe03ed8774e0410435e3228091cde056a26261e7093#rd",
@@ -1659,6 +3049,12 @@
     ],
     "小红书发布InstantStyle-Plus，解锁进阶风格保持新境界，效果令人惊艳！": [
         {
+            "id": "1000000143/2247486253_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486253&idx=1&sn=95a3e73247858380e105a9c8e10da760&chksm=fcf6f4cccb817dda571f7a8837973a80686aec6443a5d3e070cff2a43ed437eb8d88abd79693#rd",
+            "create_time": "2024-07-05 23:16",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000147/2247486369_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486369&idx=3&sn=c94888910f2671e4bf2cf8121ba5d4ab&chksm=fcf6f440cb817d56d33366d7cc146e6f3c8f9d5f9602f2343b1afb51f8ab37f0ac83bbed628f#rd",
             "create_time": "2024-07-09 23:33",
@@ -1679,6 +3075,12 @@
     ],
     "WebDesignAgent: AI帮你一键构建你自己想要的网站！": [
         {
+            "id": "1000000142/2247486240_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486240&idx=2&sn=96df32309b28baa003bd9875991c7da7&chksm=fcf6f4c1cb817dd74c9980ab984ab62b63f9faa92c4d1d53e3417320172e8c3cf6112a1f8c35#rd",
+            "create_time": "2024-07-04 20:58",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000143/2247486253_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486253&idx=3&sn=0ff1e7709f63afeb8c9acae87b24f12e&chksm=fcf6f4cccb817dda8e0bb6c9b83aefb944c283600f8c7c84f55ecbdde44e65dc2536b84683c8#rd",
             "create_time": "2024-07-05 23:16",
@@ -1693,6 +3095,12 @@
     ],
     "academic-homepage:一键快速搭建个人学术主页，兼容移动端。": [
         {
+            "id": "1000000151/2247486424_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486424&idx=3&sn=e5a1830175e7a64c210d3adcf6efc64d&chksm=fcf6f439cb817d2f20b4cbd974d211ad4e151c7cabc5fcc52acdb183302870db14c4cba5dbeb#rd",
+            "create_time": "2024-07-13 22:11",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000152/2247486452_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486452&idx=3&sn=a5796f7b0146ddab5b5999e0850c3b79&chksm=fcf6f415cb817d0383ed707902affd48fb2fbef2f5bdaae9e61b203f2141a8e9fab266ca69ca#rd",
             "create_time": "2024-07-14 12:02",
@@ -1700,6 +3108,12 @@
         }
     ],
     "gptpdf:使用大模型一键将PDF解析为markdown格式，文中附教程！": [
+        {
+            "id": "1000000148/2247486401_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486401&idx=2&sn=429439e748dcdaaa308eefe8b40ea1f2&chksm=fcf6f420cb817d36b67c55c025a9676746e1120cc3dddd8006e496fc53478c235dadaeed44c6#rd",
+            "create_time": "2024-07-10 20:13",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000152/2247486452_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486452&idx=4&sn=7ef336ab3de147110aa663b3d413e5cf&chksm=fcf6f415cb817d033157ffb73cabd2d8a78be4151b4ed57db2516d87bf0928c3d25ef63d6599#rd",
@@ -1709,6 +3123,12 @@
     ],
     "推荐一个免费的AI图标生成器（附试用链接）": [
         {
+            "id": "1000000148/2247486401_5",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486401&idx=5&sn=acf046a2819592d41356ee54a7dbd7cf&chksm=fcf6f420cb817d36ab54755a59e7167b01f890ac3a7d514a46f20e821d97ff77388f262d0e70#rd",
+            "create_time": "2024-07-10 20:13",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000152/2247486452_5",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486452&idx=5&sn=ae1b8657d813ec4c1c5129c6dd9d1f3d&chksm=fcf6f415cb817d03cf435cbb56b3c2e4133e0a1f8a106f9d7e39a8c6bb8f464c74d5ac87cc1f#rd",
             "create_time": "2024-07-14 12:02",
@@ -1716,6 +3136,12 @@
         }
     ],
     "哈工大&提出Poetry2Image：专为中文古诗词图像生成，忠于原诗意境和语义。": [
+        {
+            "id": "1000000151/2247486424_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486424&idx=1&sn=0271a15320a438167bcef93043d946de&chksm=fcf6f439cb817d2f5b0a7b7d622a57ecc7a2ccead7e8142c39c7e79c12390eb45536b5b4e546#rd",
+            "create_time": "2024-07-13 22:11",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000177/2247486988_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486988&idx=3&sn=94177cde469a03412b77f163667637a6&chksm=fcf6f1edcb8178fb183e3b3b6d2f22880a58327c8f4d7ac05bf80a56882033270bf7b136840b#rd",
@@ -1725,6 +3151,12 @@
     ],
     "「视觉AI任意门」AnyDoor，只需点两下鼠标就可以实现任意场景物体交换": [
         {
+            "id": "1000000151/2247486424_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486424&idx=2&sn=1c2a6b4ec3103bf387168e574b07e8a7&chksm=fcf6f439cb817d2ff3efa0c7cabaa4e34000fa693c3fc5cc33a5010e55322b01dd434850d71f#rd",
+            "create_time": "2024-07-13 22:11",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000177/2247486988_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486988&idx=4&sn=3bcbe156087057af6e3eb95825652c48&chksm=fcf6f1edcb8178fb322964243e4c3b63ba5d94d2228d7cc934483299b27245ae9bd9ba0f9e5a#rd",
             "create_time": "2024-08-06 23:15",
@@ -1733,6 +3165,12 @@
     ],
     "阿里&中科大推出ViViD: 轻松实现视频中人物换衣，虚拟试衣技术迈向实用化的重要一步！": [
         {
+            "id": "1000000149/2247486402_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486402&idx=2&sn=7aa2e94a04da2830d27e237b2219525c&chksm=fcf6f423cb817d353189a085d735450f5a304b46a1c0e75c08c415463b3e2b8347cfa74d9133#rd",
+            "create_time": "2024-07-12 00:07",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000160/2247486625_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486625&idx=4&sn=19fa8d073706d19cdeaa37f7aaa94f4b&chksm=fcf6f340cb817a56fc56ec598aded7ce46e645477dc0034997ad917f318c36ae3feda95f88f1#rd",
             "create_time": "2024-07-22 00:03",
@@ -1740,6 +3178,12 @@
         }
     ],
     "效果对标Sora, 快手「可灵」视频生成大模型支持生成30FPS两分钟1080P视频,已开放邀测！": [
+        {
+            "id": "1000000140/2247486176_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486176&idx=3&sn=bd339986775ec7f2caf691e4cd42d45f&chksm=fcf6f501cb817c17c0f7f2d52fddecc4ddb0d2391094025e0d9772b663e4b244bf8d9fee381e#rd",
+            "create_time": "2024-07-02 23:19",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000145/2247486331_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486331&idx=2&sn=3b06927b24d3bfe07fd317c645c0a450&chksm=fcf6f49acb817d8c2bf22d6358002c3b9ee1d038b3c696d540ba4a014d8ac4f8d5f268d44509#rd",
@@ -1754,6 +3198,12 @@
         }
     ],
     "3D建模新标杆，CLAY震撼来袭！极致质量、完美布线，支持多模态输入与材质生成。": [
+        {
+            "id": "1000000140/2247486176_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486176&idx=1&sn=4d43b78efdd61b65fe30e2445076d237&chksm=fcf6f501cb817c173d5a53a55c87fc87d406187b908369023d15faf8566612d006238ed72882#rd",
+            "create_time": "2024-07-02 23:19",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000142/2247486240_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486240&idx=3&sn=c79f9dffeecb5a15cd624d3d8b3fa950&chksm=fcf6f4c1cb817dd7f346907fc4c5a1747cadc55e71bbc4ab7581b55d5b92d3fdb8c095e61a28#rd",
@@ -1775,6 +3225,12 @@
     ],
     "自媒体起号新神器！阿里Motionshop：AI一键替换视频人物为3D角色，效果逼真！": [
         {
+            "id": "1000000146/2247486350_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486350&idx=1&sn=643c280e1d58983def917b8a39b75230&chksm=fcf6f46fcb817d79f3a44ba79c8732b34132465e3917762e89adab1538a61daf18c3c6277d5b#rd",
+            "create_time": "2024-07-08 22:35",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000161/2247486627_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486627&idx=2&sn=da75c42c0b9e34080e6f498aa952a999&chksm=fcf6f342cb817a541b34b102735029612ea969cc638e2094fd3c87750d7452cc9ccfbf1784a9#rd",
             "create_time": "2024-07-22 23:30",
@@ -1782,6 +3238,12 @@
         }
     ],
     "3D建模革新科技来袭！Unique3D：一键操作，轻松将图片转为逼真高质量3D网格！": [
+        {
+            "id": "1000000144/2247486330_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486330&idx=1&sn=1f89ba6b06632c5356b3cbddd13f47ae&chksm=fcf6f49bcb817d8d5e5baf3e9ecf9482ce4330fbceaa1e77ca251993dfda07d85976fbd7fcb5#rd",
+            "create_time": "2024-07-06 20:17",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000146/2247486350_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486350&idx=3&sn=a441b0d321b24a8a5949cd09b0c5b736&chksm=fcf6f46fcb817d79f90f66a9e45d65ad90efd124a390ec4def345d41ba6d3065f048f62e6b72#rd",
@@ -1797,6 +3259,12 @@
     ],
     "腾讯震撼发布！MOFA-Video：表情随心换，运动由你控，视频创作由你做主！": [
         {
+            "id": "1000000139/2247486175_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486175&idx=1&sn=5b24429f669235984ef1ce503d8bfbab&chksm=fcf6f53ecb817c28ea2f8a13a39805c1592a5615df379091db50ac2f805f4990cbdb71d2c9a6#rd",
+            "create_time": "2024-07-01 22:39",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000145/2247486331_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486331&idx=3&sn=2b5bfb4e7766ec548707179188ff4d2d&chksm=fcf6f49acb817d8c706acacade628ae7706f0dd984d74d15eb27b69d05d5a93c85ca283edc0b#rd",
             "create_time": "2024-07-08 07:36",
@@ -1805,6 +3273,12 @@
     ],
     "字节&旷视提出HiDiffusion：无需训练，一行代码就可提高SD生图清晰度和速度，代码已开源！": [
         {
+            "id": "1000000139/2247486175_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486175&idx=3&sn=04cc66b7bde2c5334b962008ad80baf8&chksm=fcf6f53ecb817c28101ec6b1a2dedaedd9863ead4fdda00cfc4ea5078d5a842ac74d4e00d1f8#rd",
+            "create_time": "2024-07-01 22:39",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000145/2247486331_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486331&idx=4&sn=9e2d7238ac407d0dc91e5946bf66fc63&chksm=fcf6f49acb817d8c3d23b9f88d5dc1b55de3fbc36416f22fd9a99477987e59224a8a45987879#rd",
             "create_time": "2024-07-08 07:36",
@@ -1812,6 +3286,12 @@
         }
     ],
     "开启视频创作新篇章！腾讯发布MimicMotion:单张图像+简单姿势，瞬间“活”化视频。": [
+        {
+            "id": "1000000141/2247486222_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486222&idx=1&sn=ab1f79f2f73d1f3f96385fc4402affe8&chksm=fcf6f4efcb817df965107cf801fe2c224a5a6fcc5af51f43d83e61ef4e4b1e748ef4e4a4ab73#rd",
+            "create_time": "2024-07-03 23:05",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000144/2247486330_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486330&idx=2&sn=251b89f4c4051cee7c8d5b64cf28267f&chksm=fcf6f49bcb817d8da45d7423a0af3020de8227741ff5e1e36aa1a9013b5f466c87c99d980ad5#rd",
@@ -1827,6 +3307,12 @@
     ],
     "Streamer-Sales 销冠 —— 卖货主播大模型来了，一键生成解说文案，助力你成为销冠！": [
         {
+            "id": "1000000144/2247486330_5",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486330&idx=5&sn=bee5f4b3ca4d723baa2184868c10d3ff&chksm=fcf6f49bcb817d8da62a878b603ea179c657ea1a68aa6a87f558edd84390da5e05dc9617c68f#rd",
+            "create_time": "2024-07-06 20:17",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000174/2247486889_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486889&idx=4&sn=3837188ed50dc325f54b840f8ca73852&chksm=fcf6f248cb817b5efd9f8cf3d8258f0b592edb21566be2370131c09023f27f15120d19550381#rd",
             "create_time": "2024-08-04 00:03",
@@ -1834,6 +3320,12 @@
         }
     ],
     "超越IP-Adapter！字节提出MoMA，一种即插即用、无需调优的快速个性化生成方法！": [
+        {
+            "id": "1000000139/2247486175_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486175&idx=2&sn=3fac6cbb21b686321032ebea4d8aaa17&chksm=fcf6f53ecb817c28f023132f377b6acb92197c45cd0b4e31e49e008970dea1bcebd90ae91ff9#rd",
+            "create_time": "2024-07-01 22:39",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000143/2247486253_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486253&idx=2&sn=8b40019f47f5f72116119ae65f0c1347&chksm=fcf6f4cccb817dda524e5e7c7fd74389661f6ccf63dcb1f9a698886e464fe705041333d1fd87#rd",
@@ -1843,6 +3335,12 @@
     ],
     "电商领域利器来了！港大&阿里提出MimicBrush，可模仿参考图进行零样本图像编辑。": [
         {
+            "id": "1000000140/2247486176_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486176&idx=2&sn=387f3a26f50e02c9f191b536fd954209&chksm=fcf6f501cb817c17d8b54b6c243b7732b88390dcfdba095144bf46306873772ce6dbc76d1ab7#rd",
+            "create_time": "2024-07-02 23:19",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000142/2247486240_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486240&idx=4&sn=9d42c8209f7b37aff48b0c10bfb7a250&chksm=fcf6f4c1cb817dd76ffaab416bddaf4c953a7caed59932693e484f8b012a55f5ba54783939c3#rd",
             "create_time": "2024-07-04 20:58",
@@ -1850,6 +3348,12 @@
         }
     ],
     "海报设计师福音！微软联合清北提出Glyph-ByT5-v2，支持10国语言图文海报生成，效果惊艳！": [
+        {
+            "id": "1000000141/2247486222_2",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486222&idx=2&sn=1b3d862402a039963f0a1bea6cdbc57d&chksm=fcf6f4efcb817df9f4574fdc5fbe5851ef398bf24903145948fee0e0d486ec9b93b396b3dd7c#rd",
+            "create_time": "2024-07-03 23:05",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000081/2247485191_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485191&idx=4&sn=d2b9a2911dfe06ebd2f44dafee4f84ee&chksm=c1c23e09f6b5b71f46007c438b54a73cfd06aedbb1891bdfddb0041162394aed9312de7d58e0#rd",
@@ -1859,6 +3363,12 @@
     ],
     "腾讯&清华联合提出图像到视频生成方法-Follow-Your-Click：点击图像任意位置就可以动起来！": [
         {
+            "id": "1000000159/2247486605_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486605&idx=4&sn=1a14d08c7d136e406dab0ed3bfd44c4e&chksm=fcf6f36ccb817a7a76f02f20f25e30be0bf904b05d8dbeea49ab2d7f6e744ba55f5dec21a9eb#rd",
+            "create_time": "2024-07-21 00:09",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000169/2247486832_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486832&idx=2&sn=ae5c1878bb1eb49627a9159f2637e39d&chksm=fcf6f291cb817b877d4b78f97e4b926735d0ae57e351d757af72e75dc37a962f4621d6f8c427#rd",
             "create_time": "2024-07-30 23:57",
@@ -1867,21 +3377,25 @@
     ],
     "TextCraftor：一种创新的文本编码器微调技术，无需额外数据集即可改善图像质量与文本对齐": [
         {
+            "id": "1000000159/2247486605_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486605&idx=3&sn=93f47a47bb69c57e9e2b9110f3e1fe68&chksm=fcf6f36ccb817a7af358e010c2f65d97486f494eb021c751048d82e29a3127d4a39638d48721#rd",
+            "create_time": "2024-07-21 00:09",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000169/2247486832_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486832&idx=4&sn=97f6c64d35a17610132c8cef040e3057&chksm=fcf6f291cb817b87a20dae62d7b5b64524048e86d0c1bd81153559314c8a5445474f9bc0fe47#rd",
             "create_time": "2024-07-30 23:57",
             "duplicate_rate": 0.9270440251572327
         }
     ],
-    "图像转换新风尚！当CycleGAN遇到Diffusion能擦出什么火花？CycleGAN-Turbo来了！": [
-        {
-            "id": "1000000170/2247486833_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486833&idx=2&sn=44fb64c449f9a97abf23301f6a34d89b&chksm=fcf6f290cb817b86310dd0101385f1b4787d3b8c3b625f54004e2af294531a1813e871ef48cb#rd",
-            "create_time": "2024-07-31 21:46",
-            "duplicate_rate": 1.0
-        }
-    ],
     "解锁视频创作的新大陆！MotionClone:一键克隆视频运动，让创意无界限，想象即现实！": [
+        {
+            "id": "1000000159/2247486605_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486605&idx=1&sn=5294f486af702f8ebd6c409f206463e8&chksm=fcf6f36ccb817a7a08c3bd5c2391580c093fb8fb221dbb2dcd0b0eb490a242cfd6aaf895ca9a#rd",
+            "create_time": "2024-07-21 00:09",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000167/2247486767_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486767&idx=2&sn=69a2c0307908be32c1e3e4fbb0bc5e95&chksm=fcf6f2cecb817bd852e26c8c89d6fc8a672130c8f2990d9fcf5756cc99f9180bb6337f8081ee#rd",
@@ -1891,6 +3405,12 @@
     ],
     "腾讯OMG：支持多角色多概念在一张图片中生成，生成合影的问题终于解决了！": [
         {
+            "id": "1000000167/2247486767_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486767&idx=4&sn=f5091e78fd7a0b9e41ee99cf78a9c9e7&chksm=fcf6f2cecb817bd8408800a42b3bad8973d69cb67c7583f0a35bf448106a50ce8ae9d3445ee5#rd",
+            "create_time": "2024-07-28 22:51",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000086/2247485255_7",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485255&idx=7&sn=f8c4c31516e060ed1c40164feec912ed&chksm=c1c23e49f6b5b75f4772d2306c39eeaa6ef5b97531382b59b12e6a665296b58e5ed161a6ccc6#rd",
             "create_time": "2024-07-29 23:23",
@@ -1898,6 +3418,12 @@
         }
     ],
     "入选ACL 2024！浙大推出首个海洋大语言模型OceanGPT，水下具身智能成现实。": [
+        {
+            "id": "1000000166/2247486739_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486739&idx=1&sn=4c6b2179ac4cbbbda8610d3bf3e2ead4&chksm=fcf6f2f2cb817be4814c97fe682e3c48061dedf5e6fd4743c636ad543f4b304dd18a49e70696#rd",
+            "create_time": "2024-07-27 22:01",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000172/2247486862_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486862&idx=3&sn=6762e84de9ad7a6165421eda86cb1e6d&chksm=fcf6f26fcb817b79efc6a94aa3fd9e921b75af8a92c56f8e818c409d3ff8561f7e784700079d#rd",
@@ -1907,6 +3433,12 @@
     ],
     "IMAGDressing-v1：文字指令一键换装、变换姿势、切换背景，开启个性化时尚新纪元！": [
         {
+            "id": "1000000162/2247486628_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486628&idx=1&sn=27fa4a66fa0e83cf03c86bd4d8d7bd1b&chksm=fcf6f345cb817a5353b14aa16d8d80ba597207d87179a356b9031b71057f9ec229d00af09040#rd",
+            "create_time": "2024-07-23 22:09",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000166/2247486739_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486739&idx=2&sn=e21c6524ed7d82bf3c3965549c00bb3a&chksm=fcf6f2f2cb817be4a37e37eed15c6d3878d2de1bf86be7fce31811e73ad506c08a8f9e5c7526#rd",
             "create_time": "2024-07-27 22:01",
@@ -1914,6 +3446,12 @@
         }
     ],
     "DeepMind再献力作！Still-Moving文生视频模型定制框架，引领AI创作新潮流！": [
+        {
+            "id": "1000000161/2247486627_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486627&idx=1&sn=530cbba0285e7727aedd7e36c428abed&chksm=fcf6f342cb817a5479886a826903641cd12d926c1887b0ae6a4f79387b296b8e2a1560bd8ca8#rd",
+            "create_time": "2024-07-22 23:30",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000166/2247486739_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486739&idx=3&sn=e24718805ebc2692f89946ef1ee013e2&chksm=fcf6f2f2cb817be49eff799ff9f361fcbe8f1f5eb79e16ebefe898fda076f0ac01edfd069488#rd",
@@ -1929,6 +3467,12 @@
     ],
     "一键解锁百变发型！上交联合Tiamat震撼发布Stable-Hair发型移植黑科技！": [
         {
+            "id": "1000000165/2247486693_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486693&idx=1&sn=dec12ac553bc0adf6b2003ce4e4127b6&chksm=fcf6f304cb817a12270d2ece6cf93257a1d90401f9cd376c00789ce1b6d24b140f5e4283905b#rd",
+            "create_time": "2024-07-26 18:38",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000170/2247486833_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486833&idx=3&sn=74ba27d55fee40ec1618c9059324264b&chksm=fcf6f290cb817b86063cd37893d584c936783dc683b54a8c3d997e4a8598148ed1d1beb85548#rd",
             "create_time": "2024-07-31 21:46",
@@ -1936,6 +3480,12 @@
         }
     ],
     "ECCV`24 | 编辑能力无上限！北航&谷歌&旷视等开源Chat-Edit-3D: 3D 场景编辑新范式！": [
+        {
+            "id": "1000000165/2247486693_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486693&idx=3&sn=b0fa312f8e2e4439ebdb3f6a78777ca0&chksm=fcf6f304cb817a12e6588b285c9d094a2ff03f8e08b7f9658b1f74a2fea17e2d78cee5583d2d#rd",
+            "create_time": "2024-07-26 18:38",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000170/2247486833_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486833&idx=4&sn=d7e1f6bccb76ef4918b8c4b78696d6b7&chksm=fcf6f290cb817b86e275fd8f16d452b3a12522f71a919652c87d3828c80993a25ab8ebafd1d3#rd",
@@ -1945,6 +3495,12 @@
     ],
     "AI追踪新飞跃！DINO-Tracker：驯服DINO成为自监督学习下的动态捕捉大师。": [
         {
+            "id": "1000000160/2247486625_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486625&idx=1&sn=c7a97f52b92af1086cad2471161f2d15&chksm=fcf6f340cb817a562958cfdce46a2d29e08dcb323a3a0611311b66704323d9d9167e33756870#rd",
+            "create_time": "2024-07-22 00:03",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000171/2247486861_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486861&idx=2&sn=cedc90b9e1b7b3d74218941305cb8fdf&chksm=fcf6f26ccb817b7abb6fbcf84914db9d3a82c20b613d2f9ce432c32f04d399fa3f16de99d2a3#rd",
             "create_time": "2024-08-01 23:48",
@@ -1952,6 +3508,12 @@
         }
     ],
     "海报生成如此简单！OPPO联合港中文发布基于LLM的GlyphDraw2！": [
+        {
+            "id": "1000000160/2247486625_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486625&idx=3&sn=fa21b8aff9829efbef4915b638193557&chksm=fcf6f340cb817a56d3b0d2c268c27f1c19591cf7be5cc8e0414dcab9da3665fb1e4db2c61219#rd",
+            "create_time": "2024-07-22 00:03",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000171/2247486861_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486861&idx=3&sn=048e5c420c8eab3096032ad4c85910c0&chksm=fcf6f26ccb817b7a4b1e53db1f31381f5daad8570ba8699f945228049f60e7f4940e92efd564#rd",
@@ -1961,135 +3523,31 @@
     ],
     "深度剖析Google黑科技RB-Modulation: 告别繁琐训练，引领无训练风格迁移的新时代！": [
         {
+            "id": "1000000170/2247486833_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247486833&idx=1&sn=9ba2fd4952931a23be5fdece6c5d0180&chksm=fcf6f290cb817b86c6ba4245ec866ae846cf528c0f599cf3c1f024dabd6a848f3ac34f7fcc31#rd",
+            "create_time": "2024-07-31 21:46",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000178/2247487016_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzU2OTg5NTU2Ng==&mid=2247487016&idx=3&sn=824324d78ee9242bd3d934468d560f3a&chksm=fcf6f1c9cb8178dff4c26fd04a049ec120cdb10afdc593cd2079c9e86dce49650845805cd1af#rd",
             "create_time": "2024-08-07 23:02",
             "duplicate_rate": 1.0
         }
     ],
-    "算法工程师面试题笔记": [
+    "说说我的实习面试历程，也许对你有帮助": [
         {
-            "id": "1000000069/2247485066_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485066&idx=2&sn=af454c89ec2f516b1424cf9635457d50&chksm=c1c23f84f6b5b692347e266ecd0067b261df844a9cf8fd9b226158120b0b2478172c1b1c99e4#rd",
+            "id": "1000000068/2247485052_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485052&idx=4&sn=b934f14d395d8751e1a93eb4fa7b37f1&chksm=c1c23f72f6b5b664a8a505b5f1934a946c5ec4f098276b1c2194bab0b69c526a1c4b1a8044bb#rd",
+            "create_time": "2024-05-24 08:00",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000000069/2247485066_5",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485066&idx=5&sn=d013e8f27099dfe19f8881c766b37335&chksm=c1c23f84f6b5b69274fd988cf3c32ceafeb7b69d499c5649053bbb97baeeb4f56702591f3574#rd",
             "create_time": "2024-05-26 10:06",
             "duplicate_rate": 1.0
         },
-        {
-            "id": "1000000070/2247485091_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485091&idx=2&sn=d0634e66bc7433191e7fc7ee1e1ee41e&chksm=c1c23fadf6b5b6bb45a23c0fd1153cf01b7a30b5e8c862f49492be39c08551e1a04f4695b8bb#rd",
-            "create_time": "2024-05-27 20:55",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000071/2247485099_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485099&idx=2&sn=65812f30c25aa629f2e4725d11eabb2b&chksm=c1c23fa5f6b5b6b3cd3b936fc7b66b37e814130075e1e728bf07dddaf4a933d84a622f612c55#rd",
-            "create_time": "2024-05-28 22:22",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000072/2247485100_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485100&idx=2&sn=770f1cad355d6fb74f6c4e3d51a91591&chksm=c1c23fa2f6b5b6b4e4691e017ee741bc79ffb4f3d4488de51423ead3751318693212648fea55#rd",
-            "create_time": "2024-05-31 08:18",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000073/2247485106_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485106&idx=2&sn=14dbdd9f8680ac4a1c088fc18fd4804d&chksm=c1c23fbcf6b5b6aa4780b87f0557bd774b8bbc29305d127e09103fc43564c41e75a58f8eccda#rd",
-            "create_time": "2024-06-02 12:28",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000074/2247485112_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485112&idx=2&sn=b25c0d36190860f150e317f242ca21c8&chksm=c1c23fb6f6b5b6a0241baa5f4beb72b2bdc0ba3bdc752b73c760fde3478e09103ac35e5e8661#rd",
-            "create_time": "2024-06-02 22:55",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000075/2247485127_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485127&idx=2&sn=65df3f61eb6eee9796908908f40fcdcd&chksm=c1c23fc9f6b5b6df0d89b7bfe8b220e9fc07dd7db795069dd3bd198cdcc0c6e79a98560b9ea6#rd",
-            "create_time": "2024-06-06 17:07",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000076/2247485162_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485162&idx=2&sn=c46a7110476e60160dc932a5e82d3f08&chksm=c1c23fe4f6b5b6f2ce74de9da6ce21527954f8befeea782b386417f61e02648c41fe3122b7f5#rd",
-            "create_time": "2024-06-07 09:42",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000077/2247485163_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485163&idx=2&sn=06ab49d784e8b4e4f2e8edda823decb2&chksm=c1c23fe5f6b5b6f3b5966c7d1afeb90cdfa873bdebddea7a771b7cade405cd207568b31ae7b9#rd",
-            "create_time": "2024-06-20 19:44",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000078/2247485168_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485168&idx=2&sn=876e78fcd6972f11dd70056cc6bdfe5e&chksm=c1c23ffef6b5b6e87ec2464edc721c993b412642bd6df33f0dc37001df8a7feb90f8dd553d50#rd",
-            "create_time": "2024-06-24 08:25",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000079/2247485171_3",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485171&idx=3&sn=39c7b6beab953ec87678ba2e515fa1b9&chksm=c1c23ffdf6b5b6eb62c49aed74dc18b19e507460807b8a905e36e2cd814f7bf91df9bec70289#rd",
-            "create_time": "2024-06-25 21:39",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000080/2247485179_3",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485179&idx=3&sn=4c9bde001f096649fe9fa8efc678ac73&chksm=c1c23ff5f6b5b6e39c96eb781704efc3efa9aba9ca8670990b7c866bfd254ea0b519215830bc#rd",
-            "create_time": "2024-07-01 22:14",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000081/2247485191_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485191&idx=2&sn=28fd094e3a3ff6c9771e861067254bc4&chksm=c1c23e09f6b5b71f4fbba73e19fdc43b0270d1243505b6242afd5da4417c225adeee3d2a94d9#rd",
-            "create_time": "2024-07-04 22:21",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000082/2247485199_3",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485199&idx=3&sn=9d6b250fca89b7ce4f5020cca598b532&chksm=c1c23e01f6b5b717cf0c841f81dd248a6a54899252dfc13947683f863542ef7e4ebbb0232eab#rd",
-            "create_time": "2024-07-12 22:56",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000083/2247485228_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485228&idx=2&sn=16aee2be2ee628d7db6cdbaac27762a4&chksm=c1c23e22f6b5b73410fbd5406a1cc84ea017b0f5380b8d57dc9d5e960ffdf0355ed14f25ceeb#rd",
-            "create_time": "2024-07-18 21:02",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000084/2247485234_3",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485234&idx=3&sn=6b7c59bec39e7168ce23ab028dab61ac&chksm=c1c23e3cf6b5b72a0c0d851bd7d5f707f905f4df0a1986d9cfdcb8398ee8c22854d2e7e65a15#rd",
-            "create_time": "2024-07-24 23:27",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000086/2247485255_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485255&idx=2&sn=d25ecad117de273c23dc01278280ad48&chksm=c1c23e49f6b5b75fad34e64dc20254c3b68d6286085adb87b9a5832b0140edf6e4dedf05682a#rd",
-            "create_time": "2024-07-29 23:23",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000087/2247485267_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485267&idx=2&sn=af0d18b9608875e6059ed3d022735e0a&chksm=c1c23e5df6b5b74b9633d2fe82a337759fd2fed185eb88bc6b4693c55066b5c5895134e4bd7d#rd",
-            "create_time": "2024-07-31 22:03",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000088/2247485286_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485286&idx=2&sn=ece269b635fe8e0bf91254e9a5a88724&chksm=c1c23e68f6b5b77e918ebf69ff120c058c47534b499b611c221156951d69014057ba4e3da810#rd",
-            "create_time": "2024-08-06 19:35",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000089/2247485292_2",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485292&idx=2&sn=96eda4f897f9e3363b445fa64b7e5bd7&chksm=c1c23e62f6b5b774e810acfad1ea968c4a19a9f8d4aabffe3c73372fc0a8b958a67b5392cb48#rd",
-            "create_time": "2024-08-06 19:42",
-            "duplicate_rate": 1.0
-        }
-    ],
-    "说说我的实习面试历程，也许对你有帮助": [
         {
             "id": "1000000070/2247485091_5",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485091&idx=5&sn=0db425358e1ff0a228bcf547f5778a52&chksm=c1c23fadf6b5b6bb87f5c85fc538f5ba71a95ebbf48904eb8c5105b2ecf312c144000bac8fcc#rd",
@@ -2207,6 +3665,12 @@
     ],
     "算法工程师面试常考手撕题（更新）": [
         {
+            "id": "1000000068/2247485052_7",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485052&idx=7&sn=7b81b0a76e7f9c5ff2b15a37c1cbf44c&chksm=c1c23f72f6b5b664cf708e35795ecb170276e49efd805697530684039b5d7fd019379d8efb11#rd",
+            "create_time": "2024-05-24 08:00",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000069/2247485066_6",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485066&idx=6&sn=e193af0dce55fdb76cde93b6ee177925&chksm=c1c23f84f6b5b692bc091867ed76f844bd9b2107a757190d5e2dad6f0534ffce476a2247e229#rd",
             "create_time": "2024-05-26 10:06",
@@ -2216,6 +3680,12 @@
             "id": "1000000070/2247485091_6",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485091&idx=6&sn=90529f581a8496d1bbc1d3f971b6667d&chksm=c1c23fadf6b5b6bbb560d3e45be8c6a97577b5d6a7324f5c2868ebcff2887fa1b895ffea54d1#rd",
             "create_time": "2024-05-27 20:55",
+            "duplicate_rate": 1.0
+        },
+        {
+            "id": "1000000071/2247485099_6",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485099&idx=6&sn=289dcd660c134821c1fd1004ccf2c948&chksm=c1c23fa5f6b5b6b30f32edb64be18baad6a2966270b309dec9c662f584e81327cee2ab6aecca#rd",
+            "create_time": "2024-05-28 22:22",
             "duplicate_rate": 1.0
         },
         {
@@ -2258,12 +3728,6 @@
             "id": "1000000078/2247485168_6",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485168&idx=6&sn=2ca80e85d4aaa2a5e3ed97a116c954e7&chksm=c1c23ffef6b5b6e843c575325e501109fa9d0bd62eab5ac8c785ec029be57ddd78884ff5963c#rd",
             "create_time": "2024-06-24 08:25",
-            "duplicate_rate": 1.0
-        },
-        {
-            "id": "1000000079/2247485171_5",
-            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485171&idx=5&sn=da96f87aa0f4633d0115c47803d25a23&chksm=c1c23ffdf6b5b6ebee2450b650637e20b5960a033b07a9f1f139e841f87c729c84b4ab43ff91#rd",
-            "create_time": "2024-06-25 21:39",
             "duplicate_rate": 1.0
         },
         {
@@ -2323,6 +3787,12 @@
     ],
     "RAG系列04：使用ReRank进行重排序": [
         {
+            "id": "1000000069/2247485066_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485066&idx=3&sn=0c3a748f152ff3d805b88640b1c1790f&chksm=c1c23f84f6b5b6925ca1671ea50856ab0ab149f1aa70af3faa67c7d6f5634e40899155c5fcd5#rd",
+            "create_time": "2024-05-26 10:06",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000070/2247485091_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485091&idx=3&sn=473868b19ba5a84c6d26f0273e869188&chksm=c1c23fadf6b5b6bb040100a93746b47d6db68392bd4a1f5bf2a6aee8763fcea38eae2cbe0c03#rd",
             "create_time": "2024-05-27 20:55",
@@ -2348,6 +3818,12 @@
         }
     ],
     "大模型应用的10种架构模式": [
+        {
+            "id": "1000000069/2247485066_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485066&idx=4&sn=5a52eac5c37180b9727637604d6d68ab&chksm=c1c23f84f6b5b692dcd048c5c50b55523e4b010e36602546e724610389ea7564b39bce8fd556#rd",
+            "create_time": "2024-05-26 10:06",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000070/2247485091_4",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485091&idx=4&sn=008bbb3c24787dda05af15b7509b5736&chksm=c1c23fadf6b5b6bb8dc816b25ef0f174a5f33a16e97e1a9f0cfc336a7d0da1ec1b37bcdba00a#rd",
@@ -2375,6 +3851,12 @@
     ],
     "RAG系列03：使用RAGAS进行自动化评估": [
         {
+            "id": "1000000067/2247485033_5",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485033&idx=5&sn=faafc1eaf7e04276010a33ac75b762a0&chksm=c1c23f67f6b5b671e2d9d4b7bfe83a17bff3b71a7c7eb17d11ea7841a2766ce1ffa5b233fc4c#rd",
+            "create_time": "2024-05-22 23:11",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000068/2247485052_5",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485052&idx=5&sn=ab0b2828a9fde4e5ca125fff49f90ce5&chksm=c1c23f72f6b5b66488d0ffdc405b624b1ca802723ebc5936e0368d690329fd75045302a21dd9#rd",
             "create_time": "2024-05-24 08:00",
@@ -2389,6 +3871,12 @@
     ],
     "跨领域知识融合：RAG模型在医疗、法律、金融等领域的应用探索": [
         {
+            "id": "1000000067/2247485033_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485033&idx=3&sn=0f254a44269fc1ac0127a3a929707e89&chksm=c1c23f67f6b5b6715c629d77ccfcf7f679e6162578f0f6270b970c595c66907df6ae3390c013#rd",
+            "create_time": "2024-05-22 23:11",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000068/2247485052_3",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485052&idx=3&sn=ed5953b7313c3013ec9a4d79ddae463f&chksm=c1c23f72f6b5b664ed482cf1af88f8fe1be16976427b26a6256c99956460b293dd4e5ccc5698#rd",
             "create_time": "2024-05-24 08:00",
@@ -2396,6 +3884,12 @@
         }
     ],
     "Transformer其实是线性的? | SirLLM: 流式无限记忆LLM | SPO: 多维偏好序列对齐与隐式奖励建模...": [
+        {
+            "id": "1000000067/2247485033_6",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485033&idx=6&sn=ef3e75cb9a85738ca22e7c2a7247bd69&chksm=c1c23f67f6b5b671976d8a553dbfdf8f8ec47086579ee30fd3ef69fdfea16561081295606898#rd",
+            "create_time": "2024-05-22 23:11",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000068/2247485052_6",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkyNTY0Mjg0OQ==&mid=2247485052&idx=6&sn=cd5b2995fdd92444b2430af3edf647d2&chksm=c1c23f72f6b5b664acb0bc956567ec8c9a222d21b9db7ebec29ce5fe3d591a7272b3847ff253#rd",
@@ -2405,13 +3899,33 @@
     ],
     "【智谷要闻】科技未来——智谷AI": [
         {
+            "id": "1000000031/2247485745_4",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkxNTUxMzYwMw==&mid=2247485745&idx=4&sn=bc3f29344120f9a32ad258554abe6aa4&chksm=c15f415df628c84b41192268e5b623a710a58935ad0feb5b1d71712aa0688ba6995e1f2bc3f6#rd",
+            "create_time": "2024-07-12 13:44",
+            "duplicate_rate": 1.0
+        },
+        {
             "id": "1000000034/2247485887_2",
             "link": "http://mp.weixin.qq.com/s?__biz=MzkxNTUxMzYwMw==&mid=2247485887&idx=2&sn=a76615e1abd4b907e84567134e4bf7d6&chksm=c15f41d3f628c8c5364d9f7453090b053e7563e2a4253bedbbd514ef8a87cde5020b25dae0e4#rd",
             "create_time": "2024-08-02 10:37",
             "duplicate_rate": 0.9897843359818388
         }
     ],
+    "今日Github最火的10个Python项目": [
+        {
+            "id": "1000000103/2247485270_3",
+            "link": "http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485270&idx=3&sn=80f4ac6489b22f697de59f08fc1353a4&chksm=c2fdbd16f58a3400c4ec3269b308f317f53635def558a32bad516a5d6184a4aa641b7cdd516f#rd",
+            "create_time": "2024-06-06 13:26",
+            "duplicate_rate": 1.0
+        }
+    ],
     "2024拯救者杯OPENAIGC开发者大赛决赛入围名单公布": [
+        {
+            "id": "2247509289/2247509289_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509289&idx=1&sn=5e414f7bad50a676ac105878685be4c1&chksm=cedbfb03f9ac72156a221438fbb68b6bc9f5e227e0bd96eaa8e07b7116b5e23e312309fbdf76#rd",
+            "create_time": "2024-07-22 16:05",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "1000000521/2247509429_2",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509429&idx=2&sn=715ec3766d278159eee1968a12fbc910&chksm=cedbfb9ff9ac728905ffc2f677bc9b84516eb151c9b1ed25018a25e52f0f20d04ed08fe756d4#rd",
@@ -2420,6 +3934,12 @@
         }
     ],
     "顶峰相见，OPENAIGC开发者大赛8月17日上海决赛开启！": [
+        {
+            "id": "1000000533/2247509955_1",
+            "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509955&idx=1&sn=058a07ad598e42fad55cb4a0cd0d3dc7&chksm=cedbf9e9f9ac70ff1b8a3382747c5e844d7f6b87a2e0d122ccc430feed670c8efa1eb36fe337#rd",
+            "create_time": "2024-08-05 07:53",
+            "duplicate_rate": 1.0
+        },
         {
             "id": "2247509995/2247509995_1",
             "link": "http://mp.weixin.qq.com/s?__biz=Mzg3Mzg5MjY3Nw==&mid=2247509995&idx=1&sn=a0585cf17d5e915a7f1542eb4ee2385b&chksm=cedbf9c1f9ac70d743fa2abdb1ddb10cca2741c5ddbb68005ceed02a4d15fbe1fbccc805bea5#rd",

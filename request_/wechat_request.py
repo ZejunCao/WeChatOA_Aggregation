@@ -11,7 +11,7 @@ import json
 from lxml import etree
 import time
 import datetime
-from util.util import token, headers, check_message
+from util.util import token, headers, message_is_delete
 
 # 将js获取的时间id转化成真实事件，截止到分钟
 def jstime2realtime(jstime):
@@ -143,7 +143,7 @@ def fakeid2message_update(fakeid, message_exist=[]):
         for i in range(len(message['appmsgex'])):
             link = message['appmsgex'][i]['link']
             # 检查博文是否正常运行(未被作者删除)
-            if not check_message(link):
+            if message_is_delete(link):
                 continue
             # r = requests.get(url=link, headers=headers).text
             # tree = etree.HTML(r)
