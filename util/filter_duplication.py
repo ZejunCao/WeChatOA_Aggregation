@@ -9,6 +9,7 @@
 import json
 import requests
 from lxml import etree
+from tqdm import tqdm
 
 from .util import headers, message_is_delete
 
@@ -30,7 +31,7 @@ def url2text(url):
         if message_is_delete(response=response):
             return '已删除'
         else:
-            print(url)
+            # print(url)
             return '请求错误'
 
     s_p = [p for p in div[0].iter() if p.tag in ['section', 'p']]
@@ -73,37 +74,44 @@ def get_filtered_message():
         title_head = json.load(f)
     with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
         delete_messages = json.load(f)
+    with open('./data/dup_message.json', 'r', encoding='utf-8') as f:
+        duplicate_message = json.load(f)
 
-    duplicate_message = {}
-    for k, v in title_head.items():
+    error_links = []
+    for k, v in tqdm(title_head.items(), total=len(title_head)):
         if v['co_count'] == 1:
             continue
 
+        # 从列表中找到一个没被删除的
         for i in range(v['co_count']):
             text_list1 = url2text(v['links'][i]['link'])
             if text_list1 == '已删除':
                 delete_messages['is_delete'].append(v['links'][i]['link'])
-                v['links'][i]['is_delete'] = True
             else:
+                from_id = v['links'][i]['id']
                 break
+
         for j in range(i, v['co_count']):
+            # 已经计算过这两个之间的重复率
+            if v['links'][j]['id'] in duplicate_message.keys() and duplicate_message[v['links'][j]['id']]['from_id'] == from_id:
+                continue
             text_list2 = url2text(v['links'][j]['link'])
             if text_list2 == '请求错误':
+                error_links.append(v['links'][j]['link'])
                 continue
             elif text_list2 == '已删除':
                 delete_messages['is_delete'].append(v['links'][j]['link'])
-                v['links'][j]['is_delete'] = True
                 continue
 
             score = calc_duplicate_rate1(text_list1, text_list2)
-            v['links'][j]['duplicate_rate'] = score
+            duplicate_message[v['links'][j]['id']] = {
+                'from_id': from_id,
+                'duplicate_rate': score
+            }
 
-        v['links'] = [i for i in v['links'] if 'is_delete' not in i.keys()]
-        link = [i for i in v['links'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] > 0.5]
-        if link: duplicate_message[k] = link
-        v['links'] = [i for i in v['links'] if 'duplicate_rate' in i.keys() and i['duplicate_rate'] <= 0.5]
-        v['co_count'] = len(v['links'])
-
+    for e in error_links:
+        print(e)
+    print(f'共有{len(error_links)}个链接读取失败')
     with open('./data/title_head.json', 'w', encoding='utf-8') as f:
         json.dump(title_head, f, indent=4, ensure_ascii=False)
 

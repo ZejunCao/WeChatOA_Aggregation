@@ -7,6 +7,9 @@
 # @description : 工具函数，存储一些通用的函数
 
 import os
+
+from tqdm import tqdm
+
 os.chdir('D:\\learning\\python\\WeChatOA_Aggregation')
 import json
 from collections import defaultdict
@@ -42,24 +45,24 @@ def update_message_info():
         messages = json.load(f)
     with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
         delete_messages = json.load(f)
+    delete_messages_set = set(delete_messages['is_delete'])
 
-    for k, v in messages.items():
-        print('当前自检中：', k)
-        for m in v['blogs']:
-            if message_is_delete(m['link']):
-                delete_messages['is_delete'].append(str(m['msgid']) + '/' + str(m['aid']))
+    try:
+        for k, v in tqdm(messages.items(), total=len(messages)):
+            for m in v['blogs']:
+                if m['id'] in delete_messages_set:
+                    continue
+                if message_is_delete(m['link']):
+                    delete_messages['is_delete'].append(m['id'])
+    except:
+        pass
 
     # 已被博主删除的文章，在message_info中添加is_delete字段，不进行删除
     # for k, v in messages.items():
     #     v['blogs'] = [i for i in v['blogs'] if not i['is_delete']]
 
-    with open('./data/message_info.json', 'w', encoding='utf-8') as f:
-        json.dump(messages, f, indent=4, ensure_ascii=False)
     with open('./data/delete_message.json', 'w', encoding='utf-8') as f:
         json.dump(delete_messages, f, indent=4, ensure_ascii=False)
-
-    # 每次自检完默认重新生成title_head文件
-    generate_title_head()
 
 
 # 以message_info文件生成title_head文件
@@ -74,11 +77,8 @@ def generate_title_head():
     title_head = defaultdict(dict)
     for k, v in messages.items():
         for m in v['blogs']:
-            id = str(m['msgid']) + '/' + str(m['aid'])
-            if id in delete_messages_set:
+            if m['id'] in delete_messages_set:
                 continue
-            # if 'is_delete' in m.keys() and m['is_delete']:
-            #     continue
             title = m['title']
             if title not in title_head.keys():
                 title_head[title] = {
@@ -86,7 +86,7 @@ def generate_title_head():
                     'links': [],
                 }
             cur_m = {
-                'id': id,
+                'id': m['id'],
                 'link': m['link'],
                 'create_time': m['create_time'],
             }

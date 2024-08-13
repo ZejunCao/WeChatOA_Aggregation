@@ -26,26 +26,34 @@ tags:
     if not message_info:
         with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
             message_info = json.load(fp)
-
+    with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
+        delete_messages = json.load(f)
+    delete_messages_set = set(delete_messages['is_delete'])
     with open('./data/dup_message.json', 'r', encoding='utf-8') as f:
         dup_message = json.load(f)
 
-    a = 0
+    delete_count = 0
+    dup_count = 0
     md_dict = defaultdict(list)
     for k, v in message_info.items():
         for m in v['blogs']:
+            # 历史遗留，有些文章没有创建时间，疑似已删除，待验证
             if not m['create_time']:
                 continue
-            if m['title'] in dup_message.keys():
-                id = str(m['msgid']) + '/' + str(m['aid'])
-                ids = [i['id'] for i in dup_message[m['title']]]
-                if id in ids:
-                    a +=1
-                    continue
+            # 去除已删除文章
+            if m['id'] in delete_messages_set:
+                delete_count += 1
+                continue
+            # 去掉重复率高的文章
+            if m['id'] in dup_message.keys() and dup_message[m['id']]['duplicate_rate'] > 0.5:
+                dup_count +=1
+                continue
 
             t = datetime.datetime.strptime(m['create_time'],"%Y-%m-%d %H:%M").strftime("%Y-%m-%d")
             md_dict[t].append(m)
-    print(f'已去重{a}条重复数据')
+
+    print(f'{delete_count} messages have been deleted')
+    print(f'{dup_count} messages have been deduplicated')
     date_list = sorted(md_dict.keys(), reverse=True)
     for date in date_list:
         if date < '2024-07-01':

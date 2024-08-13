@@ -127,14 +127,14 @@ def fakeid2message_update(fakeid, message_exist=[]):
     # 根据文章id判断新爬取的文章是否已存在
     msgid_exist = set()
     for m in message_exist:
-        msgid_exist.add(m['msgid'])
+        msgid_exist.add(m['id'].split('/')[0])
 
     message_url = []
     url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
     response = requests.get(url=url, params=params, headers=headers).json()
     session_is_overdue(response)
     if 'publish_page' not in response.keys():
-        raise Exception('请求次数过快，请稍后重试')
+        raise Exception('The number of requests is too fast, please try again later')
     messages = json.loads(response['publish_page'])['publish_list']
     for message_i in range(len(messages)):
         message = json.loads(messages[message_i]['publish_info'])
@@ -145,19 +145,12 @@ def fakeid2message_update(fakeid, message_exist=[]):
             # 检查博文是否正常运行(未被作者删除)
             if message_is_delete(link):
                 continue
-            # r = requests.get(url=link, headers=headers).text
-            # tree = etree.HTML(r)
-            # warn = tree.xpath('//div[@class="weui-msg__title warn"]/text()')
-            # if len(warn) > 0 and warn[0] == '该内容已被发布者删除':
-            #     continue
 
             real_time = jstime2realtime(message['appmsgex'][i]['create_time'])
             message_url.append({
                 'title': message['appmsgex'][i]['title'],
                 'create_time': real_time,
                 'link': link,
-                'msgid': message['msgid'],
-                'appmsgid': message['appmsgex'][i]['appmsgid'],
-                'aid': message['appmsgex'][i]['aid'],
+                'id': str(message['msgid']) + '/' + str(message['appmsgex'][i]['aid']),
             })
     return message_url
