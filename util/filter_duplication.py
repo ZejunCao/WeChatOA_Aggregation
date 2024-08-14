@@ -22,9 +22,20 @@ def url2text(url):
     '''
     response = requests.get(url, headers=headers).text
     tree = etree.HTML(response)
+    # 不同文章存储字段的class标签名不同
     div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]')
     if not div:
         div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       defaultNoSetting\n            "]')
+    # 点进去显示分享一篇文章，然后需要再点阅读原文跳转
+    if not div:
+        url = tree.xpath('//div[@class="original_panel_tool"]/span/@data-url')
+        if url:
+            response = requests.get(url[0], headers=headers).text
+            tree = etree.HTML(response)
+            # 不同文章存储字段的class标签名不同
+            div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]')
+            if not div:
+                div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       defaultNoSetting\n            "]')
 
     # 判断是博文删除了还是请求错误
     if not div:

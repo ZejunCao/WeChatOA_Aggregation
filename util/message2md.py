@@ -46,7 +46,7 @@ tags:
                 continue
             # 去掉重复率高的文章
             if m['id'] in dup_message.keys() and dup_message[m['id']]['duplicate_rate'] > 0.5:
-                dup_count +=1
+                dup_count += 1
                 continue
 
             t = datetime.datetime.strptime(m['create_time'],"%Y-%m-%d %H:%M").strftime("%Y-%m-%d")
