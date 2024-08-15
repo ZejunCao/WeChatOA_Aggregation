@@ -98,6 +98,16 @@ def generate_title_head():
     with open('./data/title_head.json', 'w', encoding='utf-8') as f:
         json.dump(title_head, f, indent=4, ensure_ascii=False)
 
+def sort_messages():
+    with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
+        message_info = json.load(fp)
+
+    for k, v in message_info.items():
+        v['blogs'].sort(key=lambda x: x['create_time'])
+
+    with open('./data/message_info.json', 'w', encoding='utf-8') as fp:
+        json.dump(message_info, fp, ensure_ascii=False, indent=4)
+
 
 if __name__ == '__main__':
     # update_message_info()

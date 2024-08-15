@@ -127,7 +127,7 @@ def fakeid2message_update(fakeid, message_exist=[]):
     # 根据文章id判断新爬取的文章是否已存在
     msgid_exist = set()
     for m in message_exist:
-        msgid_exist.add(m['id'].split('/')[0])
+        msgid_exist.add(int(m['id'].split('/')[0]))
 
     message_url = []
     url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
@@ -143,8 +143,8 @@ def fakeid2message_update(fakeid, message_exist=[]):
         for i in range(len(message['appmsgex'])):
             link = message['appmsgex'][i]['link']
             # 检查博文是否正常运行(未被作者删除)
-            if message_is_delete(link):
-                continue
+            # if message_is_delete(link):
+            #     continue
 
             real_time = jstime2realtime(message['appmsgex'][i]['create_time'])
             message_url.append({
@@ -153,4 +153,12 @@ def fakeid2message_update(fakeid, message_exist=[]):
                 'link': link,
                 'id': str(message['msgid']) + '/' + str(message['appmsgex'][i]['aid']),
             })
+    message_url.sort(key=lambda x: x['create_time'])
     return message_url
+
+if __name__ == '__main__':
+
+    with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
+        message_info = json.load(fp)
+
+    fakeid2message_update('MzAxMjc3MjkyMg==', message_info['老刘说NLP']['blogs'])

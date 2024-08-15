@@ -14,8 +14,8 @@ from util.message2md import message2md
 
 if __name__ == '__main__':
     # 获取必要信息
-    name2fakeid_dict = {}
-    message_info = {}
+    # name2fakeid_dict = {}
+    # message_info = {}
     with open('./data/name2fakeid.json', 'r', encoding='utf-8') as fp:
         name2fakeid_dict = json.load(fp)
     with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
