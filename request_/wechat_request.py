@@ -11,7 +11,7 @@ import json
 from lxml import etree
 import time
 import datetime
-from util.util import token, headers, message_is_delete
+from util.util import token, headers
 
 # 将js获取的时间id转化成真实事件，截止到分钟
 def jstime2realtime(jstime):
@@ -20,10 +20,13 @@ def jstime2realtime(jstime):
 
 # 检查session和token是否过期
 def session_is_overdue(response):
-    if response['base_resp']['err_msg'] == 'invalid session':
-        raise Exception('session expired')
-    if response['base_resp']['err_msg'] == 'invalid csrf token':
-        raise Exception('token expired')
+    err_msg = response['base_resp']['err_msg']
+    if err_msg in ['invalid session', 'invalid csrf token']:
+        login()
+        return True
+    if err_msg == 'freq control':
+        raise Exception('The number of requests is too fast, please try again later')
+    return False
 
 # 计算时间差
 def time_delta(time1, time2):
@@ -61,52 +64,6 @@ def name2fakeid(name):
     else:
         return None
 
-# 根据公众号 id 值获取所有文章
-def fakeid2message(fakeid):
-    params = {
-        'sub': 'list',
-        'search_field': 'null',
-        'begin': 0,
-        'count': 20,
-        'query': '',
-        'fakeid': fakeid,
-        'type': '101_1',
-        'free_publish_type': 1,
-        'sub_action': 'list_ex',
-        'token': token,
-        'lang': 'zh_CN',
-        'f': 'json',
-        'ajax': 1,
-    }
-
-    message_url = []
-    url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
-    response = requests.get(url=url, params=params, headers=headers).json()
-    session_is_overdue(response)
-    messages = json.loads(response['publish_page'])['publish_list']
-    for message_i in range(len(messages)):
-        message = json.loads(messages[message_i]['publish_info'])
-        for i in range(len(message['appmsgex'])):
-            link = message['appmsgex'][i]['link']
-            # 检查博文是否已被博主删除
-            r = requests.get(url=link, headers=headers).text
-            tree = etree.HTML(r)
-            warn = tree.xpath('//div[@class="weui-msg__title warn"]/text()')
-            if len(warn) > 0 and warn[0] == '该内容已被发布者删除':
-                continue
-            real_time = jstime2realtime(message['appmsgex'][i]['create_time'])
-            message_url.append({
-                'title': message['appmsgex'][i]['title'],
-                'create_time': real_time,
-                'link': link,
-                'msgid': message['msgid'],
-                'appmsgid': message['appmsgex'][i]['appmsgid'],
-                'aid': message['appmsgex'][i]['aid'],
-            })
-    # 返回存储该公众号的所有文章链接列表
-    return message_url
-
-
 # 请求次数限制，不是请求文章条数限制
 def fakeid2message_update(fakeid, message_exist=[]):
     params = {
@@ -132,9 +89,10 @@ def fakeid2message_update(fakeid, message_exist=[]):
     message_url = []
     url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
     response = requests.get(url=url, params=params, headers=headers).json()
-    session_is_overdue(response)
-    if 'publish_page' not in response.keys():
-        raise Exception('The number of requests is too fast, please try again later')
+    if session_is_overdue(response):
+        response = requests.get(url=url, params=params, headers=headers).json()
+    # if 'publish_page' not in response.keys():
+    #     raise Exception('The number of requests is too fast, please try again later')
     messages = json.loads(response['publish_page'])['publish_list']
     for message_i in range(len(messages)):
         message = json.loads(messages[message_i]['publish_info'])
@@ -142,9 +100,6 @@ def fakeid2message_update(fakeid, message_exist=[]):
             continue
         for i in range(len(message['appmsgex'])):
             link = message['appmsgex'][i]['link']
-            # 检查博文是否正常运行(未被作者删除)
-            # if message_is_delete(link):
-            #     continue
 
             real_time = jstime2realtime(message['appmsgex'][i]['create_time'])
             message_url.append({
@@ -156,9 +111,36 @@ def fakeid2message_update(fakeid, message_exist=[]):
     message_url.sort(key=lambda x: x['create_time'])
     return message_url
 
+def login():
+    import re
+    from selenium import webdriver
+    # 根据 chrome 浏览器的版本下载对应的 chromedriver
+    bro = webdriver.Chrome(executable_path='./chromedriver.exe')
+    bro.get('https://mp.weixin.qq.com/')
+    bro.maximize_window()
+    while not 'token' in bro.current_url:
+        pass
+
+    token = re.search(r'token=(.*)', bro.current_url).group(1)
+    cookie = bro.get_cookies()
+    cookie_str = ''
+    for c in cookie:
+        cookie_str += c['name'] + '=' + c['value'] + '; '
+
+    id_info = {
+        'token': token,
+        'cookie': cookie_str,
+    }
+    with open('./data/id_info.json', 'w', encoding='utf-8') as fp:
+        json.dump(id_info, fp, ensure_ascii=False, indent=4)
+    bro.close()
+
+
 if __name__ == '__main__':
 
-    with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
-        message_info = json.load(fp)
+    # with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
+    #     message_info = json.load(fp)
+    #
+    # fakeid2message_update('MzAxMjc3MjkyMg==', message_info['老刘说NLP']['blogs'])
 
-    fakeid2message_update('MzAxMjc3MjkyMg==', message_info['老刘说NLP']['blogs'])
+    login()
