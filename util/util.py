@@ -7,13 +7,9 @@
 # @description : 工具函数，存储一些通用的函数
 
 import os
-
 from tqdm import tqdm
-
 os.chdir('D:\\learning\\python\\WeChatOA_Aggregation')
 import json
-from collections import defaultdict
-
 import requests
 from lxml import etree
 
@@ -35,14 +31,12 @@ def message_is_delete(url='', response=None):
 
 # 自检函数，更新message_info.json文件
 def update_message_info():
-    with open('./data/message_info.json', 'r', encoding='utf-8') as f:
-        messages = json.load(f)
-    with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
-        delete_messages = json.load(f)
+    message_info = handle_json('message_info')
+    delete_messages = handle_json('delete_message')
     delete_messages_set = set(delete_messages['is_delete'])
 
     try:
-        for k, v in tqdm(messages.items(), total=len(messages)):
+        for k, v in tqdm(message_info.items(), total=len(message_info)):
             for m in v['blogs']:
                 if m['id'] in delete_messages_set:
                     continue
@@ -51,52 +45,7 @@ def update_message_info():
     except:
         pass
 
-    with open('./data/delete_message.json', 'w', encoding='utf-8') as f:
-        json.dump(delete_messages, f, indent=4, ensure_ascii=False)
-
-
-# 以message_info文件生成title_head文件
-def generate_title_head():
-    with open('./data/message_info.json', 'r', encoding='utf-8') as f:
-        messages = json.load(f)
-    with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
-        delete_messages = json.load(f)
-    delete_messages_set = set(delete_messages['is_delete'])
-
-    # 以 title 为 key 写入 json 文件，记录有几个重复的title和它们的相关信息
-    title_head = defaultdict(dict)
-    for k, v in messages.items():
-        for m in v['blogs']:
-            if m['id'] in delete_messages_set:
-                continue
-            title = m['title']
-            if title not in title_head.keys():
-                title_head[title] = {
-                    'co_count': 1,
-                    'links': [],
-                }
-            cur_m = {
-                'id': m['id'],
-                'link': m['link'],
-                'create_time': m['create_time'],
-            }
-            title_head[title]['links'].append(cur_m)
-
-    for k, v in title_head.items():
-        v['links'].sort(key=lambda x: x['create_time'])
-        title_head[k]['co_count'] = len(v['links'])
-    with open('./data/title_head.json', 'w', encoding='utf-8') as f:
-        json.dump(title_head, f, indent=4, ensure_ascii=False)
-
-def sort_messages():
-    with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
-        message_info = json.load(fp)
-
-    for k, v in message_info.items():
-        v['blogs'].sort(key=lambda x: x['create_time'])
-
-    with open('./data/message_info.json', 'w', encoding='utf-8') as fp:
-        json.dump(message_info, fp, ensure_ascii=False, indent=4)
+    handle_json('message_info', message_info)
 
 def handle_json(file_name, data=None):
     if not file_name.endswith('.json'):
@@ -111,8 +60,7 @@ def handle_json(file_name, data=None):
 
 
 if __name__ == '__main__':
-    # update_message_info()
-    generate_title_head()
+    update_message_info()
     # delete_messages = {
     #     'is_delete': []
     # }

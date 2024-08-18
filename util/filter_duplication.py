@@ -16,12 +16,12 @@
     - [x] 解决方案2：改进`tree.xpath`取文本策略，获取所有section和p标签，取此标签下的所有文本并还原顺序
 '''
 
-
+from collections import defaultdict
 import requests
 from lxml import etree
 from tqdm import tqdm
 
-from .util import headers, message_is_delete, handle_json
+from util import headers, message_is_delete, handle_json
 
 
 def url2text(url):
@@ -91,6 +91,7 @@ def calc_duplicate_rate1(text_list1, text_list2):
 
 
 def get_filtered_message():
+    generate_title_head()
     title_head = handle_json('title_head')
     delete_messages = handle_json('delete_message')
     duplicate_message = handle_json('dup_message')
@@ -104,21 +105,22 @@ def get_filtered_message():
         for i in range(v['co_count']):
             text_list1 = url2text(v['links'][i]['link'])
             if text_list1 == '已删除':
-                delete_messages['is_delete'].append(v['links'][i]['link'])
+                delete_messages['is_delete'].append(v['links'][i]['id'])
             else:
                 from_id = v['links'][i]['id']
                 break
 
-        for j in range(i, v['co_count']):
+        for j in range(i+1, v['co_count']):
             # 已经计算过这两个之间的重复率
             if v['links'][j]['id'] in duplicate_message.keys() and duplicate_message[v['links'][j]['id']]['from_id'] == from_id:
                 continue
             text_list2 = url2text(v['links'][j]['link'])
             if text_list2 == '请求错误':
                 error_links.append(v['links'][j]['link'])
+                delete_messages['is_delete'].append(v['links'][j]['id'])
                 continue
             elif text_list2 == '已删除':
-                delete_messages['is_delete'].append(v['links'][j]['link'])
+                delete_messages['is_delete'].append(v['links'][j]['id'])
                 continue
 
             score = calc_duplicate_rate1(text_list1, text_list2)
@@ -135,6 +137,37 @@ def get_filtered_message():
     handle_json('delete_message', data=delete_messages)
 
 
+# 以message_info文件生成title_head文件
+def generate_title_head():
+    message_info = handle_json('message_info')
+    delete_messages = handle_json('delete_message')
+    delete_messages_set = set(delete_messages['is_delete'])
+
+    # 以 title 为 key 写入 json 文件，记录有几个重复的title和它们的相关信息
+    title_head = defaultdict(dict)
+    for k, v in message_info.items():
+        for m in v['blogs']:
+            if m['id'] in delete_messages_set:
+                continue
+            title = m['title']
+            if title not in title_head.keys():
+                title_head[title] = {
+                    'co_count': 1,
+                    'links': [],
+                }
+            cur_m = {
+                'id': m['id'],
+                'link': m['link'],
+                'create_time': m['create_time'],
+            }
+            title_head[title]['links'].append(cur_m)
+
+    for k, v in title_head.items():
+        v['links'].sort(key=lambda x: x['create_time'])
+        title_head[k]['co_count'] = len(v['links'])
+    handle_json('title_head', data=title_head)
+
+
 if __name__ == '__main__':
     # url1 = 'http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488093&idx=1&sn=4c61d43fd3e6e57f632f1fe2c29ab59e&chksm=c17d2d79f60aa46f13db4861aa9fd16eb9010759e2cd6a5887a574333badba95975f32e19e98#rd'
     # url2 = 'http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485270&idx=3&sn=80f4ac6489b22f697de59f08fc1353a4&chksm=c2fdbd16f58a3400c4ec3269b308f317f53635def558a32bad516a5d6184a4aa641b7cdd516f#rd'
@@ -142,6 +175,14 @@ if __name__ == '__main__':
     # text_list2 = url2text1(url2)
     # co_rate = calc_duplicate_rate1(text_list1, text_list2)
     # print(co_rate)
+    url = 'https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650930329&idx=1&sn=1418416efe70fd2a965ac259fac81c3d&chksm=84e438e7b393b1f17389649e3aa6287871633b4063b184cdaf32ce70715dc041e1eb0cbab216#rd'
+    text_list1 = url2text(url)
+    url2 = 'https://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247564131&idx=2&sn=7ac4c81349e53d0709803e1ce24a68a9&chksm=976d5efea01ad7e8c353354ea58ef0ff35b258e5307b78636b4c86251e9619a78469744f92a7#rd'
+    text_list2 = url2text(url2)
+    co_rate = calc_duplicate_rate1(text_list1, text_list2)
 
+    from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
+    score = sentence_bleu([list(''.join(text_list1))], list(''.join(text_list2)), weights=(0.25, 0.25, 0.25, 0.25))
+    print(score)
 
     get_filtered_message()

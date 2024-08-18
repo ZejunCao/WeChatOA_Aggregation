@@ -145,6 +145,14 @@ class WechatRequest:
             raise Exception('The number of requests is too fast, please try again later')
         return False
 
+    def sort_messages(self):
+        message_info = handle_json('message_info')
+
+        for k, v in message_info.items():
+            v['blogs'].sort(key=lambda x: x['create_time'])
+
+        handle_json('message_info', data=message_info)
+
 
 if __name__ == '__main__':
 

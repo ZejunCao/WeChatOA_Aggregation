@@ -41,6 +41,8 @@ tags:
             if m['id'] in delete_messages_set:
                 delete_count += 1
                 continue
+            if m['title'] == '一文看尽LLM对齐技术：RLHF、RLAIF、PPO、DPO……':
+                print()
             # 去掉重复率高的文章
             if m['id'] in dup_message.keys() and dup_message[m['id']]['duplicate_rate'] > 0.5:
                 dup_count += 1
