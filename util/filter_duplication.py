@@ -5,13 +5,23 @@
 # @File        : filter_duplication.py
 # @Software    : Pycharm
 # @description : 去重操作
+'''
+## 实验过程
+- 根据标题去重
+  - 存在问题：存在标题相同内容不同，例如“今日Github最火的10个Python项目”，该公众号每天都用这个标题，但是内容每日更新
+  - [ ] 解决方案1：增加白名单，保留该标题所有博文（不需要）
+  - [x] 解决方案2：获取文章具体内容，使用`tree.xpath`提取对应`div`下的所有`//text()`，以列表形式返回，计算两个文本列表的重叠个数占比
+    - 存在问题：取`//text()`的方式是按照标签分割，一些加粗的文本会单独列出，导致文章结尾多出很多无意义文本，但在列表长度上占比很大
+    - [x] 解决方案1：以重叠字数计算占比，而不是重叠列表长度
+    - [x] 解决方案2：改进`tree.xpath`取文本策略，获取所有section和p标签，取此标签下的所有文本并还原顺序
+'''
 
-import json
+
 import requests
 from lxml import etree
 from tqdm import tqdm
 
-from .util import headers, message_is_delete
+from .util import headers, message_is_delete, handle_json
 
 
 def url2text(url):
@@ -81,12 +91,9 @@ def calc_duplicate_rate1(text_list1, text_list2):
 
 
 def get_filtered_message():
-    with open('./data/title_head.json', 'r', encoding='utf-8') as f:
-        title_head = json.load(f)
-    with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
-        delete_messages = json.load(f)
-    with open('./data/dup_message.json', 'r', encoding='utf-8') as f:
-        duplicate_message = json.load(f)
+    title_head = handle_json('title_head')
+    delete_messages = handle_json('delete_message')
+    duplicate_message = handle_json('dup_message')
 
     error_links = []
     for k, v in tqdm(title_head.items(), total=len(title_head)):
@@ -123,14 +130,10 @@ def get_filtered_message():
     for e in error_links:
         print(e)
     print(f'共有{len(error_links)}个链接读取失败')
-    with open('./data/title_head.json', 'w', encoding='utf-8') as f:
-        json.dump(title_head, f, indent=4, ensure_ascii=False)
+    handle_json('title_head', data=title_head)
+    handle_json('dup_message', data=duplicate_message)
+    handle_json('delete_message', data=delete_messages)
 
-    with open('./data/dup_message.json', 'w', encoding='utf-8') as f:
-        json.dump(duplicate_message, f, indent=4, ensure_ascii=False)
-
-    with open('./data/delete_message.json', 'w', encoding='utf-8') as f:
-        json.dump(delete_messages, f, indent=4, ensure_ascii=False)
 
 if __name__ == '__main__':
     # url1 = 'http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488093&idx=1&sn=4c61d43fd3e6e57f632f1fe2c29ab59e&chksm=c17d2d79f60aa46f13db4861aa9fd16eb9010759e2cd6a5887a574333badba95975f32e19e98#rd'

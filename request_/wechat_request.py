@@ -11,22 +11,12 @@ import json
 from lxml import etree
 import time
 import datetime
-from util.util import token, headers
+from util.util import handle_json, headers
 
-# 将js获取的时间id转化成真实事件，截止到分钟
+# 将js获取的时间id转化成真实时间，截止到分钟
 def jstime2realtime(jstime):
     return (datetime.datetime.strptime("1970-01-01 08:00", "%Y-%m-%d %H:%M") + datetime.timedelta(
         minutes=jstime // 60)).strftime("%Y-%m-%d %H:%M")
-
-# 检查session和token是否过期
-def session_is_overdue(response):
-    err_msg = response['base_resp']['err_msg']
-    if err_msg in ['invalid session', 'invalid csrf token']:
-        login()
-        return True
-    if err_msg == 'freq control':
-        raise Exception('The number of requests is too fast, please try again later')
-    return False
 
 # 计算时间差
 def time_delta(time1, time2):
@@ -35,105 +25,125 @@ def time_delta(time1, time2):
 def time_now():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-# 使用公众号名字获取 id 值
-def name2fakeid(name):
-    params = {
-        'action': 'search_biz',
-        'begin': 0,
-        'count': 5,
-        'query': name,
-        'token': token,
-        'lang': 'zh_CN',
-        'f': 'json',
-        'ajax': 1,
-    }
+class WechatRequest:
+    def __init__(self):
+        id_info = handle_json('id_info')
+        self.headers = headers
+        self.headers['Cookie'] = id_info['cookie']
+        self.token = id_info['token']
 
-    nickname = {}
-    url = 'https://mp.weixin.qq.com/cgi-bin/searchbiz?'
-    # 避免请求频率过高
-    while True:
-        response = requests.get(url=url, params=params, headers=headers).json()
-        if response['base_resp']['err_msg'] == 'ok':
-            break
+    # 使用公众号名字获取 id 值
+    def name2fakeid(self, name):
+        params = {
+            'action': 'search_biz',
+            'begin': 0,
+            'count': 5,
+            'query': name,
+            'token': self.token,
+            'lang': 'zh_CN',
+            'f': 'json',
+            'ajax': 1,
+        }
+
+        nickname = {}
+        url = 'https://mp.weixin.qq.com/cgi-bin/searchbiz?'
+        # 避免请求频率过高
+        while True:
+            response = requests.get(url=url, params=params, headers=headers).json()
+            if response['base_resp']['err_msg'] == 'ok':
+                break
+            else:
+                time.sleep(0.1)
+        for l in response['list']:
+            nickname[l['nickname']] = l['fakeid']
+        if name in nickname.keys():
+            return nickname[name]
         else:
-            time.sleep(0.1)
-    for l in response['list']:
-        nickname[l['nickname']] = l['fakeid']
-    if name in nickname.keys():
-        return nickname[name]
-    else:
-        return None
+            return None
 
-# 请求次数限制，不是请求文章条数限制
-def fakeid2message_update(fakeid, message_exist=[]):
-    params = {
-        'sub': 'list',
-        'search_field': 'null',
-        'begin': 0,
-        'count': 20,
-        'query': '',
-        'fakeid': fakeid,
-        'type': '101_1',
-        'free_publish_type': 1,
-        'sub_action': 'list_ex',
-        'token': token,
-        'lang': 'zh_CN',
-        'f': 'json',
-        'ajax': 1,
-    }
-    # 根据文章id判断新爬取的文章是否已存在
-    msgid_exist = set()
-    for m in message_exist:
-        msgid_exist.add(int(m['id'].split('/')[0]))
+    # 请求次数限制，不是请求文章条数限制
+    def fakeid2message_update(self, fakeid, message_exist=[]):
+        params = {
+            'sub': 'list',
+            'search_field': 'null',
+            'begin': 0,
+            'count': 20,
+            'query': '',
+            'fakeid': fakeid,
+            'type': '101_1',
+            'free_publish_type': 1,
+            'sub_action': 'list_ex',
+            'token': self.token,
+            'lang': 'zh_CN',
+            'f': 'json',
+            'ajax': 1,
+        }
+        # 根据文章id判断新爬取的文章是否已存在
+        msgid_exist = set()
+        for m in message_exist:
+            msgid_exist.add(int(m['id'].split('/')[0]))
 
-    message_url = []
-    url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
-    response = requests.get(url=url, params=params, headers=headers).json()
-    if session_is_overdue(response):
+        message_url = []
+        url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
         response = requests.get(url=url, params=params, headers=headers).json()
-    # if 'publish_page' not in response.keys():
-    #     raise Exception('The number of requests is too fast, please try again later')
-    messages = json.loads(response['publish_page'])['publish_list']
-    for message_i in range(len(messages)):
-        message = json.loads(messages[message_i]['publish_info'])
-        if message['msgid'] in msgid_exist:
-            continue
-        for i in range(len(message['appmsgex'])):
-            link = message['appmsgex'][i]['link']
+        if self.session_is_overdue(response):
+            params['token'] = self.token
+            response = requests.get(url=url, params=params, headers=headers).json()
+            self.session_is_overdue(response)
+        # if 'publish_page' not in response.keys():
+        #     raise Exception('The number of requests is too fast, please try again later')
+        messages = json.loads(response['publish_page'])['publish_list']
+        for message_i in range(len(messages)):
+            message = json.loads(messages[message_i]['publish_info'])
+            if message['msgid'] in msgid_exist:
+                continue
+            for i in range(len(message['appmsgex'])):
+                link = message['appmsgex'][i]['link']
 
-            real_time = jstime2realtime(message['appmsgex'][i]['create_time'])
-            message_url.append({
-                'title': message['appmsgex'][i]['title'],
-                'create_time': real_time,
-                'link': link,
-                'id': str(message['msgid']) + '/' + str(message['appmsgex'][i]['aid']),
-            })
-    message_url.sort(key=lambda x: x['create_time'])
-    return message_url
+                real_time = jstime2realtime(message['appmsgex'][i]['create_time'])
+                message_url.append({
+                    'title': message['appmsgex'][i]['title'],
+                    'create_time': real_time,
+                    'link': link,
+                    'id': str(message['msgid']) + '/' + str(message['appmsgex'][i]['aid']),
+                })
+        message_url.sort(key=lambda x: x['create_time'])
+        return message_url
 
-def login():
-    import re
-    from selenium import webdriver
-    # 根据 chrome 浏览器的版本下载对应的 chromedriver
-    bro = webdriver.Chrome(executable_path='./chromedriver.exe')
-    bro.get('https://mp.weixin.qq.com/')
-    bro.maximize_window()
-    while not 'token' in bro.current_url:
-        pass
+    def login(self):
+        import re
+        from selenium import webdriver
+        # 根据 chrome 浏览器的版本下载对应的 chromedriver
+        bro = webdriver.Chrome(executable_path='./chromedriver.exe')
+        bro.get('https://mp.weixin.qq.com/')
+        bro.maximize_window()
+        while not 'token' in bro.current_url:
+            pass
 
-    token = re.search(r'token=(.*)', bro.current_url).group(1)
-    cookie = bro.get_cookies()
-    cookie_str = ''
-    for c in cookie:
-        cookie_str += c['name'] + '=' + c['value'] + '; '
+        token = re.search(r'token=(.*)', bro.current_url).group(1)
+        cookie = bro.get_cookies()
+        cookie_str = ''
+        for c in cookie:
+            cookie_str += c['name'] + '=' + c['value'] + '; '
 
-    id_info = {
-        'token': token,
-        'cookie': cookie_str,
-    }
-    with open('./data/id_info.json', 'w', encoding='utf-8') as fp:
-        json.dump(id_info, fp, ensure_ascii=False, indent=4)
-    bro.close()
+        self.token = token
+        self.headers['Cookie'] = cookie_str
+        id_info = {
+            'token': token,
+            'cookie': cookie_str,
+        }
+        handle_json('id_info', data=id_info)
+        bro.close()
+
+    # 检查session和token是否过期
+    def session_is_overdue(self, response):
+        err_msg = response['base_resp']['err_msg']
+        if err_msg in ['invalid session', 'invalid csrf token']:
+            self.login()
+            return True
+        if err_msg == 'freq control':
+            raise Exception('The number of requests is too fast, please try again later')
+        return False
 
 
 if __name__ == '__main__':

@@ -8,9 +8,9 @@
 
 import os
 os.chdir('D:\\learning\\python\\WeChatOA_Aggregation')
-import json
 import datetime
 from collections import defaultdict
+from .util import handle_json
 
 
 def message2md(message_info=None):
@@ -24,13 +24,10 @@ tags:
 ---
 '''
     if not message_info:
-        with open('./data/message_info.json', 'r', encoding='utf-8') as fp:
-            message_info = json.load(fp)
-    with open('./data/delete_message.json', 'r', encoding='utf-8') as f:
-        delete_messages = json.load(f)
+        message_info = handle_json('message_info')
+    dup_message = handle_json('dup_message')
+    delete_messages = handle_json('delete_message')
     delete_messages_set = set(delete_messages['is_delete'])
-    with open('./data/dup_message.json', 'r', encoding='utf-8') as f:
-        dup_message = json.load(f)
 
     delete_count = 0
     dup_count = 0

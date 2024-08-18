@@ -18,14 +18,8 @@ import requests
 from lxml import etree
 
 
-# token和Cookie定期更换
-with open('./data/id_info.json', 'r', encoding='utf-8') as f:
-    id_info = json.load(f)
-token = id_info['token']
-cookie = id_info['cookie']
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
-    'Cookie': cookie
 }
 
 
@@ -56,10 +50,6 @@ def update_message_info():
                     delete_messages['is_delete'].append(m['id'])
     except:
         pass
-
-    # 已被博主删除的文章，在message_info中添加is_delete字段，不进行删除
-    # for k, v in messages.items():
-    #     v['blogs'] = [i for i in v['blogs'] if not i['is_delete']]
 
     with open('./data/delete_message.json', 'w', encoding='utf-8') as f:
         json.dump(delete_messages, f, indent=4, ensure_ascii=False)
@@ -107,6 +97,17 @@ def sort_messages():
 
     with open('./data/message_info.json', 'w', encoding='utf-8') as fp:
         json.dump(message_info, fp, ensure_ascii=False, indent=4)
+
+def handle_json(file_name, data=None):
+    if not file_name.endswith('.json'):
+        file_name = './data/' + file_name + '.json'
+
+    if not data:
+        with open(file_name, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    else:
+        with open(file_name, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == '__main__':
