@@ -99,7 +99,8 @@ class WechatRequest:
                 continue
             for i in range(len(message['appmsgex'])):
                 link = message['appmsgex'][i]['link']
-
+                if not message['appmsgex'][i]['create_time']:
+                    continue
                 real_time = jstime2realtime(message['appmsgex'][i]['create_time'])
                 message_url.append({
                     'title': message['appmsgex'][i]['title'],
@@ -161,4 +162,5 @@ if __name__ == '__main__':
     #
     # fakeid2message_update('MzAxMjc3MjkyMg==', message_info['老刘说NLP']['blogs'])
 
-    login()
+    wechat_request = WechatRequest()
+    wechat_request.sort_messages()

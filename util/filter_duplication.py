@@ -20,6 +20,7 @@ from collections import defaultdict
 import requests
 from lxml import etree
 from tqdm import tqdm
+from upstash_vector import Index
 
 from util import headers, message_is_delete, handle_json
 
@@ -168,6 +169,82 @@ def generate_title_head():
     handle_json('title_head', data=title_head)
 
 
+class UpstashVector:
+    def __init__(self):
+        id_info = handle_json('id_info')
+        self.delete_messages = handle_json('delete_message')
+        self.delete_messages_set = set(self.delete_messages['is_delete'])
+        self.index = Index(url=id_info['upstash_url'],
+                      token=id_info['upstash_token'])
+        self.dup_vector_message = {
+            "1000001086/2247549329_1": {
+                "from_id": "1000000273/2247504853_1",
+                "duplicate_rate": 1
+            }
+        }
+
+    def upsert(self, text_list, m):
+        self.index.upsert(
+            vectors=[
+                (m['id'], '\n'.join(text_list),
+                 {
+                     "title": m['title'],
+                     "create_time": m['create_time'],
+                     "link": m['link'],
+                  }
+                 ),
+            ]
+        )
+
+    def query_vector(self, text_list, top_k=1):
+        query_result = self.index.query(
+            data='\n'.join(text_list),
+            top_k=top_k,
+            include_vectors=True,
+            include_metadata=True,
+            include_data=True,
+        )
+        return query_result
+
+    def write_vector(self):
+        message_info = handle_json('message_info')
+
+        message_total = [m for v in message_info.values() for m in v['blogs']
+                         if m['id'] not in self.delete_messages_set
+                         and m['create_time'] > "2024-07-01"]
+        message_total.sort(key=lambda x: x['create_time'])
+        for i, m in tqdm(enumerate(message_total), total=len(message_total)):
+            if i < 339:
+                continue
+            # query_result = self.query_vector(m)
+
+            # fetch_result = self.index.fetch(
+            #     ids=m['id'],
+            #     include_vectors=True,
+            #     include_metadata=True,
+            #     include_data=True,
+            # )
+            # if fetch_result[0]:
+            #     continue
+            text_list = url2text(m['link'])
+            self.is_delete(text_list, m['id'])
+
+            query_result = self.query_vector(m)
+            if query_result[0].score > 0.9:
+                self.dup_vector_message[m['id']] = {
+                        'from_id': query_result[0].id,
+                        'duplicate_rate': query_result[0].score
+                }
+            self.upsert(text_list, m)
+            if i % 300 == 0:
+                handle_json('dup_vector_message', data=self.dup_vector_message)
+
+    def is_delete(self, text_list, id_):
+        if text_list in ['请求错误', '已删除']:
+            self.delete_messages['is_delete'].append(id_)
+            handle_json('delete_message', data=self.delete_messages)
+
+
 if __name__ == '__main__':
     # url1 = 'http://mp.weixin.qq.com/s?__biz=MzkxMzUxNzEzMQ==&mid=2247488093&idx=1&sn=4c61d43fd3e6e57f632f1fe2c29ab59e&chksm=c17d2d79f60aa46f13db4861aa9fd16eb9010759e2cd6a5887a574333badba95975f32e19e98#rd'
     # url2 = 'http://mp.weixin.qq.com/s?__biz=MzkzODY1MTQzOQ==&mid=2247485270&idx=3&sn=80f4ac6489b22f697de59f08fc1353a4&chksm=c2fdbd16f58a3400c4ec3269b308f317f53635def558a32bad516a5d6184a4aa641b7cdd516f#rd'
@@ -175,14 +252,19 @@ if __name__ == '__main__':
     # text_list2 = url2text1(url2)
     # co_rate = calc_duplicate_rate1(text_list1, text_list2)
     # print(co_rate)
-    url = 'https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650930329&idx=1&sn=1418416efe70fd2a965ac259fac81c3d&chksm=84e438e7b393b1f17389649e3aa6287871633b4063b184cdaf32ce70715dc041e1eb0cbab216#rd'
-    text_list1 = url2text(url)
-    url2 = 'https://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247564131&idx=2&sn=7ac4c81349e53d0709803e1ce24a68a9&chksm=976d5efea01ad7e8c353354ea58ef0ff35b258e5307b78636b4c86251e9619a78469744f92a7#rd'
-    text_list2 = url2text(url2)
-    co_rate = calc_duplicate_rate1(text_list1, text_list2)
+    # url = 'https://mp.weixin.qq.com/s?__biz=MzA3MzI4MjgzMw==&mid=2650930329&idx=1&sn=1418416efe70fd2a965ac259fac81c3d&chksm=84e438e7b393b1f17389649e3aa6287871633b4063b184cdaf32ce70715dc041e1eb0cbab216#rd'
+    # text_list1 = url2text(url)
+    # url2 = 'https://mp.weixin.qq.com/s?__biz=MzIwOTc2MTUyMg==&mid=2247564131&idx=2&sn=7ac4c81349e53d0709803e1ce24a68a9&chksm=976d5efea01ad7e8c353354ea58ef0ff35b258e5307b78636b4c86251e9619a78469744f92a7#rd'
+    # text_list2 = url2text(url2)
+    # co_rate = calc_duplicate_rate1(text_list1, text_list2)
+    #
+    # from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
+    # score = sentence_bleu([list(''.join(text_list1))], list(''.join(text_list2)), weights=(0.25, 0.25, 0.25, 0.25))
+    # print(score)
+    #
+    # get_filtered_message()
+    # message_info = handle_json('message_info')
+    # message_total = [m for v in message_info.values() for m in v['blogs']]
 
-    from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
-    score = sentence_bleu([list(''.join(text_list1))], list(''.join(text_list2)), weights=(0.25, 0.25, 0.25, 0.25))
-    print(score)
-
-    get_filtered_message()
+    upstash_vector = UpstashVector()
+    upstash_vector.write_vector()
