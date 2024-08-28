@@ -7,6 +7,8 @@
 # @description : 工具函数，存储一些通用的函数
 
 import os
+import shutil
+
 from tqdm import tqdm
 os.chdir('D:\\learning\\python\\WeChatOA_Aggregation')
 import json
@@ -52,11 +54,16 @@ def handle_json(file_name, data=None):
         file_name = './data/' + file_name + '.json'
 
     if not data:
+        if not os.path.exists(file_name):
+            return {}
         with open(file_name, 'r', encoding='utf-8') as f:
             return json.load(f)
     else:
-        with open(file_name, 'w', encoding='utf-8') as f:
+        # 安全写入，防止在写入过程中中断程序导致数据丢失
+        with open('tmp.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
+        shutil.move('tmp.json', file_name)
+
 
 
 if __name__ == '__main__':
