@@ -89,6 +89,8 @@ def calc_duplicate_rate1(text_list1, text_list2):
     :param text_list2: 其余相同 title 的文章
     :return:
     '''
+    if len(''.join(text_list1)) == 0:
+        return 0
     text_set2 = set(text_list2)
     co_word_count = 0
     for t in text_list1:
