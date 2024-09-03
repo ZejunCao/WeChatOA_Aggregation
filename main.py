@@ -7,9 +7,8 @@
 # @description : 主程序，爬取文章并存储
 
 from tqdm import tqdm
-import json
 from request_.wechat_request import WechatRequest, time_delta, time_now
-from util.message2md import message2md
+from util.message2md import message2md, message2md_byname
 from util.util import handle_json
 
 
@@ -36,3 +35,4 @@ if __name__ == '__main__':
 
     # 将message_info转换为md上传到个人博客系统
     message2md(message_info)
+    message2md_byname(message_info)

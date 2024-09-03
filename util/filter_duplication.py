@@ -14,6 +14,8 @@
     - 存在问题：取`//text()`的方式是按照标签分割，一些加粗的文本会单独列出，导致文章结尾多出很多无意义文本，但在列表长度上占比很大
     - [x] 解决方案1：以重叠字数计算占比，而不是重叠列表长度
     - [x] 解决方案2：改进`tree.xpath`取文本策略，获取所有section和p标签，取此标签下的所有文本并还原顺序
+
+- datasketch官方文档：https://ekzhu.com/datasketch/lsh.html
 '''
 import os.path
 import re
