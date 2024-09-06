@@ -6,8 +6,7 @@
 # @Software    : Pycharm
 # @description : 将微信公众号聚合平台数据转换为markdown文件，上传博客平台
 
-import os
-os.chdir('D:\\learning\\python\\WeChatOA_Aggregation')
+from pathlib import Path
 import datetime
 from collections import defaultdict
 from .util import handle_json
@@ -66,7 +65,8 @@ tags:
         for m in md_dict[date]:
             md += f'* [{m["title"]}]({m["link"]})\n'
 
-    with open('./data/微信公众号聚合平台.md', 'w', encoding='utf-8') as f:
+    md_path = Path(__file__).parent.parent / 'data' / '微信公众号聚合平台.md'
+    with open(md_path, 'w', encoding='utf-8') as f:
         f.write(md)
 
 
@@ -116,7 +116,9 @@ tags:
             if m['create_time'] < '2024-07-01':
                 continue
             md += f'* [{m["title"]}]({m["link"]})\n'
-    with open('./data/微信公众号聚合平台_byname.md', 'w', encoding='utf-8') as f:
+
+    md_path = Path(__file__).parent / 'data' / '微信公众号聚合平台_byname.md'
+    with open(md_path, 'w', encoding='utf-8') as f:
         f.write(md)
 
 

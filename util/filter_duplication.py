@@ -17,7 +17,7 @@
 
 - datasketch官方文档：https://ekzhu.com/datasketch/lsh.html
 '''
-import os.path
+from pathlib import Path
 import re
 import pickle
 import sys
@@ -278,8 +278,8 @@ class minHashLSH:
         self.delete_messages_set = set(self.delete_messages['is_delete'])
 
         # 加载minhash签名缓存文件
-        self.minhash_dict_path = './data/minhash_dict.pickle'
-        if os.path.exists(self.minhash_dict_path):
+        self.minhash_dict_path = Path(__file__).parent.parent / 'data' / 'minhash_dict.pickle'
+        if self.minhash_dict_path.exists():
             with open(self.minhash_dict_path, 'rb') as fp:
                 self.minhash_dict = pickle.load(fp)
 

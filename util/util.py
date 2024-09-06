@@ -6,11 +6,10 @@
 # @Software    : Pycharm
 # @description : 工具函数，存储一些通用的函数
 
-import os
+from pathlib import Path
 import shutil
 
 from tqdm import tqdm
-os.chdir('D:\\learning\\python\\WeChatOA_Aggregation')
 import json
 import requests
 from lxml import etree
@@ -51,10 +50,10 @@ def update_message_info():
 
 def handle_json(file_name, data=None):
     if not file_name.endswith('.json'):
-        file_name = './data/' + file_name + '.json'
+        file_name = Path(__file__).parent.parent / 'data' / f'{file_name}.json'
 
     if not data:
-        if not os.path.exists(file_name):
+        if not file_name.exists():
             return {}
         with open(file_name, 'r', encoding='utf-8') as f:
             return json.load(f)
