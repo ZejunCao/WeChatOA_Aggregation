@@ -117,7 +117,7 @@ tags:
                 continue
             md += f'* [{m["title"]}]({m["link"]})\n'
 
-    md_path = Path(__file__).parent / 'data' / '微信公众号聚合平台_byname.md'
+    md_path = Path(__file__).parent.parent / 'data' / '微信公众号聚合平台_byname.md'
     with open(md_path, 'w', encoding='utf-8') as f:
         f.write(md)
 
