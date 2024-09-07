@@ -113,16 +113,16 @@ class WechatRequest:
 
     def login(self):
         import re
-        from selenium import webdriver
-        # 根据 chrome 浏览器的版本下载对应的 chromedriver
-        bro = webdriver.Chrome(executable_path='./chromedriver.exe')
+        from DrissionPage import ChromiumPage
+
+        bro = ChromiumPage()
         bro.get('https://mp.weixin.qq.com/')
-        bro.maximize_window()
-        while not 'token' in bro.current_url:
+        bro.set.window.max()
+        while 'token' not in bro.url:
             pass
 
-        token = re.search(r'token=(.*)', bro.current_url).group(1)
-        cookie = bro.get_cookies()
+        token = re.search(r'token=(.*)', bro.url).group(1)
+        cookie = bro.cookies()
         cookie_str = ''
         for c in cookie:
             cookie_str += c['name'] + '=' + c['value'] + '; '
@@ -163,4 +163,7 @@ if __name__ == '__main__':
     # fakeid2message_update('MzAxMjc3MjkyMg==', message_info['老刘说NLP']['blogs'])
 
     wechat_request = WechatRequest()
-    wechat_request.sort_messages()
+    # wechat_request.sort_messages()
+
+    # 测试登录
+    wechat_request.login()
