@@ -6,10 +6,16 @@
 # @Software    : Pycharm
 # @description : 将微信公众号聚合平台数据转换为markdown文件，上传博客平台
 
+import sys
 from pathlib import Path
 import datetime
 from collections import defaultdict
-from .util import handle_json
+
+# 调试用，执行当前文件时防止路径导入错误
+if sys.argv[0] == __file__:
+    from util import handle_json
+else:
+    from .util import handle_json
 
 
 def message2md(message_info=None):
@@ -85,6 +91,7 @@ tags:
     if not message_info:
         message_info = handle_json('message_info')
 
+    name2fakeid = handle_json('name2fakeid')
     issues_message = handle_json('issues_message')
     delete_messages_set = set(issues_message['is_delete'])
 
@@ -92,6 +99,8 @@ tags:
     dup_count = 0
     md_dict = defaultdict(list)
     for k, v in message_info.items():
+        if k not in name2fakeid.keys():
+            continue
         for m in v['blogs']:
             # 历史遗留，有些文章没有创建时间，疑似已删除，待验证
             if not m['create_time']:
@@ -123,5 +132,5 @@ tags:
 
 
 if __name__ == '__main__':
-    # message2md()
+    message2md()
     message2md_byname()
