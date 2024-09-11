@@ -25,6 +25,16 @@
   - 想主打一个零成本，但免费的代理ip不稳定
 - [ ] 优化hexo网页显示或自己搭建一个博客
 
+## minHash实验记录
+- 在 4005 条博文的测试集下做的实验记录
+- 其中 minhash_0.9 代表 MinHashLSH 的阈值设置为 0.9
+
+| 方法                | 检测重复个数 | 错误个数           |
+|-------------------|--------|----------------|
+| minhash_0.9       | 528    | 0              |
+| minhash_0.8       | 699    | 24             |
+| minhash_0.8+规则0.7 | 665    | 1 (文字很少，主体为图片) |
+
 ## 类似项目参考
 - https://github.com/jooooock/wechat-article-exporter
 - https://github.com/1061700625/WeChat_Article
