@@ -68,8 +68,10 @@ def url2text(url):
     s_p = [p for p in div[0].iter() if p.tag in ['section', 'p']]
     text_list = []
     tag = []
+    filter_char = ['\xa0', '\u200d', '&nbsp;', '■', ' ']
+    pattern = '|'.join(filter_char)
     for s in s_p:
-        text = ''.join([i.replace('\xa0', '') for i in s.xpath('.//text()') if i != '\u200d'])
+        text = ''.join([re.sub(pattern, '', i) for i in s.xpath('.//text()') if i != '\u200d'])
         if not text:
             continue
         if text_list and text in text_list[-1]:
@@ -274,8 +276,12 @@ class minHashLSH:
         from datasketch import MinHash, MinHashLSH
         self.lsh = MinHashLSH(threshold=0.9, num_perm=128)
 
-        self.delete_messages = handle_json('delete_message')
-        self.delete_messages_set = set(self.delete_messages['is_delete'])
+        # 加载minhash重复文件
+        self.issues_message = handle_json('issues_message')
+        if 'dup_minhash' not in self.issues_message.keys():
+            self.issues_message['dup_minhash'] = {}
+
+        self.delete_messages_set = set(self.issues_message['is_delete'])
 
         # 加载minhash签名缓存文件
         self.minhash_dict_path = Path(__file__).parent.parent / 'data' / 'minhash_dict.pickle'
@@ -288,13 +294,8 @@ class minHashLSH:
         else:
             self.minhash_dict = {}
 
-        # 加载minhash重复文件
-        self.issues_message = handle_json('issues_message')
-        if 'dup_minhash' not in self.issues_message.keys():
-            self.issues_message['dup_minhash'] = {}
-
     def write_vector(self):
-        from datasketch import MinHash, MinHashLSH
+        from datasketch import MinHash
         message_info = handle_json('message_info')
 
         message_total = [m for v in message_info.values() for m in v['blogs']
@@ -322,9 +323,9 @@ class minHashLSH:
                 self.lsh.insert(m['id'], self.minhash_dict[m['id']])
 
     def is_delete(self, text_list, id_):
-        if text_list in ['请求错误', '已删除']:
-            self.delete_messages['is_delete'].append(id_)
-            handle_json('delete_message', data=self.delete_messages)
+        if text_list in ['已删除']:
+            self.issues_message['is_delete'].append(id_)
+            handle_json('issues_message', data=self.issues_message)
             return True
         return False
 
