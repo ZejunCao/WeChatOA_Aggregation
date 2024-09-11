@@ -26,6 +26,7 @@ import requests
 from lxml import etree
 from tqdm import tqdm
 from upstash_vector import Index
+from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
 
 # 调试用，执行当前文件时防止路径导入错误
 if sys.argv[0] == __file__:
@@ -102,6 +103,12 @@ def calc_duplicate_rate1(text_list1, text_list2):
             co_word_count += len(t)
     co_rate = co_word_count / len(''.join(text_list1))
     return co_rate
+
+def calc_duplicate_rate_max(text_list1, text_list2):
+    dup_rate = max([calc_duplicate_rate1(text_list1, text_list2), calc_duplicate_rate1(text_list2, text_list1)])
+    if dup_rate < 0.8:
+        dup_rate = max(dup_rate, sentence_bleu([list(''.join(text_list1))], list(''.join(text_list2))))
+    return dup_rate
 
 
 def get_filtered_message():
