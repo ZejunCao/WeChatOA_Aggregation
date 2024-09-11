@@ -49,7 +49,7 @@ class WechatRequest:
         url = 'https://mp.weixin.qq.com/cgi-bin/searchbiz?'
         # 避免请求频率过高
         while True:
-            response = requests.get(url=url, params=params, headers=headers).json()
+            response = requests.get(url=url, params=params, headers=self.headers).json()
             if response['base_resp']['err_msg'] == 'ok':
                 break
             else:
@@ -166,4 +166,7 @@ if __name__ == '__main__':
     # wechat_request.sort_messages()
 
     # 测试登录
-    wechat_request.login()
+    # wechat_request.login()
+
+    # 测试 name2fakeid
+    res = wechat_request.name2fakeid('央视新闻')
