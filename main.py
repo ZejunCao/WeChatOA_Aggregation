@@ -10,6 +10,7 @@ from tqdm import tqdm
 from request_.wechat_request import WechatRequest, time_delta, time_now
 from util.message2md import message2md, message2md_byname
 from util.util import handle_json
+from util.filter_duplication import minHashLSH
 
 
 if __name__ == '__main__':
@@ -32,6 +33,10 @@ if __name__ == '__main__':
 
     # 写入message_info，如果请求顺利进行，则正常写入
     handle_json('message_info', data=message_info)
+
+    # 每次更新时验证去重
+    with minHashLSH() as minhash:
+        minhash.write_vector()
 
     # 将message_info转换为md上传到个人博客系统
     message2md(message_info)
