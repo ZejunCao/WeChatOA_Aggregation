@@ -35,7 +35,7 @@ else:
     from .util import headers, message_is_delete, handle_json
 
 
-def url2text(url):
+def url2text(url, num=0):
     '''
     提取文本方法1：直接获取对应div下的所有文本，未处理
     :param url:
@@ -49,9 +49,9 @@ def url2text(url):
         div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       defaultNoSetting\n            "]')
     # 点进去显示分享一篇文章，然后需要再点阅读原文跳转
     if not div:
-        url = tree.xpath('//div[@class="original_panel_tool"]/span/@data-url')
-        if url:
-            response = requests.get(url[0], headers=headers).text
+        data_url = tree.xpath('//div[@class="original_panel_tool"]/span/@data-url')
+        if data_url:
+            response = requests.get(data_url[0], headers=headers).text
             tree = etree.HTML(response)
             # 不同文章存储字段的class标签名不同
             div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]')
@@ -63,8 +63,10 @@ def url2text(url):
         if message_is_delete(response=response):
             return '已删除'
         else:
-            # print(url)
-            return '请求错误'
+            # '请求错误'则再次重新请求，最多3次
+            if num == 3:
+                return '请求错误'
+            return url2text(url, num=num+1)
 
     s_p = [p for p in div[0].iter() if p.tag in ['section', 'p']]
     text_list = []
@@ -107,6 +109,7 @@ def calc_duplicate_rate1(text_list1, text_list2):
 def calc_duplicate_rate_max(text_list1, text_list2):
     dup_rate = max([calc_duplicate_rate1(text_list1, text_list2), calc_duplicate_rate1(text_list2, text_list1)])
     if dup_rate < 0.8:
+
         dup_rate = max(dup_rate, sentence_bleu([list(''.join(text_list1))], list(''.join(text_list2))))
     return dup_rate
 
@@ -189,6 +192,7 @@ def generate_title_head():
     handle_json('title_head', data=title_head)
 
 
+# 暂时弃用
 class UpstashVector:
     def __init__(self):
         id_info = handle_json('id_info')
@@ -281,7 +285,7 @@ class UpstashVector:
 class minHashLSH:
     def __init__(self):
         from datasketch import MinHash, MinHashLSH
-        self.lsh = MinHashLSH(threshold=0.9, num_perm=128)
+        self.lsh = MinHashLSH(threshold=0.8, num_perm=128)
 
         # 加载minhash重复文件
         self.issues_message = handle_json('issues_message')
@@ -304,12 +308,14 @@ class minHashLSH:
     def write_vector(self):
         from datasketch import MinHash
         message_info = handle_json('message_info')
+        id2url = {m['id']: m['link'] for v in message_info.values() for m in v['blogs']}
 
         message_total = [m for v in message_info.values() for m in v['blogs']
                          if m['id'] not in self.delete_messages_set
                          and m['create_time'] > "2024-07-01"]
         message_total.sort(key=lambda x: x['create_time'])
         for i, m in tqdm(enumerate(message_total), total=len(message_total)):
+            text_list = ''  # 防止后面用到
             if m['id'] not in self.minhash_dict.keys():
                 text_list = url2text(m['link'])
                 if self.is_delete(text_list, m['id']): continue
@@ -322,7 +328,19 @@ class minHashLSH:
 
             sim_m = self.lsh.query(self.minhash_dict[m['id']])
             if sim_m:
-                if m['id'] not in self.issues_message['dup_minhash'].keys():
+                if m['id'] in self.issues_message['dup_minhash'].keys():
+                    continue
+                # 如果有相似的，先判断jaccard相似度，大于0.9直接通过，若在0.8-0.9之间则使用规则再次判断
+                sim_m_res = []
+                for s in sim_m:
+                    if self.minhash_dict[m['id']].jaccard(self.minhash_dict[s]) >= 0.9:  # .jaccard会和MinHashLSH计算的有点差异
+                        sim_m_res.append(s)
+                    else:
+                        if not text_list: text_list = url2text(m['link'])
+                        dup_rate = calc_duplicate_rate_max(text_list, url2text(id2url[s]))
+                        if dup_rate > 0.7:
+                            sim_m_res.append(s)
+                if sim_m_res:
                     self.issues_message['dup_minhash'][m['id']] = {
                         'from_id': sim_m,
                     }
