@@ -110,14 +110,14 @@ tags:
                 delete_count += 1
                 continue
             # 去掉重复率高的文章
-            if m['id'] in issues_message['dup_minhash'].keys():
-                dup_count += 1
-                continue
+            # if m['id'] in issues_message['dup_minhash'].keys():
+            #     dup_count += 1
+            #     continue
 
             md_dict[k].append(m)
 
-    print(f'{delete_count} messages have been deleted')
-    print(f'{dup_count} messages have been deduplicated')
+    # print(f'{delete_count} messages have been deleted')
+    # print(f'{dup_count} messages have been deduplicated')
     md_dict = {k: sorted(v, key=lambda x: x['create_time'], reverse=True) for k, v in md_dict.items()}
     for k, v in md_dict.items():
         md += f'## {k}\n'
