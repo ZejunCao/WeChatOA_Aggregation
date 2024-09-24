@@ -22,5 +22,14 @@ else
     exit 1
 fi
 
+SOURCE_PATH="D:\learning\python\WeChatOA_Aggregation\data\微信公众号聚合平台_byname.md"
+TARGET_PATH="D:\learning\zejun'blog\Hexo\source\_posts"
+if test -d "$TARGET_PATH"; then
+    cp $SOURCE_PATH $TARGET_PATH
+else
+    echo "目标路径不存在: $TARGET_PATH"
+    exit 1
+fi
+
 cd "D:\learning\zejun'blog\Hexo"
 hexo g -d
