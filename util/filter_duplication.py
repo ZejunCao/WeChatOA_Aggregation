@@ -325,6 +325,9 @@ class minHashLSH:
                 for d in text_list:
                     min1.update(d.encode('utf8'))
                 self.minhash_dict[m['id']] = min1
+            else:
+                # 已 minhash 编码的文章也已去过重
+                continue
 
             sim_m = self.lsh.query(self.minhash_dict[m['id']])
             if sim_m:
