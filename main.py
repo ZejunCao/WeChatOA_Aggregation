@@ -21,6 +21,14 @@ if __name__ == '__main__':
     wechat_request = WechatRequest()
     try:
         for n, id in tqdm(name2fakeid_dict.items()):
+            # 如果是新增加的公众号
+            if not id:
+                name2fakeid_dict[n] = wechat_request.name2fakeid(n)
+                handle_json('name2fakeid', data=name2fakeid_dict)
+                message_info[n] = {
+                    'latest_time': "2000-01-01 00:00", # 默认一个很久远的时间
+                    'blogs': [],
+                }
             # 如果latest_time非空（之前太久不发文章的），或者今天已经爬取过，则跳过
             if message_info[n]['latest_time'] and time_delta(time_now(), message_info[n]['latest_time']).days < 1:
                 continue
