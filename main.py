@@ -6,46 +6,59 @@
 # @Software    : Pycharm
 # @description : 主程序，爬取文章并存储
 
-from tqdm import tqdm
-from request_.wechat_request import WechatRequest
-from util.message2md import message2md, single_message2md
-from util.util import read_json, write_json, time_delta, time_now
-from util.filter_duplication import minHashLSH
+import time
 
+from tqdm import tqdm
+
+from request_.wechat_request import WechatRequest
+from util.data_config import data_manager
+from util.filter_duplication import minHashLSH
+from util.message2md import message2md, single_message2md
+from util.util import time_delta, time_now
 
 if __name__ == '__main__':
     # 获取必要信息
-    name2fakeid_dict = read_json('name2fakeid')
-    message_info = read_json('message_info')
-
     wechat_request = WechatRequest()
-    try:
-        for n, id in tqdm(name2fakeid_dict.items()):
-            # 如果是新增加的公众号
-            if not id:
-                name2fakeid_dict[n] = wechat_request.name2fakeid(n)
-                write_json('name2fakeid', data=name2fakeid_dict)
-                message_info[n] = {
-                    'latest_time': "2000-01-01 00:00", # 默认一个很久远的时间
-                    'blogs': [],
-                }
-            # 如果latest_time非空（之前太久不发文章的），或者今天已经爬取过，则跳过
-            if message_info[n]['latest_time'] and time_delta(time_now(), message_info[n]['latest_time']).days < 1:
-                continue
-            message_info[n]['blogs'].extend(wechat_request.fakeid2message_update(id, message_info[n]['blogs']))
-            message_info[n]['latest_time'] = time_now()
-    except Exception as e:
-        # 写入message_info，如果请求中间失败，及时写入
-        write_json('message_info', data=message_info)
-        raise e
+
+    # 爬取公众号文章
+    finished_name = set()
+    while len(finished_name) != len(data_manager.name2fakeid):
+        try:
+            for oa_name, fakeid in tqdm(data_manager.name2fakeid.items(), total=len(data_manager.name2fakeid)):
+                # 如果已经爬取过，则跳过
+                if oa_name in finished_name:
+                    continue
+                # 如果是新增加的公众号
+                if not fakeid:
+                    data_manager.name2fakeid[oa_name] = wechat_request.name2fakeid(oa_name)
+                    data_manager.write('name2fakeid')
+                # 如果message_info中没有该公众号，则初始化
+                if oa_name not in data_manager.message_info.keys():
+                    data_manager.message_info[oa_name] = {
+                        'latest_update_time': "2000-01-01 00:00", # 默认一个很久远的时间
+                        'blogs': [],
+                    }
+                # 如果latest_update_time非空（之前太久不发文章的），或者今天已经爬取过，则跳过
+                if data_manager.message_info[oa_name]['latest_update_time'] and time_delta(time_now(), data_manager.message_info[oa_name]['latest_update_time']).days < 1:
+                    finished_name.add(oa_name)
+                    continue
+                data_manager.message_info[oa_name]['blogs'].extend(wechat_request.fakeid2message_update(fakeid, data_manager.message_info[oa_name]['blogs']))
+                data_manager.message_info[oa_name]['latest_update_time'] = time_now()
+                finished_name.add(oa_name)
+        except Exception as e:
+            # 写入message_info，如果请求中间失败，及时写入
+            data_manager.write('message_info')
+            print(e)
+            time.sleep(30)  # 若请求失败（通常为请求频率限制），则等待30秒后重试
+            continue
 
     # 写入message_info，如果请求顺利进行，则正常写入
-    write_json('message_info', data=message_info)
+    data_manager.write('message_info')
 
     # 每次更新时验证去重
     with minHashLSH() as minhash:
         minhash.write_vector()
 
     # 将message_info转换为md上传到个人博客系统
-    message2md(message_info)
-    single_message2md(message_info)
+    message2md()
+    single_message2md()

@@ -23,7 +23,8 @@ from pathlib import Path
 from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
 from tqdm import tqdm
 
-from .util import read_json, url2text, write_json
+from .util import url2text
+from .data_config import data_manager
 
 
 def calc_duplicate_rate(text_list1, text_list2) -> float:
@@ -61,12 +62,8 @@ class minHashLSH:
         self.lsh = MinHashLSH(threshold=0.8, num_perm=128)
 
         # 加载minhash重复文件
-        self.issues_message = read_json('issues_message')
-        if 'dup_minhash' not in self.issues_message.keys():
-            self.issues_message['dup_minhash'] = {}
-
-        self.delete_messages_set = set(self.issues_message['is_delete'])
-        self.message_detail_text = read_json('message_detail_text')
+        self.issues_message = data_manager.issues_message
+        self.is_deleted_set = set(data_manager.issues_message['is_delete'])
 
         # 加载minhash签名缓存文件
         self.minhash_dict_path = Path(__file__).parent.parent / 'data' / 'minhash_dict.pickle'
@@ -81,22 +78,28 @@ class minHashLSH:
 
     def write_vector(self):
         from datasketch import MinHash
-        message_info = read_json('message_info')
-        id2url = {m['id']: m['link'] for v in message_info.values() for m in v['blogs']}
+        # 获取 {id: url} 的映射
+        id2url = {m['id']: m['link'] for v in data_manager.message_info.values() for m in v['blogs']}
 
-        message_total = [m for v in message_info.values() for m in v['blogs']
-                         if m['id'] not in self.delete_messages_set
-                         and m['create_time'] > "2024-07-01"]
+        # 获取所有文章，并过滤掉已删除和创建时间小于2025-06-01的
+        message_total = [m for v in data_manager.message_info.values() for m in v['blogs']
+                         if m['id'] not in self.is_deleted_set
+                         and m['create_time'] > "2025-06-01"]
+        # 按照创建时间排序，去重时优先保留发布时间更早的
         message_total.sort(key=lambda x: x['create_time'])
+
         for i, m in tqdm(enumerate(message_total), total=len(message_total)):
             # 如果文章没有minhash编码，则进行minhash编码
             if m['id'] not in self.minhash_dict.keys():
-                if m['id'] not in self.message_detail_text:
-                    self.message_detail_text[m['id']] = url2text(m['link'])
-                text_list = self.message_detail_text[m['id']]
-                if self.is_delete(text_list, m['id']): continue
-                text_list = ' '.join(text_list)
-                text_list = self.split_text(text_list)
+                # 如果没有爬取过详细文章内容，则在此进行爬取
+                if m['id'] not in data_manager.message_detail_text:
+                    data_manager.message_detail_text[m['id']] = url2text(m['link'])
+                text_list = data_manager.message_detail_text[m['id']]
+                # 如果文章已删除，则跳过
+                if self.is_delete(text_list, m['id']):
+                    continue
+                # 对文章进行分词
+                text_list = self.split_text(' '.join(text_list))
                 min1 = MinHash(num_perm=128)
                 for d in text_list:
                     min1.update(d.encode('utf8'))
@@ -106,8 +109,10 @@ class minHashLSH:
                 continue
 
             sim_m = self.lsh.query(self.minhash_dict[m['id']])
+            # sim_m 不为空，说明有相似的文章
             if sim_m:
-                if m['id'] in self.issues_message['dup_minhash'].keys():
+                # 如果文章已去重，则跳过
+                if m['id'] in data_manager.issues_message['dup_minhash'].keys():
                     continue
                 # 如果有相似的，先判断jaccard相似度，大于0.9直接通过，若在0.8-0.9之间则使用规则再次判断
                 sim_m_res = []
@@ -120,22 +125,19 @@ class minHashLSH:
                         if dup_rate > 0.7:
                             sim_m_res.append(s)
                 if sim_m_res:
-                    self.issues_message['dup_minhash'][m['id']] = {
-                        'from_id': sim_m,
-                    }
+                    data_manager.issues_message['dup_minhash'][m['id']] = sim_m
             else:
                 self.lsh.insert(m['id'], self.minhash_dict[m['id']])
-        write_json('message_detail_text', self.message_detail_text)
+        data_manager.write('message_detail_text')
 
     def is_delete(self, text_list, id_):
         if text_list in ['已删除']:
-            self.issues_message['is_delete'].append(id_)
-            write_json('issues_message', self.issues_message)
+            data_manager.issues_message['is_delete'].append(id_)
+            data_manager.write('issues_message')
             return True
         return False
 
     def split_text(self, text):
-        # words = re.findall(r'\w| |[\u4e00-\u9fff]', text)
         words = list(text)
 
         # 结果列表
@@ -176,6 +178,6 @@ class minHashLSH:
             hashvalues_dict[k] = v.hashvalues
         with open(self.minhash_dict_path, 'wb') as fp:
             pickle.dump(hashvalues_dict, fp)
-        write_json('issues_message', self.issues_message)
+        data_manager.write('issues_message')
         # 返回 True 表示异常已被处理，不会向外传播
         # return True

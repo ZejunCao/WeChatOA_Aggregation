@@ -14,16 +14,26 @@ from pathlib import Path
 
 import requests
 from lxml import etree
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36',
-}
+from util.data_config import headers
 
 
 def jstime2realtime(jstime):
     """将js获取的时间id转化成真实时间，截止到分钟"""
     return (datetime.datetime.strptime("1970-01-01 08:00", "%Y-%m-%d %H:%M") + datetime.timedelta(
         minutes=jstime // 60)).strftime("%Y-%m-%d %H:%M")
+
+def realtime2jstime(realtime):
+    """
+    将真实时间（如"2024-07-02 11:40"）转化为js获取的时间（自1970-01-01 08:00起的分钟数）
+    Args:
+        realtime: 字符串，格式为"YYYY-MM-DD HH:MM"
+    Returns:
+        int，分钟数
+    """
+    base_time = datetime.datetime.strptime("1970-01-01 08:00", "%Y-%m-%d %H:%M")
+    target_time = datetime.datetime.strptime(realtime, "%Y-%m-%d %H:%M")
+    delta = target_time - base_time
+    return int(delta.total_seconds() // 60)
 
 
 def time_delta(time1, time2):
@@ -112,27 +122,6 @@ def message_is_delete(url='', response=None):
     if len(warn) > 0 and warn[0] == '该内容已被发布者删除':
         return True
     return False
-
-
-def read_json(file_name) -> dict:
-    """读取json文件，传入文件名可自动补全路径，若没有文件则返回空字典"""
-    if not file_name.endswith('.json'):
-        file_name = Path(__file__).parent.parent / 'data' / f'{file_name}.json'
-
-    if not file_name.exists():
-        return {}
-    with open(file_name, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-def write_json(file_name, data) -> None:
-    """安全写入，防止在写入过程中中断程序导致数据丢失"""
-    if not file_name.endswith('.json'):
-        file_name = Path(__file__).parent.parent / 'data' / f'{file_name}.json'
-    
-    with open('tmp.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-    shutil.move('tmp.json', file_name)
 
 
 def check_text_ratio(text):

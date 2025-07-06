@@ -16,39 +16,33 @@ import requests
 from PIL import Image
 from tqdm import tqdm
 
-from .util import check_text_ratio, headers, nunjucks_escape, read_json
+from .util import check_text_ratio, nunjucks_escape
+from .data_config import data_manager, headers
 
 
-def get_valid_message(message_info=None):
-    if not message_info:
-        message_info = read_json('message_info')
-
-    name2fakeid = read_json('name2fakeid')
-    issues_message = read_json('issues_message')
-    delete_messages_set = set(issues_message['is_delete']) if issues_message else set()
+def get_valid_message():
+    is_deleted_set = set(data_manager.issues_message['is_delete'])
 
     delete_count = 0
     dup_count = 0
     md_dict_by_date = defaultdict(list)  # 按日期分割，key=时间，年月日，value=文章
     md_dict_by_blogger = defaultdict(list)  # 按博主分割，key=博主名，value=文章
-    for k, v in message_info.items():
-        if k not in name2fakeid.keys():
+    for k, v in data_manager.message_info.items():
+        # 由name2fakeid决定哪些公众号需要展示，如果从name2fakeid中删除了公众号但历史的message_info中存在，则跳过
+        if k not in data_manager.name2fakeid.keys():
             continue
+        # 遍历所有文章
         for m in v['blogs']:
-            # 历史遗留，有些文章没有创建时间，疑似已删除，待验证
-            if not m['create_time']:
-                continue
             # 去除已删除文章
-            if m['id'] in delete_messages_set:
+            if m['id'] in is_deleted_set:
                 delete_count += 1
                 continue
-            # 按博主分割，不需要文章去重
+            # 按博主展示，不需要文章去重
             md_dict_by_blogger[k].append(m)
-            # 去掉重复率高的文章
-            if m['id'] in issues_message['dup_minhash'].keys():
+            # 按日期展示，需要去掉重复率高的文章
+            if m['id'] in data_manager.issues_message['dup_minhash'].keys():
                 dup_count += 1
                 continue
-            # 按日期分割，需要文章去重
             t = datetime.datetime.strptime(m['create_time'],"%Y-%m-%d %H:%M").strftime("%Y-%m-%d")
             md_dict_by_date[t].append(m)
 
@@ -57,8 +51,8 @@ def get_valid_message(message_info=None):
     return md_dict_by_date, md_dict_by_blogger
 
 
-def message2md(message_info=None):
-    md_dict_by_date, md_dict_by_blogger = get_valid_message(message_info)
+def message2md():
+    md_dict_by_date, md_dict_by_blogger = get_valid_message()
     # 1. 写入按日期区分的md文件
     md_by_date = '''---
 layout: post
@@ -112,11 +106,8 @@ tags:
         f.write(md_by_blogger)
 
 
-def single_message2md(message_info=None):
-    if not message_info:
-        message_info = read_json('message_info')
-    md_dict_by_date, _ = get_valid_message(message_info)
-    message_detail_text = read_json('message_detail_text')
+def single_message2md():
+    md_dict_by_date, _ = get_valid_message()
     # hexo路径
     img_path = r"D:\learning\zejun'blog\Hexo\themes\hexo-theme-matery\source\medias\frontcover"
     md_path = r"D:\learning\zejun'blog\Hexo\source\_posts"
@@ -125,7 +116,7 @@ def single_message2md(message_info=None):
     # 1. 先收集近半月的文章id
     # - 先获取每个id对应的博主名字
     id2oaname = {}
-    for k, v in message_info.items():
+    for k, v in data_manager.message_info.items():
         for m in v['blogs']:
             id2oaname[m['id']] = k
     # - 获取每个id对应的文章信息
@@ -143,17 +134,10 @@ def single_message2md(message_info=None):
     for _id in tqdm(id2message_info.keys(), desc='downloading frontcover img', total=len(id2message_info)):
         if _id.replace('/', '_') + '.jpg' in all_frontcover_img:
             continue
-        # 下载处理
-        d = id2message_info[_id]
-        url = d['link']
-        response = requests.get(url=url, headers=headers)
-        msg_cdn_url = re.search(r'var msg_cdn_url = "/*?(.*)"', response.text)
-        if msg_cdn_url:
-            msg_cdn_url = msg_cdn_url.group(1)
-        else:
-            continue
-        img = requests.get(url=msg_cdn_url, headers=headers).content
+        # 下载封面图
+        img = requests.get(url=id2message_info[_id]['cover'], headers=headers).content
         single_img_path = os.path.join(img_path, f"{_id.replace('/', '_')}.jpg")
+        # 写入到hexo展示目录
         with open(single_img_path, 'wb') as fp:
             fp.write(img)
         # 缩放图片，防止封面太大占用空间
@@ -185,11 +169,9 @@ tags:
     - {d['oaname']}
 ---
 '''
-    # - 开源项目
-    # - 微信公众号聚合平台
         md += f'[{d["title"]}]({d["link"]})\n\n'
         md += '> 仅用于站内搜索，没有排版格式，具体信息请跳转上方微信公众号内链接\n\n'
-        all_text = message_detail_text[_id]
+        all_text = data_manager.message_detail_text[_id]
         all_text = [all_text] if isinstance(all_text, str) else all_text
         for i in range(len(all_text)):
             # 替换一些字符，防止 Nunjucks 转义失败
@@ -204,7 +186,7 @@ tags:
         with open(single_md_path, 'w', encoding='utf-8') as f:
             f.write(md)
 
-    valid_id = [id.replace('/', '_') for id in id2message_info.keys()]
+    valid_id = [id for id in id2message_info.keys()]
     # 4. 删除多余的md文件
     for filename in os.listdir(md_path):
         if filename in ["微信公众号聚合平台.md", "微信公众号聚合平台_byname.md"]:
