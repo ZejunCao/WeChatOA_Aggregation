@@ -12,8 +12,8 @@ from dataclasses import asdict
 
 import requests
 
-from util.data_config import Message_Info, data_manager, headers
-from util.util import jstime2realtime, time_delta, time_now
+from src.utils.data_manager import Message_Info, data_manager, headers
+from src.utils.helpers import jstime2realtime, time_delta, time_now
 
 
 class WechatRequest:

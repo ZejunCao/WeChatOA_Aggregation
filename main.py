@@ -10,11 +10,11 @@ import time
 
 from tqdm import tqdm
 
-from request_.wechat_request import WechatRequest
-from util.data_config import data_manager
-from util.filter_duplication import minHashLSH
-from util.message2md import message2md, single_message2md
-from util.util import time_delta, time_now
+from src.crawler.wechat_request import WechatRequest
+from src.utils.data_manager import data_manager
+from src.processor.deduplication import minHashLSH
+from src.processor.message2md import message2md, single_message2md
+from src.utils.helpers import time_delta, time_now
 
 if __name__ == '__main__':
     # 获取必要信息

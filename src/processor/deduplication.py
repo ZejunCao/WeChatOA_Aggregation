@@ -23,8 +23,8 @@ from pathlib import Path
 from nltk.translate.bleu_score import corpus_bleu, sentence_bleu
 from tqdm import tqdm
 
-from .util import url2text
-from .data_config import data_manager
+from ..utils.helpers import url2text
+from ..utils.data_manager import data_manager
 
 
 def calc_duplicate_rate(text_list1, text_list2) -> float:

@@ -19,7 +19,7 @@ class Message_Info:
     cover: str  # 封面图片链接
     create_time: str  # 创建时间
     is_deleted: bool  # 是否删除
-    item_show_type: int  # 文章类型，目前已知5(视频)、8(左右结构)、10是特殊结构（不知道怎么描述），0为正常，11暂时未知
+    item_show_type: int  # 文章类型，目前已知5(视频)、8(左右结构)、10是特殊结构（不知道怎么描述），0为正常，11暂时未知(貌似是转发)
 
 
 # 单例模式，处理json文件的读写

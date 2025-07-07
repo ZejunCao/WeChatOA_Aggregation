@@ -14,7 +14,7 @@ from pathlib import Path
 
 import requests
 from lxml import etree
-from util.data_config import headers
+from src.utils.data_manager import headers
 
 
 def jstime2realtime(jstime):

@@ -16,8 +16,8 @@ import requests
 from PIL import Image
 from tqdm import tqdm
 
-from .util import check_text_ratio, nunjucks_escape
-from .data_config import data_manager, headers
+from ..utils.helpers import check_text_ratio, nunjucks_escape
+from ..utils.data_manager import data_manager, headers
 
 
 def get_valid_message():
