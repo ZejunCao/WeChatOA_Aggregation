@@ -187,14 +187,3 @@ def _cleanup_old_files(id2message_info, md_path, img_path):
     for filename in os.listdir(img_path):
         if filename[:-4] not in valid_id:
             os.remove(os.path.join(img_path, filename))
-
-
-# 为了保持向后兼容，提供原来的函数名
-def message2md():
-    """生成汇总Markdown文件（向后兼容）"""
-    generate_summary_markdown()
-
-
-def single_message2md():
-    """生成单个文章的Markdown文件（向后兼容）"""
-    generate_single_posts() 
