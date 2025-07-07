@@ -10,11 +10,8 @@ import time
 
 from tqdm import tqdm
 
-from src.crawler.wechat_request import WechatRequest
-from src.utils.data_manager import data_manager
-from src.processor.deduplication import minHashLSH
-from src.processor.message2md import message2md, single_message2md
-from src.utils.helpers import time_delta, time_now
+from src import (WechatRequest, data_manager, generate_single_posts,
+                 generate_summary_markdown, minHashLSH, time_delta, time_now)
 
 if __name__ == '__main__':
     # 获取必要信息
@@ -60,5 +57,5 @@ if __name__ == '__main__':
         minhash.write_vector()
 
     # 将message_info转换为md上传到个人博客系统
-    message2md()
-    single_message2md()
+    generate_summary_markdown()
+    generate_single_posts()

@@ -26,7 +26,7 @@ class Message_Info:
 class JsonFileManager:
     _instance = None
     _lock = threading.Lock()
-    data_dir = Path(__file__).parent.parent / 'data'  # 默认数据目录
+    data_dir = Path(__file__).parent.parent.parent / 'data'  # 默认数据目录
     
     # 预定义文件名
     FILES = [

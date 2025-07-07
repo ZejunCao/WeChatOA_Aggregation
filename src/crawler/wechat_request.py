@@ -96,8 +96,6 @@ class WechatRequest:
                 # 3. 特殊文章类型，跳过
                 if message['appmsgex'][i]['item_show_type'] in [5, 8, 10]:
                     continue
-                if message['appmsgex'][i]['item_show_type'] != 0:
-                    print(message['appmsgex'][i]['item_show_type'], message['appmsgex'][i]['link'])
                 # 4. 重新刷新，只爬取一个月内的文章
                 if time_delta(time_now(), jstime2realtime(message['appmsgex'][i]['create_time'])).days > 30:
                     continue

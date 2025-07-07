@@ -1,58 +1,28 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 # @Author      : Cao Zejun
-# @Time        : 2024/7/31 23:43
-# @File        : message2md.py
+# @Time        : 2025/07/08
+# @File        : blog_generator.py
 # @Software    : Pycharm
-# @description : 将微信公众号聚合平台数据转换为markdown文件，上传博客平台
+# @description : 博客生成器，负责生成Markdown文件和下载图片
 
 import datetime
 import os
-import re
-from collections import defaultdict
 from pathlib import Path
 
 import requests
 from PIL import Image
 from tqdm import tqdm
 
+from ..processor.message_converter import get_valid_message
 from ..utils.helpers import check_text_ratio, nunjucks_escape
 from ..utils.data_manager import data_manager, headers
 
 
-def get_valid_message():
-    is_deleted_set = set(data_manager.issues_message['is_delete'])
-
-    delete_count = 0
-    dup_count = 0
-    md_dict_by_date = defaultdict(list)  # 按日期分割，key=时间，年月日，value=文章
-    md_dict_by_blogger = defaultdict(list)  # 按博主分割，key=博主名，value=文章
-    for k, v in data_manager.message_info.items():
-        # 由name2fakeid决定哪些公众号需要展示，如果从name2fakeid中删除了公众号但历史的message_info中存在，则跳过
-        if k not in data_manager.name2fakeid.keys():
-            continue
-        # 遍历所有文章
-        for m in v['blogs']:
-            # 去除已删除文章
-            if m['id'] in is_deleted_set:
-                delete_count += 1
-                continue
-            # 按博主展示，不需要文章去重
-            md_dict_by_blogger[k].append(m)
-            # 按日期展示，需要去掉重复率高的文章
-            if m['id'] in data_manager.issues_message['dup_minhash'].keys():
-                dup_count += 1
-                continue
-            t = datetime.datetime.strptime(m['create_time'],"%Y-%m-%d %H:%M").strftime("%Y-%m-%d")
-            md_dict_by_date[t].append(m)
-
-    print(f'{delete_count} messages have been deleted')
-    print(f'{dup_count} messages have been deduplicated')
-    return md_dict_by_date, md_dict_by_blogger
-
-
-def message2md():
+def generate_summary_markdown():
+    """生成汇总Markdown文件（按时间和按公众号区分）"""
     md_dict_by_date, md_dict_by_blogger = get_valid_message()
+    
     # 1. 写入按日期区分的md文件
     md_by_date = '''---
 layout: post
@@ -76,7 +46,7 @@ tags:
         for m in md_dict_by_date[date]:
             md_by_date += f'* [{m["title"]}]({m["link"]})\n'
 
-    md_path = Path(__file__).parent.parent / 'data' / '微信公众号聚合平台_按时间区分.md'
+    md_path = Path(__file__).parent.parent.parent / 'data' / '微信公众号聚合平台_按时间区分.md'
     with open(md_path, 'w', encoding='utf-8') as f:
         f.write(md_by_date)
 
@@ -101,14 +71,16 @@ tags:
                 continue
             md_by_blogger += f'* [{m["title"]}]({m["link"]})\n'
 
-    md_path = Path(__file__).parent.parent / 'data' / '微信公众号聚合平台_按公众号区分.md'
+    md_path = Path(__file__).parent.parent.parent / 'data' / '微信公众号聚合平台_按公众号区分.md'
     with open(md_path, 'w', encoding='utf-8') as f:
         f.write(md_by_blogger)
 
 
-def single_message2md():
+def generate_single_posts():
+    """生成单个文章的Markdown文件并下载封面图片"""
     md_dict_by_date, _ = get_valid_message()
-    # hexo路径
+    
+    # hexo路径 - 这些路径应该配置化
     img_path = r"D:\learning\zejun'blog\Hexo\themes\hexo-theme-matery\source\medias\frontcover"
     md_path = r"D:\learning\zejun'blog\Hexo\source\_posts"
 
@@ -130,6 +102,17 @@ def single_message2md():
             id2message_info[m['id']]['oaname'] = id2oaname[m['id']]
 
     # 2. 下载文章封面图
+    _download_cover_images(id2message_info, img_path)
+
+    # 3. 将近半月的文章写入成单个md文件
+    _generate_single_markdown_files(id2message_info, md_path)
+
+    # 4. 清理多余的文件
+    _cleanup_old_files(id2message_info, md_path, img_path)
+
+
+def _download_cover_images(id2message_info, img_path):
+    """下载文章封面图片"""
     all_frontcover_img = os.listdir(img_path)
     for _id in tqdm(id2message_info.keys(), desc='downloading frontcover img', total=len(id2message_info)):
         if _id.replace('/', '_') + '.jpg' in all_frontcover_img:
@@ -144,7 +127,7 @@ def single_message2md():
         img = Image.open(single_img_path)
         # 获取图片尺寸
         width, height = img.size
-        # 如果高度大于640,进行缩放
+        # 如果宽度大于640,进行缩放
         if width > 640:
             # 计算缩放比例
             ratio = 640.0 / width
@@ -154,7 +137,9 @@ def single_message2md():
             # 保存缩放后的图片
             img.save(single_img_path)
 
-    # 3. 将近半月的文章写入成单个md文件
+
+def _generate_single_markdown_files(id2message_info, md_path):
+    """生成单个文章的Markdown文件"""
     for _id in id2message_info.keys():
         d = id2message_info[_id]
         d['title'] = d['title'].replace('"', "'")
@@ -186,15 +171,30 @@ tags:
         with open(single_md_path, 'w', encoding='utf-8') as f:
             f.write(md)
 
+
+def _cleanup_old_files(id2message_info, md_path, img_path):
+    """清理多余的文件"""
     valid_id = [id for id in id2message_info.keys()]
-    # 4. 删除多余的md文件
+    
+    # 删除多余的md文件
     for filename in os.listdir(md_path):
         if filename in ["微信公众号聚合平台.md", "微信公众号聚合平台_byname.md"]:
             continue
         if filename[:-3] not in valid_id:
             os.remove(os.path.join(md_path, filename))
 
-    # 5. 删除多余的图片
+    # 删除多余的图片
     for filename in os.listdir(img_path):
         if filename[:-4] not in valid_id:
             os.remove(os.path.join(img_path, filename))
+
+
+# 为了保持向后兼容，提供原来的函数名
+def message2md():
+    """生成汇总Markdown文件（向后兼容）"""
+    generate_summary_markdown()
+
+
+def single_message2md():
+    """生成单个文章的Markdown文件（向后兼容）"""
+    generate_single_posts() 

@@ -66,7 +66,7 @@ class minHashLSH:
         self.is_deleted_set = set(data_manager.issues_message['is_delete'])
 
         # 加载minhash签名缓存文件
-        self.minhash_dict_path = Path(__file__).parent.parent / 'data' / 'minhash_dict.pickle'
+        self.minhash_dict_path = Path(__file__).parent.parent.parent / 'data' / 'minhash_dict.pickle'
         # minhash_dict 字典记录所有id的minhash签名，key: id, value: minhash签名
         if self.minhash_dict_path.exists():
             with open(self.minhash_dict_path, 'rb') as fp:
