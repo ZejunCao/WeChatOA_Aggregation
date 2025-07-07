@@ -1,7 +1,45 @@
 # WeChatOA_Aggregation
+
 微信公众号聚合平台，获取多个公众号的博文进行筛选、过滤，使用户更方便的读取公众号上的所有文章
 
-![blog_preview.png](figures/blog_preview.png)
+![blog_preview.png](output/assets/blog_preview.png)
+
+## 📢 项目重构说明
+
+**本项目已完成标准化重构！** 新结构更加模块化、专业化，符合开源项目标准。
+
+- 📁 **新目录结构**: 采用标准Python包结构
+- ⚙️ **模块化设计**: 清晰的功能模块分离
+- 🔧 **配置管理**: 统一的YAML配置文件
+- 📦 **标准安装**: 支持pip安装和打包
+- 🧪 **测试框架**: 完整的测试和开发工具支持
+
+详情请查看 [📋 重构完成报告](重构完成报告.md) 和 [📖 重构设计文档](project_structure_redesign.md)
+
+## 🚀 快速开始
+
+### 安装依赖
+```bash
+pip install -r requirements.txt
+```
+
+### 配置项目
+```bash
+# 复制示例配置文件
+cp config/config.example.yaml config/config.yaml
+
+# 编辑配置文件，填入你的微信token和cookie
+nano config/config.yaml
+```
+
+### 运行项目
+```bash
+# 使用新的模块化入口
+python -m wechat_aggregator.main
+
+# 或使用配置文件
+python -m wechat_aggregator.main config/config.yaml
+```
 
 
 ## 关于token和cookie

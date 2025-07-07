@@ -1,0 +1,108 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wechat-aggregator"
+version = "1.0.0"
+description = "微信公众号聚合平台，获取多个公众号的博文进行筛选、过滤"
+authors = [
+    {name = "Cao Zejun", email = "your-email@example.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "DrissionPage",
+    "lxml",
+    "requests",
+    "tqdm",
+    "datasketch",
+    "pyyaml",
+    "Pillow",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "mypy",
+]
+nlp = [
+    "nltk",
+]
+all = [
+    "pytest",
+    "pytest-cov", 
+    "black",
+    "flake8",
+    "mypy",
+    "nltk",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/WeChatOA_Aggregation"
+Repository = "https://github.com/yourusername/WeChatOA_Aggregation"
+Documentation = "https://github.com/yourusername/WeChatOA_Aggregation/docs"
+Issues = "https://github.com/yourusername/WeChatOA_Aggregation/issues"
+
+[project.scripts]
+wechat-aggregator = "wechat_aggregator.main:main"
+
+[tool.setuptools]
+packages = ["wechat_aggregator"]
+
+[tool.setuptools.package-data]
+wechat_aggregator = ["config/*.conf", "config/*.yaml"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
