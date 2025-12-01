@@ -42,5 +42,5 @@
 | minhash_0.8+规则0.7 | 665    | 1 (文字很少，主体为图片) |
 
 ## 类似项目参考
-- https://github.com/jooooock/wechat-article-exporter
-- https://github.com/1061700625/WeChat_Article
+- [https://github.com/jooooock/wechat-article-exporter](https://github.com/wechat-article/wechat-article-exporter)
+- [https://github.com/1061700625/WeChat_Article](https://github.com/1061700625/WeChat_Article)
