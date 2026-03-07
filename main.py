@@ -10,8 +10,15 @@ import time
 
 from tqdm import tqdm
 
-from src import (WechatRequest, data_manager, generate_single_posts,
-                 generate_summary_markdown, minHashLSH, time_delta, time_now)
+from src import (
+    WechatRequest,
+    data_manager,
+    generate_single_posts,
+    generate_summary_markdown,
+    minHashLSH,
+    time_delta,
+    time_now,
+)
 
 if __name__ == '__main__':
     # 获取必要信息

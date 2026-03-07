@@ -1,0 +1,4 @@
+{"timestamp": "2026-03-07 03:03:59", "type": "crawl_start", "message": "开始爬取，共 2 个公众号", "details": {"accounts": ["Gaffey大杂烩"]}}
+{"timestamp": "2026-03-07 03:04:01", "type": "crawl_finish", "message": "爬取完成：新增 0 篇，成功", "details": {"new_articles": 0, "total_accounts": 2, "error_count": 0, "errors": [], "started_at": "2026-03-07 03:03:59", "finished_at": "2026-03-07 03:04:01"}}
+{"timestamp": "2026-03-07 03:11:20", "type": "crawl_start", "message": "开始爬取，共 2 个公众号", "details": {"accounts": ["Gaffey大杂烩"]}}
+{"timestamp": "2026-03-07 03:11:21", "type": "crawl_finish", "message": "爬取完成：新增 0 篇，成功", "details": {"new_articles": 0, "total_accounts": 2, "error_count": 0, "errors": [], "started_at": "2026-03-07 03:11:19", "finished_at": "2026-03-07 03:11:21"}}

@@ -1,0 +1,17 @@
+[project]
+name = "wechatoa-aggregation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "datasketch>=1.9.0",
+    "drissionpage>=4.1.1.2",
+    "fastapi>=0.135.1",
+    "lxml>=6.0.2",
+    "nltk>=3.9.3",
+    "pillow>=12.1.1",
+    "requests>=2.32.5",
+    "tqdm>=4.67.3",
+    "uvicorn[standard]>=0.41.0",
+]

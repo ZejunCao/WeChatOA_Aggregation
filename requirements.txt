@@ -1,5 +1,0 @@
-DrissionPage
-lxml
-requests
-tqdm
-datasketch
