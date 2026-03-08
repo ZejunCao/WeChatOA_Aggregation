@@ -1,4 +1,12 @@
 <script setup lang="ts">
+// ─────────────────────────────────────────────────────────────────────────────
+// LogView — 操作日志页面
+//
+// 展示后端写入 data/operation_logs.jsonl 的所有操作记录，
+// 包括：爬取开始/完成/失败、添加/移除公众号、清理缓存。
+// 支持展开单条日志查看详细 JSON 数据。
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { ref, computed, onMounted } from 'vue'
 import {
   ScrollText,
@@ -15,30 +23,34 @@ import {
   Inbox,
 } from 'lucide-vue-next'
 
+// 与后端 LogEntry Pydantic 模型对应的前端接口
 interface LogEntry {
-  timestamp: string
-  type: string
-  message: string
-  details: Record<string, unknown>
+  timestamp: string                    // 时间戳 "YYYY-MM-DD HH:MM:SS"
+  type: string                         // 日志类型（crawl_start / account_add 等）
+  message: string                      // 简短描述
+  details: Record<string, unknown>     // 附加结构化数据（可展开查看）
 }
 
 const logs = ref<LogEntry[]>([])
 const loading = ref(false)
-const expandedIdx = ref<number | null>(null)
+const expandedIdx = ref<number | null>(null)  // 当前展开详情的日志索引（null=全部折叠）
 
+// 每种日志类型对应的显示元数据（图标、颜色、背景色、中文标签）
 const LOG_META: Record<string, { label: string; color: string; bg: string; icon: unknown }> = {
-  crawl_start:    { label: '爬取开始', color: 'text-blue-500',   bg: 'bg-blue-500/10',   icon: RefreshCw },
+  crawl_start:    { label: '爬取开始', color: 'text-blue-500',    bg: 'bg-blue-500/10',    icon: RefreshCw },
   crawl_finish:   { label: '爬取完成', color: 'text-emerald-500', bg: 'bg-emerald-500/10', icon: CircleCheck },
-  crawl_error:    { label: '爬取失败', color: 'text-red-500',    bg: 'bg-red-500/10',    icon: AlertTriangle },
+  crawl_error:    { label: '爬取失败', color: 'text-red-500',     bg: 'bg-red-500/10',     icon: AlertTriangle },
   account_add:    { label: '添加公众号', color: 'text-indigo-500', bg: 'bg-indigo-500/10', icon: UserPlus },
   account_remove: { label: '移除公众号', color: 'text-orange-500', bg: 'bg-orange-500/10', icon: UserMinus },
-  cache_clear:    { label: '清理缓存', color: 'text-purple-500', bg: 'bg-purple-500/10', icon: Eraser },
+  cache_clear:    { label: '清理缓存',  color: 'text-purple-500', bg: 'bg-purple-500/10', icon: Eraser },
 }
 
+/** 根据日志类型获取元数据，未知类型返回默认样式 */
 function getMeta(type: string) {
   return LOG_META[type] ?? { label: type, color: 'text-[var(--color-muted-foreground)]', bg: 'bg-[var(--color-muted)]', icon: ScrollText }
 }
 
+/** 从后端拉取最近 300 条日志（已按时间倒序） */
 async function loadLogs() {
   loading.value = true
   try {
@@ -49,13 +61,15 @@ async function loadLogs() {
   }
 }
 
+/** 展开/折叠某条日志的详情 JSON（同一时间只展开一条） */
 function toggleExpand(idx: number) {
   expandedIdx.value = expandedIdx.value === idx ? null : idx
 }
 
+/** 判断某条日志是否有可展开的详情（details 不为空对象） */
 const hasDetails = (entry: LogEntry) => Object.keys(entry.details).length > 0
 
-// 统计各类型数量
+/** 各类型日志的数量统计，用于头部的分类徽标 */
 const stats = computed(() => {
   const counts: Record<string, number> = {}
   for (const log of logs.value) {
@@ -64,6 +78,7 @@ const stats = computed(() => {
   return counts
 })
 
+// 页面挂载后立即加载日志
 onMounted(loadLogs)
 </script>
 

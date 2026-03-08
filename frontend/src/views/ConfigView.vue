@@ -1,4 +1,17 @@
 <script setup lang="ts">
+// ─────────────────────────────────────────────────────────────────────────────
+// ConfigView — 公众号管理页面
+//
+// 包含以下功能模块（各自独立，通过注释分隔）：
+//   1. 公众号列表展示 & 可见性切换
+//   2. 搜索/添加公众号（两步流程：搜索候选 → 确认添加）
+//   3. 删除公众号
+//   4. 立即爬取（后台任务 + 进度轮询横幅）
+//   5. 缓存清理（预览弹窗 + 确认删除）
+//   6. 凭证状态检测（横幅提示 + 重新检测）
+//   7. 扫码登录（无头 Chrome 截图 + 前端展示弹窗）
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { computed, onUnmounted, ref } from 'vue'
 import {
   Settings,
@@ -24,27 +37,36 @@ import {
   CircleX,
   Eraser,
   TriangleAlert,
+  ShieldCheck,
+  ShieldAlert,
+  ShieldOff,
+  QrCode,
 } from 'lucide-vue-next'
-import type { CrawlStatus, CachePreview } from '@/types'
+import type { CrawlStatus, CachePreview, AuthStatus } from '@/types'
 import { useArticlesStore } from '@/stores/articles'
 import { useConfigStore } from '@/stores/config'
 
 const articlesStore = useArticlesStore()
 const configStore = useConfigStore()
 
+// ── 公众号搜索（本地过滤，不调用后端） ─────────────────────────────────────
 const accountSearchQuery = ref('')
 
+// 根据搜索词过滤已添加的公众号列表
 const filteredAccounts = computed(() => {
   const q = accountSearchQuery.value.trim().toLowerCase()
   return articlesStore.accounts.filter((a) => !q || a.name.toLowerCase().includes(q))
 })
 
+// 当前在文章流中可见的公众号数量（未被隐藏的）
 const visibleCount = computed(
   () => articlesStore.accounts.filter((a) => configStore.isVisible(a.name)).length,
 )
 
+// 当前被隐藏的公众号数量
 const hiddenCount = computed(() => articlesStore.accounts.length - visibleCount.value)
 
+/** 全选/全不选公众号可见性 */
 function toggleAll(show: boolean) {
   if (show) {
     configStore.showAll()
@@ -53,11 +75,13 @@ function toggleAll(show: boolean) {
   }
 }
 
+/** 所有公众号中最近一次爬取时间（取最大值），用于统计卡片展示 */
 const latestUpdateTime = computed(() => {
   const times = articlesStore.accounts.map((a) => a.latest_update_time).filter(Boolean)
   return times.sort().reverse()[0] || '—'
 })
 
+// 公众号头像背景色（由名称首字符 charCode 取模决定，同名同色）
 const accountColors = [
   '#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6', '#3b82f6', '#10b981',
   '#f59e0b', '#ef4444', '#84cc16',
@@ -67,7 +91,9 @@ function getColor(name: string) {
   return accountColors[name.charCodeAt(0) % accountColors.length]
 }
 
-// ---------- 添加公众号弹窗（两步：搜索 → 选择确认） ----------
+// ── 添加公众号弹窗（两步流程） ────────────────────────────────────────────────
+// 第一步（'input'）：用户输入关键词 → 调用 POST /api/accounts/search → 展示候选列表
+// 第二步（'results'）：用户点击选中 → 调用 POST /api/accounts 确认添加
 
 interface SearchCandidate {
   fakeid: string
@@ -80,12 +106,12 @@ interface SearchCandidate {
 }
 
 const showAddDialog = ref(false)
-const addStep = ref<'input' | 'results'>('input')
+const addStep = ref<'input' | 'results'>('input')  // 当前所在步骤
 const searchQuery = ref('')
 const searchState = ref<'idle' | 'loading' | 'error'>('idle')
 const searchError = ref('')
-const searchResults = ref<SearchCandidate[]>([])
-const selectedCandidate = ref<SearchCandidate | null>(null)
+const searchResults = ref<SearchCandidate[]>([])    // 搜索结果候选列表
+const selectedCandidate = ref<SearchCandidate | null>(null)  // 正在确认添加的候选
 const confirmState = ref<'idle' | 'loading' | 'success' | 'error'>('idle')
 const confirmError = ref('')
 
@@ -172,9 +198,9 @@ function serviceTypeLabel(t: number) {
   return '公众号'
 }
 
-// ---------- 删除公众号 ----------
+// ── 删除公众号 ────────────────────────────────────────────────────────────────
 
-const deletingName = ref('')
+const deletingName = ref('')  // 正在删除中的公众号名，用于显示加载状态
 
 async function removeAccount(name: string) {
   if (!confirm(`确认从追踪列表中移除「${name}」？\n（已爬取的文章数据不会删除）`)) return
@@ -182,8 +208,8 @@ async function removeAccount(name: string) {
   try {
     const res = await fetch(`/api/accounts/${encodeURIComponent(name)}`, { method: 'DELETE' })
     if (res.ok || res.status === 204) {
-      await articlesStore.reloadAccounts()
-      configStore.showAll()
+      await articlesStore.reloadAccounts()  // 刷新公众号列表
+      configStore.showAll()                 // 重置可见性（避免已删除账号残留在隐藏列表）
     }
   } catch {
     alert('删除失败，请确认后端服务已启动')
@@ -192,7 +218,10 @@ async function removeAccount(name: string) {
   }
 }
 
-// ---------- 爬取任务 ----------
+// ── 爬取任务 ─────────────────────────────────────────────────────────────────
+// 流程：点击"立即爬取" → POST /api/crawl → 后端启动后台线程
+//       → 前端每 800ms 轮询 GET /api/crawl/status → 展示进度横幅
+//       → 爬取完成后重新加载文章数据，停止轮询
 
 const defaultCrawlStatus: CrawlStatus = {
   running: false,
@@ -203,31 +232,36 @@ const defaultCrawlStatus: CrawlStatus = {
   started_at: '',
   finished_at: '',
   new_articles: 0,
+  auth_error: false,
 }
 
 const crawlStatus = ref<CrawlStatus>({ ...defaultCrawlStatus })
-const crawlStarting = ref(false)
-const showCrawlBanner = ref(false)
+const crawlStarting = ref(false)  // 点击按钮后到后端确认启动之间的短暂 loading 状态
+const showCrawlBanner = ref(false) // 是否展示进度横幅
 let _pollTimer: ReturnType<typeof setInterval> | null = null
 
+/** 轮询爬取进度，爬取完成后自动停止并刷新数据 */
 async function fetchCrawlStatus() {
   try {
     const res = await fetch('/api/crawl/status')
     if (res.ok) {
       const data: CrawlStatus = await res.json()
       crawlStatus.value = data
-      // 爬取完成后重新加载文章数据
+      // 爬取完成（running=false 且有结束时间）时自动收尾
       if (!data.running && showCrawlBanner.value && data.finished_at) {
-        await articlesStore.loadData()
+        await articlesStore.loadData()  // 重新加载文章数据，展示新爬取的内容
         stopPolling()
+        // 后端在爬取结束时已更新 _auth_state，直接读缓存同步前端显示
+        await loadAuthStatus()
       }
     }
-  } catch { /* 忽略轮询错误 */ }
+  } catch { /* 忽略轮询网络错误，下次轮询会自动重试 */ }
 }
 
 function startPolling() {
   stopPolling()
-  _pollTimer = setInterval(fetchCrawlStatus, 2000)
+  // 800ms 轮询一次，既不太频繁，又能捕捉到每个账号的进度变化
+  _pollTimer = setInterval(fetchCrawlStatus, 800)
 }
 
 function stopPolling() {
@@ -242,7 +276,7 @@ async function startCrawl() {
   try {
     const res = await fetch('/api/crawl', { method: 'POST' })
     if (res.status === 409) {
-      // 已有任务在运行，直接展示状态
+      // 后端已有爬取任务在运行（比如之前没关页面），直接接上展示进度
       showCrawlBanner.value = true
       startPolling()
       return
@@ -254,7 +288,8 @@ async function startCrawl() {
     }
     showCrawlBanner.value = true
     crawlStatus.value = { ...defaultCrawlStatus, running: true, started_at: new Date().toLocaleString() }
-    // 立即查询一次，尽快拿到后端写入的 total，避免等首个轮询周期
+    // 立即查询一次，尽快拿到后端写入的 total（账号总数），
+    // 避免等第一个 800ms 轮询周期才显示进度分母
     await fetchCrawlStatus()
     startPolling()
   } catch {
@@ -264,13 +299,117 @@ async function startCrawl() {
   }
 }
 
+/** 用户手动关闭进度横幅（不影响后台爬取任务的继续运行） */
 function dismissCrawlBanner() {
   stopPolling()
   showCrawlBanner.value = false
   crawlStatus.value = { ...defaultCrawlStatus }
 }
 
-onUnmounted(() => stopPolling())
+// 组件卸载时清理所有轮询定时器，避免内存泄漏
+onUnmounted(() => { stopPolling(); stopLoginPoll() })
+
+// ── 凭证状态 ──────────────────────────────────────────────────────────────────
+
+const authStatus = ref<AuthStatus | null>(null)
+
+/** 仅读取缓存状态，不发起微信探测（页面加载时用） */
+async function loadAuthStatus() {
+  try {
+    const res = await fetch('/api/auth/status')
+    if (res.ok) authStatus.value = await res.json()
+  } catch { /* 静默 */ }
+}
+
+// 计算凭证的综合状态
+const authLevel = computed<'ok' | 'warn' | 'error' | 'unknown'>(() => {
+  const s = authStatus.value
+  if (!s) return 'unknown'
+  if (!s.has_credentials) return 'error'
+  if (!s.valid && s.checked_at) return 'warn'
+  return 'ok'
+})
+
+// 页面载入时只读缓存，不主动探测（避免每次进页面都发微信请求）
+loadAuthStatus()
+
+// ---------- 扫码登录 ----------
+
+const showLoginModal = ref(false)
+const loginPending = ref(false)     // 正在等待扫码
+const loginError = ref('')
+const qrcodeImg = ref('')           // 最新二维码截图（base64）
+const qrcodeAt = ref('')            // 截图时间
+const qrcodeLoading = ref(true)     // 二维码尚未就绪
+
+let _loginPollTimer: ReturnType<typeof setInterval> | null = null
+let _qrcodePollTimer: ReturnType<typeof setInterval> | null = null
+
+function stopLoginPoll() {
+  if (_loginPollTimer !== null) { clearInterval(_loginPollTimer); _loginPollTimer = null }
+  if (_qrcodePollTimer !== null) { clearInterval(_qrcodePollTimer); _qrcodePollTimer = null }
+}
+
+async function fetchQrcode() {
+  try {
+    const res = await fetch('/api/auth/qrcode')
+    if (res.ok) {
+      const data = await res.json()
+      qrcodeImg.value = data.img
+      qrcodeAt.value = data.refreshed_at
+      qrcodeLoading.value = false
+    }
+  } catch { /* 忽略 */ }
+}
+
+async function pollLoginStatus() {
+  try {
+    const res = await fetch('/api/auth/login/status')
+    if (!res.ok) return
+    const data = await res.json()
+    if (!data.running && data.done) {
+      stopLoginPoll()
+      loginPending.value = false
+      if (data.error) {
+        loginError.value = data.error
+      } else {
+        showLoginModal.value = false
+        await loadAuthStatus()
+      }
+    }
+  } catch { /* 忽略 */ }
+}
+
+async function startLogin() {
+  if (loginPending.value) return
+  loginPending.value = true
+  loginError.value = ''
+  qrcodeImg.value = ''
+  qrcodeLoading.value = true
+  showLoginModal.value = true
+  try {
+    const res = await fetch('/api/auth/login', { method: 'POST' })
+    if (!res.ok) {
+      loginPending.value = false
+      showLoginModal.value = false
+      return
+    }
+    // 每 2 秒刷新二维码截图
+    _qrcodePollTimer = setInterval(fetchQrcode, 2000)
+    // 每 2 秒检查是否扫码完成
+    _loginPollTimer = setInterval(pollLoginStatus, 2000)
+  } catch {
+    loginPending.value = false
+    showLoginModal.value = false
+    alert('无法连接到后端服务')
+  }
+}
+
+function closeLoginModal() {
+  if (loginPending.value) return   // 扫码过程中不允许关闭
+  showLoginModal.value = false
+  stopLoginPoll()
+}
 
 // ---------- 缓存清理 ----------
 
@@ -386,6 +525,49 @@ async function doCacheClear() {
       </div>
     </div>
 
+    <!-- Auth status banner -->
+    <div
+      v-if="authLevel !== 'ok'"
+      class="shrink-0 flex items-center gap-3 px-6 py-2.5 text-sm border-b"
+      :class="{
+        'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400': authLevel === 'error',
+        'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-400': authLevel === 'warn',
+        'bg-[var(--color-muted)]/50 border-[var(--color-border)] text-[var(--color-muted-foreground)]': authLevel === 'unknown',
+      }"
+    >
+      <ShieldOff v-if="authLevel === 'error'" class="h-4 w-4 shrink-0" />
+      <ShieldAlert v-else-if="authLevel === 'warn'" class="h-4 w-4 shrink-0" />
+      <Loader2 v-else class="h-4 w-4 shrink-0 animate-spin" />
+
+      <span v-if="authLevel === 'error'" class="flex-1">
+        <strong>凭证未配置</strong>：请在 <code class="rounded bg-red-100 dark:bg-red-800/40 px-1 py-0.5 text-xs">data/id_info.json</code> 中填入有效的 token 和 cookie，或点击右侧按钮扫码登录
+      </span>
+      <span v-else-if="authLevel === 'warn'" class="flex-1">
+        <strong>凭证可能已过期</strong>：上次爬取时出现认证错误（{{ authStatus?.error }}），可更新 <code class="rounded bg-orange-100 dark:bg-orange-800/40 px-1 py-0.5 text-xs">data/id_info.json</code> 或点击右侧按钮扫码重新登录
+      </span>
+      <span v-else class="flex-1 text-xs">正在检测凭证状态...</span>
+
+      <!-- 等待扫码时显示进度提示 -->
+      <span v-if="loginPending" class="shrink-0 flex items-center gap-1.5 text-xs opacity-80">
+        <Loader2 class="h-3.5 w-3.5 animate-spin" />
+        等待扫码，请查看弹出的浏览器窗口...
+      </span>
+
+      <button
+        @click="startLogin"
+        :disabled="loginPending"
+        class="shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-white/50 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="{
+          'border-red-300 dark:border-red-700': authLevel === 'error',
+          'border-orange-300 dark:border-orange-700': authLevel === 'warn',
+          'border-[var(--color-border)]': authLevel === 'unknown',
+        }"
+      >
+        {{ loginPending ? '登录中...' : '扫码登录' }}
+      </button>
+    </div>
+
+    <!-- Auth status OK indicator (compact, only in toolbar) -->
     <!-- Toolbar -->
     <div class="shrink-0 border-b border-[var(--color-border)] bg-[var(--color-background)] px-6 py-3 flex items-center gap-3">
       <div class="relative flex-1 max-w-sm">
@@ -417,6 +599,25 @@ async function doCacheClear() {
       </span>
       <!-- Right actions -->
       <div class="ml-auto flex items-center gap-2">
+        <!-- Auth status pill -->
+        <div
+          v-if="authStatus"
+          class="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium"
+          :class="{
+            'border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400': authLevel === 'ok',
+            'border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-400': authLevel === 'warn',
+            'border-red-200 bg-red-50 text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400': authLevel === 'error',
+          }"
+          :title="authLevel === 'ok'
+            ? `凭证有效，token: ${authStatus.token_hint}，文件更新于 ${authStatus.id_info_mtime}`
+            : authStatus.error || '凭证状态异常'"
+        >
+          <ShieldCheck v-if="authLevel === 'ok'" class="h-3.5 w-3.5" />
+          <ShieldAlert v-else-if="authLevel === 'warn'" class="h-3.5 w-3.5" />
+          <ShieldOff v-else class="h-3.5 w-3.5" />
+          <span>{{ authLevel === 'ok' ? '凭证有效' : authLevel === 'warn' ? '可能过期' : '未配置' }}</span>
+        </div>
+
         <!-- Cache clear button -->
         <button
           @click="openCacheModal"
@@ -456,6 +657,7 @@ async function doCacheClear() {
           <!-- Icon -->
           <div class="mt-0.5 shrink-0">
             <Loader2 v-if="crawlStatus.running" class="h-4 w-4 animate-spin text-[var(--color-primary)]" />
+            <ShieldAlert v-else-if="crawlStatus.auth_error" class="h-4 w-4 text-red-500" />
             <CircleCheck v-else-if="crawlStatus.errors.length === 0" class="h-4 w-4 text-emerald-500" />
             <CircleX v-else class="h-4 w-4 text-orange-500" />
           </div>
@@ -469,6 +671,10 @@ async function doCacheClear() {
                   正在爬取
                   <span v-if="crawlStatus.current" class="text-[var(--color-primary)]">「{{ crawlStatus.current }}」</span>
                   <span class="text-[var(--color-muted-foreground)] font-normal ml-1">（{{ crawlStatus.done }}/{{ crawlStatus.total }}）</span>
+                </template>
+                <template v-else-if="crawlStatus.auth_error">
+                  <span class="text-red-500">凭证已失效，爬取已终止</span>
+                  <span class="text-[var(--color-muted-foreground)] font-normal ml-1 text-xs">请更新 data/id_info.json 中的 token 和 cookie</span>
                 </template>
                 <template v-else-if="crawlStatus.finished_at">
                   爬取完成 — 新增 <span class="text-emerald-500">{{ crawlStatus.new_articles }}</span> 篇文章
@@ -869,6 +1075,77 @@ async function doCacheClear() {
                 <Loader2 v-if="cacheClearLoading" class="h-3.5 w-3.5 animate-spin" />
                 <Eraser v-else class="h-3.5 w-3.5" />
                 {{ cacheClearLoading ? '清理中...' : `确认删除 ${cachePreview?.removable_articles ?? 0} 篇` }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- 扫码登录弹窗 -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div
+          v-if="showLoginModal"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          @click.self="closeLoginModal"
+        >
+          <div class="w-full max-w-sm rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-2xl overflow-hidden">
+            <!-- 标题 -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border)]">
+              <div class="flex items-center gap-2">
+                <QrCode class="h-4 w-4 text-[var(--color-primary)]" />
+                <h3 class="text-sm font-semibold text-[var(--color-foreground)]">扫码登录微信公众平台</h3>
+              </div>
+              <button
+                v-if="!loginPending"
+                @click="closeLoginModal"
+                class="rounded-md p-1 text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] transition-colors"
+              >
+                <X class="h-4 w-4" />
+              </button>
+            </div>
+
+            <!-- 二维码区域 -->
+            <div class="flex flex-col items-center gap-4 p-6">
+              <!-- 加载中 -->
+              <div
+                v-if="qrcodeLoading"
+                class="h-56 w-56 flex flex-col items-center justify-center gap-3 rounded-xl bg-[var(--color-muted)]/30 text-[var(--color-muted-foreground)]"
+              >
+                <Loader2 class="h-8 w-8 animate-spin" />
+                <span class="text-xs">正在加载二维码...</span>
+              </div>
+
+              <!-- 二维码图片 -->
+              <img
+                v-else-if="qrcodeImg"
+                :src="qrcodeImg"
+                alt="微信登录二维码"
+                class="h-56 w-56 rounded-xl object-cover border border-[var(--color-border)]"
+              />
+
+              <!-- 失败提示 -->
+              <div
+                v-if="loginError"
+                class="w-full rounded-xl bg-red-50 dark:bg-red-900/20 px-4 py-3 text-xs text-red-600 dark:text-red-400"
+              >
+                {{ loginError }}
+              </div>
+
+              <div v-if="!loginError" class="text-center space-y-1">
+                <p class="text-sm text-[var(--color-foreground)]">用微信扫一扫登录</p>
+                <p class="text-xs text-[var(--color-muted-foreground)]">登录后 token 和 cookie 将自动保存</p>
+                <p v-if="qrcodeAt" class="text-xs text-[var(--color-muted-foreground)] opacity-60">截图更新于 {{ qrcodeAt }}</p>
+              </div>
+
+              <!-- 出错后可重试 -->
+              <button
+                v-if="loginError"
+                @click="startLogin"
+                class="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+              >
+                重新尝试
               </button>
             </div>
           </div>

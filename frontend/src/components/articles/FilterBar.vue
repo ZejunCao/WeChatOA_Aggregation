@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Search, X, SlidersHorizontal, LayoutGrid, List } from 'lucide-vue-next'
+import { Search, X, SlidersHorizontal, LayoutGrid, List, Bookmark, BookmarkCheck, Circle } from 'lucide-vue-next'
 import { useArticlesStore } from '@/stores/articles'
-import type { FilterState, SortOrder, GroupBy } from '@/types'
+import { useReadingStore } from '@/stores/reading'
+import type { FilterState, SortOrder, GroupBy, ReadFilter } from '@/types'
 import Dropdown from '@/components/ui/Dropdown.vue'
 import DateRangePicker from '@/components/ui/DateRangePicker.vue'
 
@@ -19,7 +20,14 @@ const emit = defineEmits<{
 }>()
 
 const articlesStore = useArticlesStore()
+const readingStore = useReadingStore()
 const showAdvanced = ref(false)
+
+const readTabs: { value: ReadFilter; label: string; icon: unknown }[] = [
+  { value: 'all',        label: '全部',   icon: Circle },
+  { value: 'unread',     label: '未读',   icon: Circle },
+  { value: 'bookmarked', label: '收藏',   icon: Bookmark },
+]
 
 function update<K extends keyof FilterState>(key: K, value: FilterState[K]) {
   emit('update:filters', { ...props.filters, [key]: value })
@@ -67,6 +75,30 @@ const activeFilters = computed(() => {
 
 <template>
   <div class="space-y-2.5">
+    <!-- Read filter tabs -->
+    <div class="flex items-center gap-1">
+      <button
+        v-for="tab in readTabs"
+        :key="tab.value"
+        @click="update('readFilter', tab.value)"
+        class="relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+        :class="filters.readFilter === tab.value
+          ? 'bg-[var(--color-accent)] text-[var(--color-foreground)]'
+          : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-accent)]/60'"
+      >
+        <BookmarkCheck v-if="tab.value === 'bookmarked'" class="h-3.5 w-3.5" />
+        <span
+          v-else-if="tab.value === 'unread' && readingStore.unreadCount > 0"
+          class="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--color-primary)] text-[9px] font-bold text-white leading-none"
+        >{{ readingStore.unreadCount > 99 ? '99+' : readingStore.unreadCount }}</span>
+        {{ tab.label }}
+        <span
+          v-if="tab.value === 'bookmarked' && readingStore.bookmarkCount > 0"
+          class="rounded-full bg-[var(--color-primary)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]"
+        >{{ readingStore.bookmarkCount }}</span>
+      </button>
+    </div>
+
     <!-- Main toolbar row -->
     <div class="flex items-center gap-2">
       <!-- Search -->
