@@ -53,6 +53,22 @@ html[data-feed-theme="demo-glass"] .feed-shell {
   background-attachment: fixed;
 }
 
+/* demo-glass：配置页/日志页跟随粉紫基调 */
+html[data-feed-theme="demo-glass"] {
+  --color-background: #f4edf4;
+  --color-card: rgba(255, 255, 255, 0.7);
+  --color-border: rgba(236, 72, 153, 0.2);
+  --color-accent: rgba(236, 72, 153, 0.1);
+  --color-accent-foreground: #7d1f5a;
+  --app-view-bg: linear-gradient(
+    135deg,
+    #fce7f3 0%,
+    #ede9fe 35%,
+    #dbeafe 65%,
+    #fef3c7 100%
+  );
+}
+
 /* 此主题用四圆层替代 mesh（由 FeedView 渲染 .feed-shell__demo-shapes） */
 html[data-feed-theme="demo-glass"] .feed-shell__mesh {
   display: none !important;
@@ -492,6 +508,20 @@ html.dark[data-feed-theme="demo-glass"] .feed-shell {
 
   background: linear-gradient(135deg, oklch(22% 0.06 330) 0%, oklch(20% 0.07 280) 38%, oklch(18% 0.06 250) 100%);
   background-attachment: fixed;
+}
+
+html.dark[data-feed-theme="demo-glass"] {
+  --color-background: oklch(14% 0.035 300);
+  --color-card: rgba(39, 27, 52, 0.72);
+  --color-border: rgba(244, 114, 182, 0.24);
+  --color-accent: rgba(244, 114, 182, 0.18);
+  --color-accent-foreground: oklch(92% 0.04 320);
+  --app-view-bg: linear-gradient(
+    135deg,
+    oklch(22% 0.06 330) 0%,
+    oklch(20% 0.07 280) 38%,
+    oklch(18% 0.06 250) 100%
+  );
 }
 
 html.dark[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-1 {

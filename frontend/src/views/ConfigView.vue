@@ -321,6 +321,19 @@ async function loadAuthStatus() {
   } catch { /* 静默 */ }
 }
 
+/** 主动探测凭证有效性（会请求微信接口） */
+async function checkAuthStatus() {
+  try {
+    const res = await fetch('/api/auth/check', { method: 'POST' })
+    if (res.ok) {
+      authStatus.value = await res.json()
+      return
+    }
+  } catch { /* 静默降级 */ }
+  // 探测失败时回退到缓存状态，至少展示已有提示
+  await loadAuthStatus()
+}
+
 // 计算凭证的综合状态
 const authLevel = computed<'ok' | 'warn' | 'error' | 'unknown'>(() => {
   const s = authStatus.value
@@ -330,8 +343,8 @@ const authLevel = computed<'ok' | 'warn' | 'error' | 'unknown'>(() => {
   return 'ok'
 })
 
-// 页面载入时只读缓存，不主动探测（避免每次进页面都发微信请求）
-loadAuthStatus()
+// 页面载入时主动探测一次；若过期可立即在配置页横幅提示
+checkAuthStatus()
 
 // ---------- 扫码登录 ----------
 
@@ -479,7 +492,7 @@ async function doCacheClear() {
 </script>
 
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
+  <div class="app-view-shell flex h-full flex-col overflow-hidden">
     <!-- Header -->
     <div class="shrink-0 border-b border-[var(--color-border)] bg-[var(--color-background)]/80 backdrop-blur-sm px-6 py-5">
       <div class="flex items-center gap-3 mb-4">

@@ -85,7 +85,7 @@ onMounted(loadLogs)
 </script>
 
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
+  <div class="app-view-shell flex h-full flex-col overflow-hidden">
     <!-- Header -->
     <div class="shrink-0 border-b border-[var(--color-border)] bg-[var(--color-background)]/80 backdrop-blur-sm px-6 py-5">
       <div class="flex items-center justify-between">

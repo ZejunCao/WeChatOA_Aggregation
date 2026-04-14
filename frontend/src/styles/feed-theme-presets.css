@@ -7,6 +7,21 @@ html[data-feed-theme="ocean"] .feed-shell {
   --feed-accent-soft: #5eead4;
 }
 
+/* ocean：让配置页/日志页也跟随主题（使用全局 --color-* 变量） */
+html[data-feed-theme="ocean"] {
+  --color-background: #e3eef7;
+  --color-card: rgba(238, 250, 252, 0.78);
+  --color-border: rgba(15, 118, 110, 0.22);
+  --color-accent: rgba(45, 212, 191, 0.12);
+  --color-accent-foreground: #0f3d39;
+  --app-view-bg: linear-gradient(
+    165deg,
+    #dff0fb 0%,
+    #dcf6f3 48%,
+    #e8f1f8 100%
+  );
+}
+
 html[data-feed-theme="ocean"] .feed-shell__mesh {
   background:
     radial-gradient(ellipse 80% 50% at 10% 12%, rgba(147, 197, 253, 0.45) 0%, transparent 55%),
@@ -26,6 +41,20 @@ html.dark[data-feed-theme="ocean"] .feed-shell {
   background-color: oklch(18% 0.04 240);
   --feed-accent: #2dd4bf;
   --feed-accent-soft: #5eead4;
+}
+
+html.dark[data-feed-theme="ocean"] {
+  --color-background: oklch(14% 0.03 240);
+  --color-card: rgba(22, 37, 46, 0.72);
+  --color-border: rgba(94, 234, 212, 0.2);
+  --color-accent: rgba(45, 212, 191, 0.16);
+  --color-accent-foreground: oklch(92% 0.02 200);
+  --app-view-bg: linear-gradient(
+    165deg,
+    rgba(20, 44, 60, 0.95) 0%,
+    rgba(19, 54, 58, 0.92) 46%,
+    rgba(18, 34, 48, 0.95) 100%
+  );
 }
 
 html.dark[data-feed-theme="ocean"] .feed-shell__mesh {

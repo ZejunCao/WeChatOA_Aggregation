@@ -14,14 +14,14 @@ export function normalizeFeedTheme(v: unknown): FeedThemeId {
 
 export const FEED_THEMES: { id: FeedThemeId; label: string; hint?: string }[] = [
   {
+    id: 'demo-glass',
+    label: '粉紫渐变玻璃',
+    hint: '粉紫蓝黄渐变、四色圆、磨砂玻璃（与仓库 demo/index 同源样式）',
+  },
+  {
     id: 'cream-mesh',
     label: '奶白·磨砂网格',
     hint: '浅粉顶区 + 中下青蓝/淡紫/暖杏色团，高模糊低填充玻璃',
   },
   { id: 'ocean', label: '清蓝网格', hint: '蓝青系 mesh + 玻璃' },
-  {
-    id: 'demo-glass',
-    label: '粉紫渐变玻璃',
-    hint: '粉紫蓝黄渐变、四色圆、磨砂玻璃（与仓库 demo/index 同源样式）',
-  },
 ]

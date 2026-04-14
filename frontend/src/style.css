@@ -129,6 +129,11 @@
   display: none; /* Chrome/Safari */
 }
 
+/* 配置页/日志页等非 Feed 主界面容器，允许主题注入同系背景，避免和侧栏割裂 */
+.app-view-shell {
+  background: var(--app-view-bg, var(--color-background));
+}
+
 /* Line clamp utility */
 .line-clamp-2 {
   display: -webkit-box;
