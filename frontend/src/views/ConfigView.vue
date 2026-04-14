@@ -355,9 +355,11 @@ async function fetchQrcode() {
     const res = await fetch('/api/auth/qrcode')
     if (res.ok) {
       const data = await res.json()
-      qrcodeImg.value = data.img
-      qrcodeAt.value = data.refreshed_at
-      qrcodeLoading.value = false
+      if (data.img) {
+        qrcodeImg.value = data.img
+        qrcodeAt.value = data.refreshed_at
+        qrcodeLoading.value = false
+      }
     }
   } catch { /* 忽略 */ }
 }
@@ -394,7 +396,7 @@ async function startLogin() {
       showLoginModal.value = false
       return
     }
-    // 每 2 秒刷新二维码截图
+    await fetchQrcode()
     _qrcodePollTimer = setInterval(fetchQrcode, 2000)
     // 每 2 秒检查是否扫码完成
     _loginPollTimer = setInterval(pollLoginStatus, 2000)
@@ -525,46 +527,63 @@ async function doCacheClear() {
       </div>
     </div>
 
-    <!-- Auth status banner -->
+    <!-- Auth status banner：紧凑条带，避免大块泥色底与高按钮 -->
     <div
       v-if="authLevel !== 'ok'"
-      class="shrink-0 flex items-center gap-3 px-6 py-2.5 text-sm border-b"
+      class="shrink-0 border-b border-[var(--color-border)] px-6 py-2"
       :class="{
-        'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400': authLevel === 'error',
-        'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-400': authLevel === 'warn',
-        'bg-[var(--color-muted)]/50 border-[var(--color-border)] text-[var(--color-muted-foreground)]': authLevel === 'unknown',
+        'bg-[var(--color-destructive)]/[0.08]': authLevel === 'error',
+        'bg-[var(--color-muted)]/55': authLevel === 'warn',
+        'bg-[var(--color-muted)]/40': authLevel === 'unknown',
       }"
     >
-      <ShieldOff v-if="authLevel === 'error'" class="h-4 w-4 shrink-0" />
-      <ShieldAlert v-else-if="authLevel === 'warn'" class="h-4 w-4 shrink-0" />
-      <Loader2 v-else class="h-4 w-4 shrink-0 animate-spin" />
+      <div class="flex items-center gap-3">
+        <ShieldOff
+          v-if="authLevel === 'error'"
+          class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400"
+          aria-hidden="true"
+        />
+        <ShieldAlert
+          v-else-if="authLevel === 'warn'"
+          class="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+          aria-hidden="true"
+        />
+        <Loader2 v-else class="h-4 w-4 shrink-0 animate-spin text-[var(--color-muted-foreground)]" aria-hidden="true" />
 
-      <span v-if="authLevel === 'error'" class="flex-1">
-        <strong>凭证未配置</strong>：请在 <code class="rounded bg-red-100 dark:bg-red-800/40 px-1 py-0.5 text-xs">data/id_info.json</code> 中填入有效的 token 和 cookie，或点击右侧按钮扫码登录
-      </span>
-      <span v-else-if="authLevel === 'warn'" class="flex-1">
-        <strong>凭证可能已过期</strong>：上次爬取时出现认证错误（{{ authStatus?.error }}），可更新 <code class="rounded bg-orange-100 dark:bg-orange-800/40 px-1 py-0.5 text-xs">data/id_info.json</code> 或点击右侧按钮扫码重新登录
-      </span>
-      <span v-else class="flex-1 text-xs">正在检测凭证状态...</span>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium leading-snug text-[var(--color-foreground)]">
+            {{ authLevel === 'error' ? '凭证未配置，无法爬取' : authLevel === 'warn' ? '凭证可能已过期' : '正在检测凭证…' }}
+          </p>
+          <p
+            class="mt-0.5 truncate text-[11px] leading-4 text-[var(--color-muted-foreground)]"
+            :title="authLevel === 'warn' ? (authStatus?.error || '') : undefined"
+          >
+            <template v-if="authLevel === 'error'">
+              更新 <code class="rounded bg-[var(--color-muted)] px-1 py-px font-mono text-[10px]">data/id_info.json</code> 或扫码登录
+            </template>
+            <template v-else-if="authLevel === 'warn'">
+              {{ authStatus?.error || 'invalid session' }}
+            </template>
+            <template v-else>
+              连接后端获取凭证状态
+            </template>
+          </p>
+        </div>
 
-      <!-- 等待扫码时显示进度提示 -->
-      <span v-if="loginPending" class="shrink-0 flex items-center gap-1.5 text-xs opacity-80">
-        <Loader2 class="h-3.5 w-3.5 animate-spin" />
-        等待扫码，请查看弹出的浏览器窗口...
-      </span>
-
-      <button
-        @click="startLogin"
-        :disabled="loginPending"
-        class="shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-white/50 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
-        :class="{
-          'border-red-300 dark:border-red-700': authLevel === 'error',
-          'border-orange-300 dark:border-orange-700': authLevel === 'warn',
-          'border-[var(--color-border)]': authLevel === 'unknown',
-        }"
-      >
-        {{ loginPending ? '登录中...' : '扫码登录' }}
-      </button>
+        <div class="flex shrink-0 items-center gap-2">
+          <span v-if="loginPending" class="hidden items-center gap-1 text-[11px] text-[var(--color-muted-foreground)] sm:flex">
+            <Loader2 class="h-3 w-3 animate-spin" />
+            扫码中
+          </span>
+          <button
+            @click="startLogin"
+            :disabled="loginPending"
+            class="h-7 shrink-0 rounded-md border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 text-xs font-medium text-[var(--color-foreground)] transition-colors hover:bg-[var(--color-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {{ loginPending ? '登录中…' : '扫码登录' }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Auth status OK indicator (compact, only in toolbar) -->
@@ -602,19 +621,14 @@ async function doCacheClear() {
         <!-- Auth status pill -->
         <div
           v-if="authStatus"
-          class="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium"
-          :class="{
-            'border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400': authLevel === 'ok',
-            'border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-400': authLevel === 'warn',
-            'border-red-200 bg-red-50 text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400': authLevel === 'error',
-          }"
+          class="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-foreground)]"
           :title="authLevel === 'ok'
             ? `凭证有效，token: ${authStatus.token_hint}，文件更新于 ${authStatus.id_info_mtime}`
             : authStatus.error || '凭证状态异常'"
         >
-          <ShieldCheck v-if="authLevel === 'ok'" class="h-3.5 w-3.5" />
-          <ShieldAlert v-else-if="authLevel === 'warn'" class="h-3.5 w-3.5" />
-          <ShieldOff v-else class="h-3.5 w-3.5" />
+          <ShieldCheck v-if="authLevel === 'ok'" class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+          <ShieldAlert v-else-if="authLevel === 'warn'" class="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+          <ShieldOff v-else class="h-3.5 w-3.5 text-[var(--color-destructive)]" />
           <span>{{ authLevel === 'ok' ? '凭证有效' : authLevel === 'warn' ? '可能过期' : '未配置' }}</span>
         </div>
 
@@ -650,14 +664,13 @@ async function doCacheClear() {
     <!-- Crawl progress banner -->
     <Transition name="slide-down">
       <div
-        v-if="showCrawlBanner"
+        v-if="showCrawlBanner && !(crawlStatus.auth_error && !crawlStatus.running)"
         class="shrink-0 border-b border-[var(--color-border)] bg-[var(--color-card)] px-6 py-3"
       >
         <div class="flex items-start gap-3">
           <!-- Icon -->
           <div class="mt-0.5 shrink-0">
             <Loader2 v-if="crawlStatus.running" class="h-4 w-4 animate-spin text-[var(--color-primary)]" />
-            <ShieldAlert v-else-if="crawlStatus.auth_error" class="h-4 w-4 text-red-500" />
             <CircleCheck v-else-if="crawlStatus.errors.length === 0" class="h-4 w-4 text-emerald-500" />
             <CircleX v-else class="h-4 w-4 text-orange-500" />
           </div>
@@ -671,10 +684,6 @@ async function doCacheClear() {
                   正在爬取
                   <span v-if="crawlStatus.current" class="text-[var(--color-primary)]">「{{ crawlStatus.current }}」</span>
                   <span class="text-[var(--color-muted-foreground)] font-normal ml-1">（{{ crawlStatus.done }}/{{ crawlStatus.total }}）</span>
-                </template>
-                <template v-else-if="crawlStatus.auth_error">
-                  <span class="text-red-500">凭证已失效，爬取已终止</span>
-                  <span class="text-[var(--color-muted-foreground)] font-normal ml-1 text-xs">请更新 data/id_info.json 中的 token 和 cookie</span>
                 </template>
                 <template v-else-if="crawlStatus.finished_at">
                   爬取完成 — 新增 <span class="text-emerald-500">{{ crawlStatus.new_articles }}</span> 篇文章

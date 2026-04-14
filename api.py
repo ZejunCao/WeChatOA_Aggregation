@@ -5,7 +5,7 @@
 
 整体职责：
   1. 账号管理  ：搜索 / 添加 / 删除公众号（读写 name2fakeid.json）
-  2. 爬取任务  ：在后台线程遍历所有公众号，爬取近一月文章并写入 message_info.json
+  2. 爬取任务  ：在后台线程遍历所有公众号，爬取近一月文章并写入 message_info.json；新文章会拉取正文写入 message_detail_text.json；若配置 QWEN35_27B_ENDPOINT 则调用大模型为新文章生成 tags 并写回
   3. 缓存清理  ：删除超过指定天数的旧文章记录及对应封面图、详情缓存
   4. 凭证管理  ：检测 token/cookie 是否有效；支持扫码重新登录
   5. 日志记录  ：将重要操作写入 operation_logs.jsonl，供前端日志页查看
@@ -128,6 +128,7 @@ LOG_CRAWL_ERROR    = "crawl_error"
 LOG_ACCOUNT_ADD    = "account_add"
 LOG_ACCOUNT_REMOVE = "account_remove"
 LOG_CACHE_CLEAR    = "cache_clear"
+LOG_ARTICLE_DELETE = "article_delete"
 
 
 def _append_log(log_type: str, message: str, details: dict | None = None) -> None:
@@ -195,6 +196,33 @@ def _download_cover(article_id: str, cover_url: str) -> None:
         img.save(dest, "JPEG", quality=85)
     except Exception as e:
         print(f"[cover] 下载失败 {article_id}: {e}")
+
+
+def _fetch_article_detail_text(article_id: str, link: str) -> bool:
+    """
+    根据文章链接拉取 HTML 正文（url2text），写入 data_manager.message_detail_text。
+
+    存储格式与 deduplication / blog_generator 一致：正常为段落 list[str]；
+    url2text 在文章删除、请求失败时可能返回 str（如「已删除」「请求错误」），原样写入。
+
+    若该 article_id 在 message_detail_text 中已存在则跳过，避免重复抓取。
+    返回 True 表示本次写入了新数据，需要随后 write("message_detail_text")。
+    """
+    if not link or not article_id:
+        return False
+    from src.utils.data_manager import data_manager
+    from src.utils.helpers import url2text
+
+    if article_id in data_manager.message_detail_text:
+        return False
+
+    try:
+        text = url2text(link)
+        data_manager.message_detail_text[article_id] = text
+        return True
+    except Exception as e:
+        print(f"[detail] 抓取正文失败 {article_id}: {e}")
+        return False
 
 
 def _get_wechat():
@@ -350,6 +378,84 @@ def remove_account(name: str):
     _append_log(LOG_ACCOUNT_REMOVE, f"移除公众号「{name}」", {"name": name})
 
 
+# ── 删除单篇文章 ────────────────────────────────────────────────────────────────
+
+class ArticleDeleteRequest(BaseModel):
+    """从前端移除一篇文章：写入黑名单并删除本地记录。"""
+    article_id: str   # 文章唯一 id（msgid-aid-create_time）
+    account: str      # 所属公众号名称（message_info 的 key）
+
+
+@app.post("/api/articles/remove")
+def remove_article(body: ArticleDeleteRequest):
+    """
+    将文章 id 写入 data/deleted_article_ids.json，并从 message_info 中移除该条。
+    后续爬取时若微信仍返回该文，会因 id 在黑名单中而跳过。
+    同时尝试删除本地封面与详情缓存。
+    """
+    from src.utils.data_manager import data_manager
+
+    aid = body.article_id.strip()
+    acc = body.account.strip()
+    if not aid or not acc:
+        raise HTTPException(status_code=400, detail="article_id 和 account 不能为空")
+
+    data_manager.reload("deleted_article_ids")
+    data_manager.reload("message_info")
+
+    if acc not in data_manager.message_info:
+        raise HTTPException(status_code=404, detail=f"公众号「{acc}」不存在")
+
+    blogs = data_manager.message_info[acc].get("blogs", [])
+    if not any(b.get("id") == aid for b in blogs):
+        raise HTTPException(status_code=404, detail="文章不存在或已删除")
+
+    # 黑名单
+    raw = data_manager.deleted_article_ids
+    if not isinstance(raw, dict):
+        raise HTTPException(status_code=500, detail="deleted_article_ids.json 格式异常，请检查 data 目录")
+    if "ids" not in raw or not isinstance(raw["ids"], list):
+        raw["ids"] = []
+    ids_list: list = raw["ids"]
+    if aid not in ids_list:
+        ids_list.append(aid)
+    data_manager.write("deleted_article_ids")
+
+    # 从 message_info 移除
+    data_manager.message_info[acc]["blogs"] = [b for b in blogs if b.get("id") != aid]
+    data_manager.write("message_info")
+
+    # 本地封面
+    cover_path = COVERS_DIR / (aid.replace("/", "_") + ".jpg")
+    if cover_path.exists():
+        try:
+            cover_path.unlink()
+        except OSError:
+            pass
+
+    # 详情缓存
+    detail_file = DATA_DIR / "message_detail_text.json"
+    if detail_file.exists():
+        try:
+            with open(detail_file, encoding="utf-8") as f:
+                detail_texts = json.load(f)
+            if aid in detail_texts:
+                del detail_texts[aid]
+                with open(detail_file, "w", encoding="utf-8") as f:
+                    json.dump(detail_texts, f, ensure_ascii=False, indent=4)
+            data_manager.reload("message_detail_text")
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    _append_log(
+        LOG_ARTICLE_DELETE,
+        f"删除文章「{aid}」（{acc}）",
+        {"article_id": aid, "account": acc},
+    )
+
+    return {"ok": True, "article_id": aid}
+
+
 # ── 凭证状态（内存缓存） ─────────────────────────────────────────────────────────
 # _auth_state 在进程内存中记录最近一次凭证检测结果。
 # 程序重启后重置为初始值（valid=True 表示"尚未验证"）。
@@ -461,7 +567,7 @@ def _run_crawl() -> None:
     2. 从磁盘重新加载最新凭证（data_manager.reload），支持手动更新 id_info.json
     3. 调用 _check_auth_valid() 做预检：凭证失效时立刻终止，不逐个账号重试
     4. 遍历所有公众号，调用 WechatRequest.fakeid2message_update() 获取新文章
-    5. 对每篇新文章下载封面图，写入 message_info.json
+    5. 对每篇新文章下载封面图、拉正文；可选 LLM 打标签后写入 message_info.json
     6. 每处理完一个公众号（成功或失败），done += 1
     7. 全部完成后写入结束日志，设置 running=False
     """
@@ -483,6 +589,7 @@ def _run_crawl() -> None:
         })
 
         from src.crawler.wechat_request import WechatRequest
+        from src.llm.article_tagging import tag_article
         from src.utils.data_manager import data_manager
         from src.utils.helpers import time_now
 
@@ -492,6 +599,8 @@ def _run_crawl() -> None:
         data_manager.reload("name2fakeid")
         data_manager.reload("message_info")
         data_manager.reload("issues_message")
+        data_manager.reload("deleted_article_ids")
+        data_manager.reload("message_detail_text")
 
         # ── 第三步：凭证预检 ──────────────────────────────────────────
         # 如果凭证已失效，提前终止，避免每个账号都等待超时再报错
@@ -531,9 +640,26 @@ def _run_crawl() -> None:
                 if new_articles:
                     data_manager.message_info[oa_name]["blogs"].extend(new_articles)
                     new_total += len(new_articles)
-                    # 为每篇新文章下载封面图（已存在则跳过）
+                    detail_dirty = False
+                    # 新文章：下载封面 + 拉取正文写入 message_detail_text.json
                     for article in new_articles:
                         _download_cover(article["id"], article.get("cover", ""))
+                        if _fetch_article_detail_text(article["id"], article.get("link", "")):
+                            detail_dirty = True
+                    if detail_dirty:
+                        data_manager.write("message_detail_text")
+
+                    # LLM 打标签（仅当配置了 QWEN35_27B_ENDPOINT；失败不影响爬取）
+                    try:
+                        for article in new_articles:
+                            try:
+                                tags = tag_article(article, data_manager)
+                                if tags:
+                                    article["tags"] = tags
+                            except Exception as e:
+                                print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
+                    except Exception as e:
+                        print(f"[tag] 打标模块异常: {e}")
 
                 # 更新最后爬取时间
                 data_manager.message_info[oa_name]["latest_update_time"] = time_now()
@@ -911,6 +1037,32 @@ def _run_login() -> None:
         bro.set.window.size(1280, 800)  # 设置虚拟窗口大小，影响截图分辨率
         bro.get("https://mp.weixin.qq.com/")
 
+        # 首屏会先出现登录骨架/文案，二维码 img 晚几秒才出现；若此时截全页会误导用户。
+        # 先等待二维码节点出现，再进入轮询；只推送「二维码元素」截图，不再用全页图当二维码。
+        qr_wait_deadline = time.time() + 35
+        qr_elem = None
+        while time.time() < qr_wait_deadline and "token" not in bro.url:
+            try:
+                qr_elem = bro.ele("css:img[src*='qrcode']", timeout=2)
+                if qr_elem:
+                    break
+            except Exception:
+                pass
+            time.sleep(0.35)
+        if "token" not in bro.url and not qr_elem:
+            raise Exception("页面未在预期时间内加载出登录二维码，请检查网络或稍后重试")
+
+        # 二维码一出现就推送首帧，避免再等主循环一轮才写入 _login_state
+        if qr_elem and "token" not in bro.url:
+            try:
+                _b64 = qr_elem.get_screenshot(as_base64=True)
+                if _b64:
+                    with _login_lock:
+                        _login_state["qrcode_img"] = f"data:image/png;base64,{_b64}"
+                        _login_state["qrcode_at"] = datetime.now().strftime("%H:%M:%S")
+            except Exception:
+                pass
+
         max_wait = 180  # 最多等待 3 分钟
         start = time.time()
 
@@ -918,23 +1070,20 @@ def _run_login() -> None:
             if time.time() - start > max_wait:
                 raise Exception("等待扫码超时（3 分钟），请重试")
 
-            # 优先截取页面中的二维码图片元素（更清晰）
-            # 找不到时退回到全屏截图
+            img_b64 = ""
             try:
-                qr_elem = bro.ele("css:img[src*='qrcode']", timeout=1)
-                img_b64 = qr_elem.get_screenshot(as_base64=True)
+                qr_elem = bro.ele("css:img[src*='qrcode']", timeout=3)
+                if qr_elem:
+                    img_b64 = qr_elem.get_screenshot(as_base64=True)
             except Exception:
-                try:
-                    img_b64 = bro.get_screenshot(as_base64=True)
-                except Exception:
-                    img_b64 = ""
+                pass
 
             if img_b64:
                 with _login_lock:
                     _login_state["qrcode_img"] = f"data:image/png;base64,{img_b64}"
                     _login_state["qrcode_at"] = datetime.now().strftime("%H:%M:%S")
 
-            time.sleep(2)  # 每 2 秒刷新一次截图
+            time.sleep(2)  # 每 2 秒刷新一次截图（二维码会过期刷新）
 
         # ── 扫码成功，从 URL 提取 token ──
         match = re.search(r"token=(\d+)", bro.url)

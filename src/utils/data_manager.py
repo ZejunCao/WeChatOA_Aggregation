@@ -35,6 +35,7 @@ class JsonFileManager:
         'message_detail_text', # 公众号的博文详情信息，key=id，value=博文详情
         'id_info', # 微信公众号的cookie和token
         'issues_message', # 存在问题的文章，包括重复文章、文章已删除等
+        'deleted_article_ids',  # 用户主动删除的文章 id 列表，爬取时永久跳过
     ]
     
     def __new__(cls):
@@ -80,6 +81,8 @@ class JsonFileManager:
                         'is_delete': [],
                         'dup_minhash': {},
                     }
+                elif file_name == 'deleted_article_ids':
+                    self._data[file_name] = {'ids': []}
     
     def __getattr__(self, name):
         """通过属性名直接访问文件数据"""

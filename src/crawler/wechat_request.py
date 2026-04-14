@@ -82,6 +82,7 @@ class WechatRequest:
           - 已存在的文章直接跳过，不重复写入
 
         过滤逻辑（以下情况跳过）：
+          0. article_id 在 deleted_article_ids 中（用户在前端已删除，永久跳过）
           1. article_id 已在 message_exist 中（已爬取过）
           2. 文章已被微信删除（is_deleted=True），记录到 issues_message 并跳过
           3. 特殊文章类型：item_show_type 为 5、8、10（非普通图文）
@@ -110,6 +111,10 @@ class WechatRequest:
         for m in message_exist:
             msgid_exist.add(m['id'])
 
+        # 用户在前端主动删除的文章 id，爬取时永久跳过（见 data/deleted_article_ids.json）
+        _raw_del = data_manager.deleted_article_ids
+        skipped_by_user = set(_raw_del.get('ids', [])) if isinstance(_raw_del, dict) else set()
+
         # 已知被删除的文章 id 集合（避免重复记录）
         is_deleted_set = set(data_manager.issues_message['is_delete'])
 
@@ -134,6 +139,10 @@ class WechatRequest:
                     + str(message['appmsgex'][i]['aid']) + '-'
                     + str(message['appmsgex'][i]['create_time'])
                 )
+
+                # 用户主动删除过的文章，不再入库
+                if unique_id in skipped_by_user:
+                    continue
 
                 # 1. 已爬取过，跳过
                 if unique_id in msgid_exist:

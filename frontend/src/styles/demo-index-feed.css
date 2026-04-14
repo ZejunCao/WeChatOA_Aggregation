@@ -1,0 +1,565 @@
+/**
+ * 与仓库根目录 demo/index.html 内联样式一致：
+ * :root 变量、body 渐变、四块 bg-shape、top-bar / pill / card / card-row 等数值均同源复用。
+ * 仅在选择 html[data-feed-theme="demo-glass"] 时生效。
+ */
+
+/* ── demo :root → 挂在 .feed-shell，并桥接到现有 --feed-* ───────────────── */
+html[data-feed-theme="demo-glass"] .feed-shell {
+  --bg-card: rgba(255, 255, 255, 0.25);
+  --bg-card-hover: rgba(255, 255, 255, 0.35);
+  --border: rgba(255, 255, 255, 0.45);
+  --border-hover: rgba(255, 255, 255, 0.65);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --pink: #ec4899;
+  --pink-light: #f9a8d4;
+  --purple: #a855f7;
+  --blue: #3b82f6;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text-1: #1e1b2e;
+  --text-2: #6b5e7b;
+  --text-3: #a89bb8;
+  --tag-ai-bg: rgba(168, 85, 247, 0.12);
+  --tag-ai: #9333ea;
+  --tag-ai-border: rgba(168, 85, 247, 0.25);
+  --tag-tech-bg: rgba(59, 130, 246, 0.1);
+  --tag-tech: #2563eb;
+  --tag-tech-border: rgba(59, 130, 246, 0.2);
+  --tag-product-bg: rgba(245, 158, 11, 0.1);
+  --tag-product: #b45309;
+  --tag-product-border: rgba(245, 158, 11, 0.2);
+  --tag-design-bg: rgba(236, 72, 153, 0.1);
+  --tag-design: #db2777;
+  --tag-design-border: rgba(236, 72, 153, 0.2);
+
+  --feed-accent: var(--pink);
+  --feed-accent-soft: var(--pink-light);
+  --feed-glass-bg: var(--bg-card);
+  --feed-glass-bg-hover: var(--bg-card-hover);
+  --feed-glass-panel: var(--bg-card);
+  --feed-glass-blur: blur(20px) saturate(180%);
+  --feed-glass-border: var(--border);
+  --feed-glass-border-hover: var(--border-hover);
+  --feed-glass-shadow: var(--shadow);
+  --feed-glass-shadow-hover: var(--shadow-hover);
+  --feed-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --feed-text-muted: var(--text-2);
+  --feed-text-subtle: var(--text-3);
+
+  color: var(--text-1);
+  background: linear-gradient(135deg, #fce7f3 0%, #ede9fe 35%, #dbeafe 65%, #fef3c7 100%);
+  background-attachment: fixed;
+}
+
+/* 此主题用四圆层替代 mesh（由 FeedView 渲染 .feed-shell__demo-shapes） */
+html[data-feed-theme="demo-glass"] .feed-shell__mesh {
+  display: none !important;
+}
+
+/* ── demo .bg-shape ──（位置与尺寸与 demo/index.html 一致） */
+html[data-feed-theme="demo-glass"] .feed-shell__demo-shapes {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+html[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape {
+  position: absolute;
+  border-radius: 50%;
+}
+
+html[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-1 {
+  width: 500px;
+  height: 500px;
+  background: #f472b6;
+  opacity: 0.35;
+  top: -120px;
+  left: -80px;
+}
+
+html[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-2 {
+  width: 400px;
+  height: 400px;
+  background: #818cf8;
+  opacity: 0.3;
+  top: 30%;
+  right: -100px;
+}
+
+html[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-3 {
+  width: 450px;
+  height: 450px;
+  background: #38bdf8;
+  opacity: 0.25;
+  bottom: -100px;
+  left: 30%;
+}
+
+html[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-4 {
+  width: 300px;
+  height: 300px;
+  background: #fbbf24;
+  opacity: 0.2;
+  top: 60%;
+  left: -50px;
+}
+
+/* ── .top-bar → .feed-glass-top ── */
+/* 不与 demo 静态页一样加 margin-bottom：Vue 外层已有 px/pt/pb，再加会整块列表下移一行 */
+html[data-feed-theme="demo-glass"] .feed-glass-top {
+  padding: 24px 28px !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow), var(--feed-glass-inset) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+html[data-feed-theme="demo-glass"] .feed-subtitle {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-top: 3px;
+}
+
+html[data-feed-theme="demo-glass"] .feed-subtitle strong {
+  color: var(--text-1);
+}
+
+html[data-feed-theme="demo-glass"] .feed-unread-count {
+  color: var(--pink);
+  font-weight: 600;
+}
+
+html[data-feed-theme="demo-glass"] .feed-mark-all-btn {
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 12px;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+  background: rgba(236, 72, 153, 0.06);
+  color: var(--pink);
+}
+
+html[data-feed-theme="demo-glass"] .feed-mark-all-btn:hover {
+  background: rgba(236, 72, 153, 0.12);
+  border-color: var(--pink-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.12);
+}
+
+html[data-feed-theme="demo-glass"] .dark .feed-mark-all-btn {
+  border-color: rgba(244, 114, 182, 0.35);
+  background: rgba(244, 114, 182, 0.12);
+}
+
+/* ── Pills /筛选条（对齐 .pill / .view-toggle） ── */
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+  color: var(--text-2) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill:hover {
+  background: rgba(236, 72, 153, 0.06) !important;
+  border-color: rgba(236, 72, 153, 0.2) !important;
+  color: var(--text-1) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill.is-active {
+  background: rgba(236, 72, 153, 0.1) !important;
+  color: var(--pink) !important;
+  border-color: var(--pink-light) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-input {
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-input::placeholder {
+  color: var(--text-3);
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 10px;
+  box-shadow: none !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle button {
+  color: var(--text-3) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle button.is-active {
+  background: rgba(236, 72, 153, 0.1) !important;
+  color: var(--pink) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle button:hover {
+  color: var(--text-2) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-tool {
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+  color: var(--text-2) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-tool:hover {
+  color: var(--text-1) !important;
+  border-color: rgba(236, 72, 153, 0.2) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-tool.is-active {
+  border-color: rgba(236, 72, 153, 0.35) !important;
+  background: rgba(236, 72, 153, 0.08) !important;
+  color: var(--pink) !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-dd > button {
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-chip-idle {
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: none !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-advanced {
+  border: 1.5px solid var(--border) !important;
+  background: var(--bg-card) !important;
+  box-shadow: var(--shadow), var(--feed-glass-inset) !important;
+}
+
+/* ── Section header ── */
+html[data-feed-theme="demo-glass"] .feed-section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pink);
+}
+
+html[data-feed-theme="demo-glass"] .feed-section-line {
+  background: linear-gradient(90deg, var(--pink-light), transparent);
+}
+
+html[data-feed-theme="demo-glass"] .feed-section-count {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ── Card grid（与 .card-grid 一致，由 FeedView .feed-demo-card-grid 启用） ── */
+html[data-feed-theme="demo-glass"] .feed-demo-card-grid {
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 769px) {
+  html[data-feed-theme="demo-glass"] .feed-demo-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  html[data-feed-theme="demo-glass"] .feed-demo-card-grid {
+    gap: 14px;
+  }
+
+  html[data-feed-theme="demo-glass"] .feed-glass-top {
+    padding: 18px 20px !important;
+    border-radius: 16px !important;
+  }
+
+  html[data-feed-theme="demo-glass"] .feed-title {
+    font-size: 18px;
+  }
+}
+
+/* ── .card → .article-glass-card ── */
+html[data-feed-theme="demo-glass"] .article-glass-card {
+  border-radius: 16px;
+  border-width: 1.5px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-card:hover {
+  transform: translateY(-4px);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-cover::after {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.25), transparent);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-badge-ai {
+  background: rgba(168, 85, 247, 0.8);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-1);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-card.is-read .article-glass-title {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-digest {
+  color: var(--text-2);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-ft {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-ft-acct {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  max-width: 55%;
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-ft-meta {
+  font-size: 11px;
+  color: var(--text-3);
+  gap: 6px;
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-ft-meta svg {
+  width: 11px;
+  height: 11px;
+  color: var(--pink);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-tag {
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-tag--ai {
+  background: var(--tag-ai-bg);
+  color: var(--tag-ai);
+  border: 1px solid var(--tag-ai-border);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-tag--tech {
+  background: var(--tag-tech-bg);
+  color: var(--tag-tech);
+  border: 1px solid var(--tag-tech-border);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-tag--prod {
+  background: var(--tag-product-bg);
+  color: var(--tag-product);
+  border: 1px solid var(--tag-product-border);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-tag--design {
+  background: var(--tag-design-bg);
+  color: var(--tag-design);
+  border: 1px solid var(--tag-design-border);
+}
+
+@keyframes demo-index-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(236, 72, 153, 0.5);
+  }
+  50% {
+    box-shadow:
+      0 0 12px rgba(236, 72, 153, 0.7),
+      0 0 20px rgba(236, 72, 153, 0.3);
+  }
+}
+
+html[data-feed-theme="demo-glass"] .feed-dot-unread {
+  background: var(--pink);
+  box-shadow: 0 0 6px rgba(236, 72, 153, 0.5);
+  animation: demo-index-dot-pulse 2s ease-in-out infinite;
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-btn-icon--bm.is-on {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--amber);
+}
+
+/* ── .card-row → .article-glass-row ── */
+html[data-feed-theme="demo-glass"] .article-glass-row {
+  align-items: center;
+  border-width: 1.5px !important;
+  text-decoration: none;
+  transition: all 0.25s;
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-row:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.08);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-row-title {
+  color: var(--text-1);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-row.is-read .article-glass-row-title {
+  color: var(--text-2);
+}
+
+html[data-feed-theme="demo-glass"] .article-glass-row-sub {
+  color: var(--text-3);
+}
+
+/* ── 侧栏（demo 无侧栏，用同一套粉紫渐变 +玻璃） ── */
+html[data-feed-theme="demo-glass"] .app-sidebar-shell {
+  --sb-accent: #ec4899;
+  --sb-accent-soft: #f9a8d4;
+  --sb-text-muted: #6b5e7b;
+  --sb-text-subtle: #a89bb8;
+  background: linear-gradient(
+    165deg,
+    rgba(252, 231, 243, 0.55) 0%,
+    rgba(237, 233, 254, 0.62) 42%,
+    rgba(219, 234, 254, 0.65) 100%
+  );
+  border-right: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    4px 0 28px rgba(0, 0, 0, 0.06),
+    inset 1px 0 0 rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+html[data-feed-theme="demo-glass"] .app-sidebar-logo {
+  background: linear-gradient(145deg, #ec4899, #a855f7);
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.35);
+}
+
+html[data-feed-theme="demo-glass"] .app-sidebar-link--active {
+  background: rgba(236, 72, 153, 0.1);
+  border-color: rgba(249, 168, 212, 0.85);
+  color: var(--sb-accent);
+}
+
+html[data-feed-theme="demo-glass"] .app-sidebar-acct-btn--active {
+  background: rgba(236, 72, 153, 0.08);
+  border-color: rgba(236, 72, 153, 0.22);
+}
+
+/* ── 深色：demo 无对应，保留可读玻璃 ── */
+html.dark[data-feed-theme="demo-glass"] .feed-shell {
+  --bg-card: rgba(255, 255, 255, 0.1);
+  --bg-card-hover: rgba(255, 255, 255, 0.16);
+  --border: rgba(255, 255, 255, 0.22);
+  --border-hover: rgba(255, 255, 255, 0.34);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --text-1: oklch(93% 0.01 290);
+  --text-2: oklch(78% 0.04 300);
+  --text-3: oklch(68% 0.04 300);
+  --pink: #f472b6;
+  --pink-light: #f9a8d4;
+  --feed-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  background: linear-gradient(135deg, oklch(22% 0.06 330) 0%, oklch(20% 0.07 280) 38%, oklch(18% 0.06 250) 100%);
+  background-attachment: fixed;
+}
+
+html.dark[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-1 {
+  opacity: 0.2;
+}
+html.dark[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-2 {
+  opacity: 0.18;
+}
+html.dark[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-3 {
+  opacity: 0.15;
+}
+html.dark[data-feed-theme="demo-glass"] .feed-shell__demo-shapes .demo-bg-shape-4 {
+  opacity: 0.12;
+}
+
+html.dark[data-feed-theme="demo-glass"] .app-sidebar-shell {
+  background: linear-gradient(
+    165deg,
+    rgba(52, 24, 48, 0.82) 0%,
+    rgba(28, 32, 56, 0.8) 50%,
+    rgba(22, 36, 52, 0.82) 100%
+  );
+  border-right-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    4px 0 28px rgba(0, 0, 0, 0.36),
+    inset 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+html.dark[data-feed-theme="demo-glass"] .app-sidebar-logo {
+  background: linear-gradient(145deg, #db2777, #9333ea);
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.25);
+}
+
+html.dark[data-feed-theme="demo-glass"] .app-sidebar-link--active {
+  background: rgba(244, 114, 182, 0.12);
+  border-color: rgba(244, 114, 182, 0.35);
+}
+
+html.dark[data-feed-theme="demo-glass"] .app-sidebar-acct-btn--active {
+  background: rgba(244, 114, 182, 0.1);
+  border-color: rgba(244, 114, 182, 0.28);
+}
+
+/* 深色下筛选控件可读 */
+html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill {
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-2) !important;
+}
+
+html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill.is-active {
+  background: rgba(244, 114, 182, 0.15) !important;
+  color: var(--pink) !important;
+  border-color: rgba(249, 168, 212, 0.4) !important;
+}
+
+html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-input,
+html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-tool,
+html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle,
+html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-dd > button {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+html.dark[data-feed-theme="demo-glass"] .feed-title {
+  color: var(--text-1);
+}
+
+html.dark[data-feed-theme="demo-glass"] .feed-glass-top {
+  border-color: var(--border) !important;
+}

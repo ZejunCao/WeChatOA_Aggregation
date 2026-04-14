@@ -12,6 +12,7 @@
 
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { normalizeFeedTheme, type FeedThemeId } from '@/themes/feed-themes'
 
 export const useConfigStore = defineStore(
   'config',
@@ -22,6 +23,9 @@ export const useConfigStore = defineStore(
 
     // 当前主题设置：'light' | 'dark' | 'system'（跟随操作系统）
     const theme = ref<'light' | 'dark' | 'system'>('system')
+
+    // 文章 Feed 区界面预设（奶白网格 / 简约 / 蓝青等），持久化到 localStorage
+    const feedTheme = ref<FeedThemeId>('cream-mesh')
 
     // ── 公众号可见性 ──────────────────────────────────────────────────────────
 
@@ -79,18 +83,32 @@ export const useConfigStore = defineStore(
      * 应用初始化：在 App.vue 挂载时调用，确保持久化的主题设置立即生效，
      * 避免页面刷新时出现闪白/闪黑的问题。
      */
+    /** 同步 Feed 预设到 <html data-feed-theme>，供 CSS 变量覆盖 */
+    function applyFeedTheme(id: FeedThemeId) {
+      document.documentElement.setAttribute('data-feed-theme', id)
+    }
+
+    function setFeedTheme(id: FeedThemeId) {
+      feedTheme.value = id
+      applyFeedTheme(id)
+    }
+
     function initTheme() {
+      feedTheme.value = normalizeFeedTheme(feedTheme.value)
       applyTheme(theme.value)
+      applyFeedTheme(feedTheme.value)
     }
 
     return {
       hiddenAccounts,
       theme,
+      feedTheme,
       toggleAccount,
       isVisible,
       showAll,
       hideAll,
       setTheme,
+      setFeedTheme,
       initTheme,
     }
   },

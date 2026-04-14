@@ -21,6 +21,7 @@ import {
   ChevronDown,
   ChevronUp,
   Inbox,
+  Trash2,
 } from 'lucide-vue-next'
 
 // 与后端 LogEntry Pydantic 模型对应的前端接口
@@ -43,6 +44,7 @@ const LOG_META: Record<string, { label: string; color: string; bg: string; icon:
   account_add:    { label: '添加公众号', color: 'text-indigo-500', bg: 'bg-indigo-500/10', icon: UserPlus },
   account_remove: { label: '移除公众号', color: 'text-orange-500', bg: 'bg-orange-500/10', icon: UserMinus },
   cache_clear:    { label: '清理缓存',  color: 'text-purple-500', bg: 'bg-purple-500/10', icon: Eraser },
+  article_delete: { label: '删除文章', color: 'text-rose-500', bg: 'bg-rose-500/10', icon: Trash2 },
 }
 
 /** 根据日志类型获取元数据，未知类型返回默认样式 */

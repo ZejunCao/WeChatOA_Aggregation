@@ -1,0 +1,78 @@
+/* Feed 界面预设：由 html[data-feed-theme] 切换，默认样式在 style.css 的 .feed-shell（= cream-mesh） */
+
+/* ── ocean：蓝青 mesh ─────────────────────────────────────────────────────── */
+html[data-feed-theme="ocean"] .feed-shell {
+  background-color: #e4eef5;
+  --feed-accent: #0d9488;
+  --feed-accent-soft: #5eead4;
+}
+
+html[data-feed-theme="ocean"] .feed-shell__mesh {
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 12%, rgba(147, 197, 253, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 75% 48% at 88% 20%, rgba(165, 243, 252, 0.42) 0%, transparent 52%),
+    radial-gradient(ellipse 65% 42% at 45% 100%, rgba(129, 140, 248, 0.28) 0%, transparent 48%),
+    linear-gradient(165deg, #dbeafe 0%, #e0f2fe 40%, #ccfbf1 100%);
+}
+
+html[data-feed-theme="ocean"] .feed-shell {
+  --feed-glass-bg: rgba(255, 255, 255, 0.14);
+  --feed-glass-bg-hover: rgba(255, 255, 255, 0.24);
+  --feed-glass-panel: rgba(255, 255, 255, 0.2);
+  --feed-glass-blur: blur(44px) saturate(200%);
+}
+
+html.dark[data-feed-theme="ocean"] .feed-shell {
+  background-color: oklch(18% 0.04 240);
+  --feed-accent: #2dd4bf;
+  --feed-accent-soft: #5eead4;
+}
+
+html.dark[data-feed-theme="ocean"] .feed-shell__mesh {
+  background:
+    radial-gradient(ellipse 75% 48% at 12% 10%, rgba(30, 80, 120, 0.5) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 45% at 85% 25%, rgba(40, 90, 100, 0.45) 0%, transparent 50%),
+    linear-gradient(165deg, oklch(22% 0.05 240) 0%, oklch(16% 0.04 220) 100%);
+}
+
+html[data-feed-theme="ocean"] .app-sidebar-shell {
+  background: linear-gradient(
+    165deg,
+    rgba(224, 242, 254, 0.65) 0%,
+    rgba(207, 250, 254, 0.55) 50%,
+    rgba(219, 234, 254, 0.6) 100%
+  );
+}
+
+html.dark[data-feed-theme="ocean"] .app-sidebar-shell {
+  background: linear-gradient(165deg, rgba(24, 40, 52, 0.94) 0%, rgba(18, 32, 44, 0.92) 100%);
+}
+
+/* ocean：侧栏强调色跟主 accent */
+html[data-feed-theme="ocean"] .app-sidebar-shell {
+  --sb-accent: #0f766e;
+  --sb-accent-soft: #2dd4bf;
+}
+
+html.dark[data-feed-theme="ocean"] .app-sidebar-shell {
+  --sb-accent: #5eead4;
+  --sb-accent-soft: #99f6e4;
+}
+
+html[data-feed-theme="ocean"] .app-sidebar-logo {
+  background: linear-gradient(145deg, #14b8a6, #0ea5e9);
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.35);
+}
+
+html[data-feed-theme="ocean"] .app-sidebar-link--active {
+  background: rgba(13, 148, 136, 0.12);
+  border-color: rgba(13, 148, 136, 0.28);
+  color: var(--sb-accent);
+}
+
+html[data-feed-theme="ocean"] .app-sidebar-acct-btn--active {
+  background: rgba(13, 148, 136, 0.1);
+  border-color: rgba(13, 148, 136, 0.28);
+}
+
+/* demo-glass 完整复用 demo/index.html → 见 styles/demo-index-feed.css */

@@ -79,6 +79,12 @@ export const useReadingStore = defineStore(
       }
     }
 
+    /** 文章从列表删除后，同步清除已读/收藏中的 id */
+    function removeArticleTracking(id: string) {
+      readIds.value = readIds.value.filter((i) => i !== id)
+      bookmarkIds.value = bookmarkIds.value.filter((i) => i !== id)
+    }
+
     // ── 统计 ──────────────────────────────────────────────────────────────────
 
     /**
@@ -104,6 +110,7 @@ export const useReadingStore = defineStore(
       isBookmarked,
       toggleBookmark,
       markAllRead,
+      removeArticleTracking,
       unreadCount,
       bookmarkCount,
     }

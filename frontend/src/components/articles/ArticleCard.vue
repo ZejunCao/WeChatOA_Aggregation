@@ -7,15 +7,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { computed, ref } from 'vue'
-import { ExternalLink, Tag, Bot, Bookmark, BookmarkCheck } from 'lucide-vue-next'
+import { ExternalLink, Tag, Bot, Bookmark, BookmarkCheck, Trash2, Loader2 } from 'lucide-vue-next'
 import type { Article } from '@/types'
 import { useReadingStore } from '@/stores/reading'
+import { useArticlesStore } from '@/stores/articles'
 
 const props = defineProps<{
   article: Article & { account: string }  // 文章数据 + 所属公众号名称
 }>()
 
 const readingStore = useReadingStore()
+const articlesStore = useArticlesStore()
+const removing = ref(false)
 
 // 当前文章的已读/收藏状态（响应式，store 变化时自动更新）
 const isRead = computed(() => readingStore.isRead(props.article.id))
@@ -37,13 +40,48 @@ function toggleBookmark(e: MouseEvent) {
   readingStore.toggleBookmark(props.article.id)
 }
 
+/** 从本地列表删除并写入黑名单，后续爬取会跳过该 id */
+async function removeArticle(e: MouseEvent) {
+  e.preventDefault()
+  e.stopPropagation()
+  if (
+    !confirm(
+      `从列表中删除「${props.article.title}」？\n将从本地数据移除，且以后爬取也不会再入库。`,
+    )
+  ) {
+    return
+  }
+  removing.value = true
+  try {
+    const res = await fetch('/api/articles/remove', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        article_id: props.article.id,
+        account: props.article.account,
+      }),
+    })
+    const data = (await res.json().catch(() => ({}))) as { detail?: string }
+    if (!res.ok) {
+      alert(data.detail || '删除失败')
+      return
+    }
+    readingStore.removeArticleTracking(props.article.id)
+    articlesStore.removeArticleLocally(props.article.account, props.article.id)
+  } catch {
+    alert('无法连接后端，请确认 api.py 已启动')
+  } finally {
+    removing.value = false
+  }
+}
+
 /**
  * 封面图加载失败时的备用颜色（用公众号名首字符的 charCode 取模，
  * 保证同一公众号始终显示同一颜色）。
  */
 const coverFallback = computed(() => {
   const colors = [
-    '#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6', '#3b82f6', '#10b981',
+    '#6366f1', '#8b5cf6', '#c94f7c', '#f97316', '#14b8a6', '#3b82f6', '#10b981',
   ]
   const idx = props.article.account.charCodeAt(0) % colors.length
   return colors[idx]
@@ -70,21 +108,24 @@ const formattedDate = computed(() => {
 const displayDigest = computed(() => {
   return props.article.summary || props.article.digest || ''
 })
+
+const tagTones = ['article-glass-tag--ai', 'article-glass-tag--tech', 'article-glass-tag--prod', 'article-glass-tag--design'] as const
+function tagToneClass(i: number) {
+  return tagTones[i % 4]
+}
 </script>
 
 <template>
-  <a
+   <a
     :href="article.link"
     target="_blank"
     rel="noopener noreferrer"
-    class="group relative flex flex-col overflow-hidden rounded-xl border bg-[var(--color-card)] transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
-    :class="isRead
-      ? 'border-[var(--color-border)] opacity-70 hover:opacity-100'
-      : 'border-[var(--color-border)] hover:border-[var(--color-ring)]/30'"
+    class="group relative article-glass-card"
+    :class="isRead ? 'is-read' : ''"
     @click="handleClick"
   >
     <!-- 封面图区域（16:9 比例） -->
-    <div class="relative aspect-[16/9] overflow-hidden bg-[var(--color-muted)] shrink-0">
+    <div class="article-glass-cover bg-[var(--color-muted)] shrink-0">
       <!-- 优先显示本地封面，@error 时切换到颜色占位块 -->
       <img
         v-if="!coverError"
@@ -104,21 +145,29 @@ const displayDigest = computed(() => {
       </div>
 
       <!-- AI 摘要徽标：有 LLM 生成的 summary 时显示 -->
-      <div
-        v-if="article.summary"
-        class="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm"
-      >
-        <Bot class="h-3 w-3" />
+      <div v-if="article.summary" class="article-glass-badge-ai">
+        <Bot class="h-3 w-3 shrink-0" />
         <span>AI 摘要</span>
       </div>
 
+      <!-- 删除：从列表移除并加入黑名单 -->
+      <button
+        type="button"
+        @click="removeArticle"
+        :disabled="removing"
+        class="article-glass-btn-icon article-glass-btn-icon--del disabled:opacity-50 disabled:cursor-not-allowed"
+        title="从列表删除"
+      >
+        <Loader2 v-if="removing" class="h-3.5 w-3.5 animate-spin" />
+        <Trash2 v-else class="h-[13px] w-[13px]" />
+      </button>
+
       <!-- 收藏按钮：悬停时出现，已收藏时常驻显示 -->
       <button
+        type="button"
         @click="toggleBookmark"
-        class="absolute bottom-2 right-2 flex h-7 w-7 items-center justify-center rounded-full transition-all"
-        :class="isBookmarked
-          ? 'bg-amber-500/90 text-white opacity-100'
-          : 'bg-black/40 text-white opacity-0 group-hover:opacity-100 hover:bg-amber-500/80'"
+        class="article-glass-btn-icon article-glass-btn-icon--bm"
+        :class="isBookmarked ? 'is-on is-visible' : ''"
         :title="isBookmarked ? '取消收藏' : '收藏'"
       >
         <BookmarkCheck v-if="isBookmarked" class="h-3.5 w-3.5" />
@@ -127,47 +176,37 @@ const displayDigest = computed(() => {
     </div>
 
     <!-- 文字内容区 -->
-    <div class="flex flex-1 flex-col gap-2 p-4">
+    <div class="article-glass-body">
       <div class="flex items-start gap-2">
-        <!-- 未读蓝点：已读后消失 -->
-        <span
-          v-if="!isRead"
-          class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-primary)]"
-        />
-        <h3 class="line-clamp-2 text-sm font-semibold leading-snug text-[var(--color-foreground)] group-hover:text-[var(--color-primary)] transition-colors">
+        <span v-if="!isRead" class="feed-dot-unread" />
+        <h3 class="article-glass-title line-clamp-2">
           {{ article.title }}
         </h3>
       </div>
 
-      <!-- 摘要：优先 AI 摘要，line-clamp-3 超出省略 -->
-      <p
-        v-if="displayDigest"
-        class="line-clamp-3 text-xs leading-relaxed text-[var(--color-muted-foreground)]"
-      >
+      <p v-if="displayDigest" class="article-glass-digest line-clamp-3">
         {{ displayDigest }}
       </p>
 
-      <!-- 标签列表（最多显示 3 个，避免占用太多空间） -->
-      <div v-if="article.tags && article.tags.length" class="flex flex-wrap gap-1">
+      <div v-if="article.tags && article.tags.length" class="flex flex-wrap gap-1.5">
         <span
-          v-for="tag in article.tags.slice(0, 3)"
+          v-for="(tag, ti) in article.tags.slice(0, 3)"
           :key="tag"
-          class="flex items-center gap-0.5 rounded-full bg-[var(--color-primary)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--color-primary)]"
+          class="article-glass-tag inline-flex items-center gap-0.5"
+          :class="tagToneClass(ti)"
         >
-          <Tag class="h-2.5 w-2.5" />
+          <Tag class="h-2.5 w-2.5 opacity-80" />
           {{ tag }}
         </span>
       </div>
 
-      <!-- 底部：公众号名 + 日期 + 外链图标 -->
-      <div class="mt-auto flex items-center justify-between pt-1">
-        <span class="text-xs font-medium text-[var(--color-muted-foreground)] truncate max-w-[60%]">
+      <div class="article-glass-ft">
+        <span class="article-glass-ft-acct">
           {{ article.account }}
         </span>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <span class="text-xs text-[var(--color-muted-foreground)]">{{ formattedDate }}</span>
-          <!-- 悬停时出现的外链图标，提示用户点击会跳转 -->
-          <ExternalLink class="h-3 w-3 text-[var(--color-muted-foreground)] opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div class="article-glass-ft-meta">
+          <span>{{ formattedDate }}</span>
+          <ExternalLink class="h-3 w-3 shrink-0" />
         </div>
       </div>
     </div>

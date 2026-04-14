@@ -120,6 +120,16 @@ export const useArticlesStore = defineStore('articles', () => {
     }
   }
 
+  /**
+   * 删除文章后同步内存中的 message_info，不重新请求 JSON。
+   * 配合 FeedView 的 TransitionGroup，列表会平滑重排。
+   */
+  function removeArticleLocally(account: string, articleId: string) {
+    const info = messageInfo.value[account]
+    if (!info?.blogs) return
+    info.blogs = info.blogs.filter((b) => b.id !== articleId)
+  }
+
   return {
     messageInfo,
     name2fakeid,
@@ -127,6 +137,7 @@ export const useArticlesStore = defineStore('articles', () => {
     error,
     loadData,
     reloadAccounts,
+    removeArticleLocally,
     accounts,
     allArticles,
     allTags,

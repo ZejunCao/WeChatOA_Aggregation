@@ -9,6 +9,8 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import router from './router'
 import App from './App.vue'
 import './style.css'
+import './styles/feed-theme-presets.css'
+import './styles/demo-index-feed.css'
 
 // 创建 Pinia 状态管理实例
 const pinia = createPinia()

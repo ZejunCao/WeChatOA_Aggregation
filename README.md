@@ -30,13 +30,25 @@ uv sync
 
 > **凭证过期：** token 或 cookie 过期时，前端管理页会展示警告横幅并提供**扫码登录**按钮——点击后后端在无头 Chrome 中加载登录页并截图显示到前端，用手机扫码后新的 token/cookie 自动写回 `data/id_info.json`，无需手动填写。
 
-### 3. 启动后端 API 服务
+### 3. 大模型打标签（可选）
+
+爬取到**新文章**时，若配置了 LLM 接口，会为每篇生成 `tags` 并写入 `message_info.json`，前端筛选栏与卡片可展示、过滤标签。
+
+| 环境变量 | 说明 |
+|----------|------|
+| `QWEN35_27B_ENDPOINT` | 自部署或网关的 Chat Completions 兼容地址（POST JSON）。**未设置则跳过打标**，爬取与其它功能不受影响。 |
+| `QWEN35_27B_API_KEY` 或 `LLM_API_KEY` | 可选；若设置则请求头携带 `Authorization: Bearer <密钥>`。 |
+| `QWEN35_27B_MODEL` | 可选，默认 `Qwen3.5-27B`。 |
+
+标签由一组**种子标签**（含 **「广告」**）与模型扩展组成；若正文明显为推广、带货、商务合作、营销软文，提示词要求模型必须打上「广告」。单次请求失败时该篇可能无标签，不影响爬取落盘。
+
+### 4. 启动后端 API 服务
 
 ```bash
-uvicorn api:app --reload --port 8000
+uv run uvicorn api:app --reload --port 8000
 ```
 
-### 4. 启动前端
+### 5. 启动前端
 
 ```bash
 cd frontend
@@ -53,7 +65,7 @@ npm run dev
 
 | 页面 / 功能模块 | 说明 |
 |----------------|------|
-| **文章信息流** | 卡片 / 列表两种视图；默认按日期分组展示；关键词搜索、公众号筛选、日期范围过滤、排序与分组切换 |
+| **文章信息流** | 卡片 / 列表两种视图；默认按日期分组展示；关键词搜索、公众号筛选、日期范围过滤、排序与分组切换；单篇删除（写入黑名单，再次爬取不会入库） |
 | **已读 / 收藏** | 点击文章自动标为已读，支持收藏；FilterBar 提供「全部 / 未读 / 收藏」三个快速 Tab；已读文章降低透明度，未读文章显示蓝点标识 |
 | **公众号管理** | 搜索并添加公众号（两步流程：搜索候选 → 确认添加）、移除公众号、控制各账号在文章流中的显示/隐藏 |
 | **立即爬取** | 一键触发后端爬取任务；实时进度横幅展示当前账号与进度；凭证失效时立即终止并展示明确提示 |
@@ -66,10 +78,12 @@ npm run dev
 
 - 支持按公众号 `fakeid` 批量拉取近一个月文章
 - 基于 `msgid-aid-create_time` 组合 ID 增量去重，已爬取的文章不会重复写入
+- 用户在前端删除的文章 id 记入 `deleted_article_ids.json`，后续爬取遇到该 id 直接跳过，不再入库
 - 下载封面图到本地 `data/covers/`，规避微信 CDN 防盗链；超过 640px 自动等比缩放
 - 爬取前自动做凭证预检（轻量探测请求），凭证失效时立即中止，不逐账号重试卡死
 - 重要操作（爬取开始/完成/失败、添加/删除账号、清理缓存）自动写入 `data/operation_logs.jsonl`
 - 使用 MinHash+LSH 算法对文章内容编码，识别并标记相似/重复文章（阈值 0.9，4005 条测试集准确率 100%）
+- 可选：配置 `QWEN35_27B_ENDPOINT` 后，爬取新增的每篇文章会调用大模型生成 `tags`（见上文环境变量）；历史文章不会自动回填
 
 ### 技术栈
 
@@ -90,11 +104,15 @@ WeChatOA_Aggregation/
 │   ├── id_info.json        # 微信 token 和 cookie（需手动填写或扫码登录自动更新）
 │   ├── name2fakeid.json    # 已添加的公众号列表
 │   ├── message_info.json   # 所有公众号的文章数据
+│   ├── deleted_article_ids.json  # 用户删除的文章 id，爬取时跳过
 │   ├── covers/             # 本地缓存的文章封面图
 │   └── operation_logs.jsonl # 操作日志
 ├── src/
-│   └── crawler/
-│       └── wechat_request.py  # 微信爬虫核心（搜索账号、拉取文章、扫码登录）
+│   ├── crawler/
+│   │   └── wechat_request.py  # 微信爬虫核心（搜索账号、拉取文章、扫码登录）
+│   └── llm/
+│       ├── model_client.py    # Qwen3.5-27B 兼容 HTTP 调用（环境变量配置）
+│       └── article_tagging.py # 爬取后为新文章打标签
 └── frontend/
     └── src/
         ├── types/index.ts      # 全局 TypeScript 类型定义
@@ -160,7 +178,8 @@ npm run build
 
 ### LLM 集成（前端占位符已预留）
 
-- [ ] **自动打标签 + 摘要**：爬取后调用 Ollama 本地模型或 OpenAI API，为新文章生成 `tags` 和 `summary`，写回 `message_info.json`
+- [x] **自动打标签**：爬取后调用 Qwen3.5-27B 兼容接口（`QWEN35_27B_ENDPOINT`）为新文章生成 `tags`，写回 `message_info.json`
+- [ ] **摘要**：为新文章生成 `summary`（可与打标签共用同一 LLM 配置）
 - [ ] **语义搜索**：对文章内容做向量化，支持自然语言检索
 
 ### 部署
@@ -188,3 +207,10 @@ npm run build
 
 - [wechat-article-exporter](https://github.com/jooooock/wechat-article-exporter)
 - [WeChat_Article](https://github.com/1061700625/WeChat_Article)
+
+
+## TODO
+
+1. 点击添加公众号，光标直接到输入框
+2. 选中一个公众号添加完之后，返回到添加界面，继续添加下一个
+3. 每日爬取的时候，第二条0/N直接显示爬取第一个名字，而不是立即爬取然后等一会才出第一个名字

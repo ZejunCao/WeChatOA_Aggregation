@@ -7,11 +7,16 @@ import type { FilterState, SortOrder, GroupBy, ReadFilter } from '@/types'
 import Dropdown from '@/components/ui/Dropdown.vue'
 import DateRangePicker from '@/components/ui/DateRangePicker.vue'
 
-const props = defineProps<{
-  filters: FilterState
-  activeCount: number
-  viewMode: 'grid' | 'list'
-}>()
+const props = withDefaults(
+  defineProps<{
+    filters: FilterState
+    activeCount: number
+    viewMode: 'grid' | 'list'
+    /** 文章 Feed 玻璃拟态样式（仅 FeedView 使用） */
+    glass?: boolean
+  }>(),
+  { glass: false },
+)
 
 const emit = defineEmits<{
   'update:filters': [value: FilterState]
@@ -74,22 +79,28 @@ const activeFilters = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-2.5">
+  <div class="space-y-2.5" :class="{ 'feed-filter-glass': glass }">
     <!-- Read filter tabs -->
-    <div class="flex items-center gap-1">
+    <div class="flex flex-wrap items-center gap-2">
       <button
         v-for="tab in readTabs"
         :key="tab.value"
+        type="button"
         @click="update('readFilter', tab.value)"
-        class="relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
-        :class="filters.readFilter === tab.value
-          ? 'bg-[var(--color-accent)] text-[var(--color-foreground)]'
-          : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-accent)]/60'"
+        class="relative inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+        :class="glass
+          ? ['feed-pill', filters.readFilter === tab.value ? 'is-active' : '']
+          : [
+              'rounded-lg px-3 py-1.5',
+              filters.readFilter === tab.value
+                ? 'bg-[var(--color-accent)] text-[var(--color-foreground)]'
+                : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-accent)]/60',
+            ]"
       >
         <BookmarkCheck v-if="tab.value === 'bookmarked'" class="h-3.5 w-3.5" />
         <span
           v-else-if="tab.value === 'unread' && readingStore.unreadCount > 0"
-          class="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--color-primary)] text-[9px] font-bold text-white leading-none"
+          class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] px-1.5 text-[10px] font-bold tabular-nums leading-none text-white"
         >{{ readingStore.unreadCount > 99 ? '99+' : readingStore.unreadCount }}</span>
         {{ tab.label }}
         <span
@@ -109,7 +120,10 @@ const activeFilters = computed(() => {
           @input="update('keyword', ($event.target as HTMLInputElement).value)"
           type="text"
           placeholder="搜索标题或内容..."
-          class="h-9 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] pl-9 pr-8 text-sm text-[var(--color-foreground)] placeholder-[var(--color-muted-foreground)] outline-none transition-colors focus:border-[var(--color-ring)] focus:ring-1 focus:ring-[var(--color-ring)]"
+          class="w-full text-sm outline-none transition-colors"
+          :class="glass
+            ? 'feed-glass-input'
+            : 'h-9 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] pl-9 pr-8 text-[var(--color-foreground)] placeholder-[var(--color-muted-foreground)] focus:border-[var(--color-ring)] focus:ring-1 focus:ring-[var(--color-ring)]'"
         />
         <button
           v-if="filters.keyword"
@@ -123,6 +137,7 @@ const activeFilters = computed(() => {
       <!-- Date range picker -->
       <DateRangePicker
         class="hidden md:block"
+        :class="glass ? 'feed-glass-dd' : ''"
         :date-from="filters.dateFrom"
         :date-to="filters.dateTo"
         @update:dateFrom="update('dateFrom', $event)"
@@ -132,6 +147,7 @@ const activeFilters = computed(() => {
       <!-- Sort dropdown -->
       <Dropdown
         class="hidden sm:block"
+        :class="glass ? 'feed-glass-dd' : ''"
         :options="sortOptions"
         :model-value="filters.sortOrder"
         @update:modelValue="update('sortOrder', $event as SortOrder)"
@@ -140,6 +156,7 @@ const activeFilters = computed(() => {
       <!-- Group dropdown -->
       <Dropdown
         class="hidden sm:block"
+        :class="glass ? 'feed-glass-dd' : ''"
         :options="groupOptions"
         :model-value="filters.groupBy"
         @update:modelValue="update('groupBy', $event as GroupBy)"
@@ -147,13 +164,20 @@ const activeFilters = computed(() => {
 
       <!-- Advanced toggle -->
       <button
+        type="button"
         @click="showAdvanced = !showAdvanced"
-        class="flex h-9 items-center gap-1.5 rounded-lg border px-3 text-sm transition-colors shrink-0"
-        :class="
-          showAdvanced || activeCount > 0
-            ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
-            : 'border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-foreground)]'
-        "
+        class="shrink-0 text-sm transition-colors"
+        :class="glass
+          ? [
+              'feed-glass-tool',
+              showAdvanced || activeCount > 0 ? 'is-active' : '',
+            ]
+          : [
+              'flex h-9 items-center gap-1.5 rounded-lg border px-3',
+              showAdvanced || activeCount > 0
+                ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
+                : 'border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-foreground)]',
+            ]"
         :title="showAdvanced ? '收起筛选' : '展开筛选'"
       >
         <SlidersHorizontal class="h-4 w-4" />
@@ -161,22 +185,39 @@ const activeFilters = computed(() => {
       </button>
 
       <!-- View mode toggle -->
-      <div class="hidden sm:flex shrink-0 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-0.5 gap-0.5">
+      <div
+        class="hidden sm:flex shrink-0"
+        :class="glass ? 'feed-view-toggle' : 'rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-0.5 gap-0.5'"
+      >
         <button
+          type="button"
           @click="emit('update:viewMode', 'grid')"
-          class="flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-          :class="viewMode === 'grid' ? 'bg-[var(--color-accent)] text-[var(--color-foreground)]' : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]'"
           title="网格视图"
+          :class="glass
+            ? ['flex items-center justify-center transition-colors', viewMode === 'grid' ? 'is-active' : '']
+            : [
+                'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
+                viewMode === 'grid'
+                  ? 'bg-[var(--color-accent)] text-[var(--color-foreground)]'
+                  : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]',
+              ]"
         >
-          <LayoutGrid class="h-3.5 w-3.5" />
+          <LayoutGrid class="h-[15px] w-[15px]" />
         </button>
         <button
+          type="button"
           @click="emit('update:viewMode', 'list')"
-          class="flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-          :class="viewMode === 'list' ? 'bg-[var(--color-accent)] text-[var(--color-foreground)]' : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]'"
           title="列表视图"
+          :class="glass
+            ? ['flex items-center justify-center transition-colors', viewMode === 'list' ? 'is-active' : '']
+            : [
+                'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
+                viewMode === 'list'
+                  ? 'bg-[var(--color-accent)] text-[var(--color-foreground)]'
+                  : 'text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]',
+              ]"
         >
-          <List class="h-3.5 w-3.5" />
+          <List class="h-[15px] w-[15px]" />
         </button>
       </div>
     </div>
@@ -192,7 +233,8 @@ const activeFilters = computed(() => {
     >
       <div
         v-if="showAdvanced"
-        class="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 space-y-4"
+        class="p-4 space-y-4 rounded-xl"
+        :class="glass ? 'feed-glass-advanced' : 'border border-[var(--color-border)] bg-[var(--color-card)]'"
       >
         <!-- Account filter -->
         <div v-if="articlesStore.accounts.length">
@@ -201,12 +243,17 @@ const activeFilters = computed(() => {
             <button
               v-for="acc in articlesStore.accounts"
               :key="acc.name"
+              type="button"
               @click="toggleAccount(acc.name)"
               class="rounded-full border px-2.5 py-1 text-xs transition-colors"
               :class="
-                filters.accounts.includes(acc.name)
-                  ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
-                  : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--color-foreground)]/20 hover:text-[var(--color-foreground)]'
+                glass
+                  ? filters.accounts.includes(acc.name)
+                    ? 'feed-chip-active font-medium'
+                    : 'feed-chip-idle hover:border-[var(--feed-accent-soft)]/40'
+                  : filters.accounts.includes(acc.name)
+                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
+                    : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--color-foreground)]/20 hover:text-[var(--color-foreground)]'
               "
             >
               {{ acc.name }}
@@ -222,12 +269,17 @@ const activeFilters = computed(() => {
             <button
               v-for="tag in articlesStore.allTags"
               :key="tag"
+              type="button"
               @click="toggleTag(tag)"
               class="rounded-full border px-2.5 py-1 text-xs transition-colors"
               :class="
-                filters.tags.includes(tag)
-                  ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
-                  : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--color-foreground)]/20 hover:text-[var(--color-foreground)]'
+                glass
+                  ? filters.tags.includes(tag)
+                    ? 'feed-chip-active font-medium'
+                    : 'feed-chip-idle hover:border-[var(--feed-accent-soft)]/40'
+                  : filters.tags.includes(tag)
+                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
+                    : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--color-foreground)]/20 hover:text-[var(--color-foreground)]'
               "
             >
               #{{ tag }}
@@ -239,6 +291,7 @@ const activeFilters = computed(() => {
         <div class="md:hidden space-y-2">
           <p class="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">日期范围</p>
           <DateRangePicker
+            :class="glass ? 'feed-glass-dd' : ''"
             :date-from="filters.dateFrom"
             :date-to="filters.dateTo"
             @update:dateFrom="update('dateFrom', $event)"
@@ -248,12 +301,14 @@ const activeFilters = computed(() => {
         <div class="sm:hidden flex gap-2">
           <Dropdown
             class="flex-1"
+            :class="glass ? 'feed-glass-dd' : ''"
             :options="sortOptions"
             :model-value="filters.sortOrder"
             @update:modelValue="update('sortOrder', $event as SortOrder)"
           />
           <Dropdown
             class="flex-1"
+            :class="glass ? 'feed-glass-dd' : ''"
             :options="groupOptions"
             :model-value="filters.groupBy"
             @update:modelValue="update('groupBy', $event as GroupBy)"
