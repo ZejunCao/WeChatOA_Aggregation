@@ -2,39 +2,29 @@
 # -*- coding: utf-8 -*-
 """
 轻量 FastAPI 后端，供前端管理公众号列表使用。
-
-整体职责：
-  1. 账号管理  ：搜索 / 添加 / 删除公众号（读写 name2fakeid.json）
-  2. 爬取任务  ：在后台线程遍历所有公众号，爬取近一月文章并写入 message_info.json；新文章会拉取正文写入 message_detail_text.json；若配置 QWEN35_27B_ENDPOINT 则调用大模型为新文章生成 tags 并写回
-  3. 缓存清理  ：删除超过指定天数的旧文章记录及对应封面图、详情缓存
-  4. 凭证管理  ：检测 token/cookie 是否有效；支持扫码重新登录
-  5. 日志记录  ：将重要操作写入 operation_logs.jsonl，供前端日志页查看
-
-启动方式：
-    uvicorn api:app --reload --port 8000
 """
 
 import json
+import re
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # ── 数据目录和文件路径 ──────────────────────────────────────────────────────────
-# 所有持久化数据都存放在项目根目录的 data/ 文件夹下
-DATA_DIR          = Path(__file__).parent / "data"
-NAME2FAKEID_FILE  = DATA_DIR / "name2fakeid.json"   # 公众号名称 → fakeid 的映射
-MESSAGE_INFO_FILE = DATA_DIR / "message_info.json"  # 每个公众号的文章列表
-COVERS_DIR        = DATA_DIR / "covers"             # 封面图存放目录（{article_id}.jpg）
-LOGS_FILE         = DATA_DIR / "operation_logs.jsonl"  # 操作日志（每行一条 JSON）
+DATA_DIR = Path(__file__).parent / "data"
+NAME2FAKEID_FILE = DATA_DIR / "name2fakeid.json"
+MESSAGE_INFO_FILE = DATA_DIR / "message_info.json"
+COVERS_DIR = DATA_DIR / "covers"
+LOGS_FILE = DATA_DIR / "operation_logs.jsonl"
 
 # ── FastAPI 应用初始化 ──────────────────────────────────────────────────────────
 app = FastAPI(title="微信公众号聚合 API", version="1.0.0")
-
-# 允许前端开发服务器（端口 5173）跨域调用本后端（端口 8000）
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -113,6 +103,8 @@ class CrawlStatus(BaseModel):
     finished_at: str     # 任务结束时间（未结束时为空）
     new_articles: int    # 本次爬取新增的文章总数
     auth_error: bool = False  # True 表示因凭证失效而提前终止
+    cancel_requested: bool = False  # 前端是否已请求取消
+    cancelled: bool = False  # True 表示本次由用户取消
 
 
 # ── 日志系统 ────────────────────────────────────────────────────────────────────
@@ -160,33 +152,24 @@ _DOWNLOAD_HEADERS = {
 }
 
 
-def _download_cover(article_id: str, cover_url: str) -> None:
-    """
-    下载单篇文章的封面图，保存到 data/covers/{article_id}.jpg。
 
-    处理逻辑：
-    - 文件已存在则跳过（幂等，重复爬取不会重复下载）
-    - 图片宽度超过 640px 时等比缩放，节省磁盘空间
-    - RGBA/P 模式（带透明通道的 PNG）转为 RGB 再保存为 JPEG
-    - 下载失败只打印警告，不影响主流程
-    """
-    if not cover_url:
+def download_cover(article_id: str, cover_url: str, covers_dir: Path, request_headers: dict[str, str]) -> None:
+    """下载封面图到 data/covers；失败时仅告警不阻断流程。"""
+    if not article_id or not cover_url:
         return
-    COVERS_DIR.mkdir(parents=True, exist_ok=True)
-    # article_id 中可能含 "/" 字符，替换为 "_" 以兼容文件名
+    covers_dir.mkdir(parents=True, exist_ok=True)
     filename = article_id.replace("/", "_") + ".jpg"
-    dest = COVERS_DIR / filename
+    dest = covers_dir / filename
     if dest.exists():
-        return  # 已下载过，跳过
+        return
     try:
         import io
         import requests
         from PIL import Image
 
-        resp = requests.get(cover_url, timeout=15, headers=_DOWNLOAD_HEADERS)
+        resp = requests.get(cover_url, timeout=15, headers=request_headers)
         resp.raise_for_status()
         img = Image.open(io.BytesIO(resp.content))
-        # JPEG 不支持透明通道，先转为 RGB
         if img.mode in ("RGBA", "P"):
             img = img.convert("RGB")
         width, height = img.size
@@ -196,6 +179,24 @@ def _download_cover(article_id: str, cover_url: str) -> None:
         img.save(dest, "JPEG", quality=85)
     except Exception as e:
         print(f"[cover] 下载失败 {article_id}: {e}")
+
+
+def article_word_count(article: dict, data_manager) -> int:
+    """优先统计正文，缺失时回退到标题长度。"""
+    article_id = str(article.get("id") or "")
+    if article_id:
+        text_data = data_manager.message_detail_text.get(article_id)
+        if isinstance(text_data, list):
+            text = "".join(str(x) for x in text_data)
+            cleaned = re.sub(r"\s+", "", text)
+            if cleaned:
+                return len(cleaned)
+        elif isinstance(text_data, str):
+            cleaned = re.sub(r"\s+", "", text_data)
+            if cleaned:
+                return len(cleaned)
+    title = str(article.get("title") or "")
+    return len(re.sub(r"\s+", "", title))
 
 
 def _fetch_article_detail_text(article_id: str, link: str) -> bool:
@@ -500,6 +501,8 @@ _crawl_state: dict = {
     "finished_at": "",     # 任务结束时间（运行中为空）
     "new_articles": 0,     # 本次新增文章总数
     "auth_error": False,   # True = 因凭证失效提前终止（不是普通错误）
+    "cancel_requested": False,  # 前端是否已请求取消
+    "cancelled": False,  # True = 本次任务由用户取消
 }
 _crawl_lock = threading.Lock()  # 仅用于防止并发启动两个爬取任务
 
@@ -567,7 +570,7 @@ def _run_crawl() -> None:
     2. 从磁盘重新加载最新凭证（data_manager.reload），支持手动更新 id_info.json
     3. 调用 _check_auth_valid() 做预检：凭证失效时立刻终止，不逐个账号重试
     4. 遍历所有公众号，调用 WechatRequest.fakeid2message_update() 获取新文章
-    5. 对每篇新文章下载封面图、拉正文；可选 LLM 打标签后写入 message_info.json
+    5. 对每篇新文章下载封面图、拉正文；可选 LLM 生成摘要+标签写入 message_info.json
     6. 每处理完一个公众号（成功或失败），done += 1
     7. 全部完成后写入结束日志，设置 running=False
     """
@@ -586,10 +589,17 @@ def _run_crawl() -> None:
             "finished_at": "",
             "new_articles": 0,
             "auth_error": False,
+            "cancel_requested": False,
+            "cancelled": False,
         })
 
         from src.crawler.wechat_request import WechatRequest
         from src.llm.article_tagging import tag_article
+        from src.llm.llm_config import (
+            llm_tagging_enabled,
+            read_crawl_llm_multithread_enabled,
+            read_crawl_llm_multithread_workers,
+        )
         from src.utils.data_manager import data_manager
         from src.utils.helpers import time_now
 
@@ -622,8 +632,19 @@ def _run_crawl() -> None:
         wechat = WechatRequest()
         new_total = 0  # 本次爬取新增文章的累计数
 
+        # 爬取时是否启用模型总结+打标（配置页开关）
+        llm_enabled_for_crawl = llm_tagging_enabled()
+        # 爬取补总结/打标是否启用多线程（全局开关）
+        llm_multithread_for_crawl = read_crawl_llm_multithread_enabled()
+        llm_multithread_workers_cap = read_crawl_llm_multithread_workers()
+
         # ── 第四步：逐个公众号爬取 ──────────────────────────────────────
         for oa_name, fakeid in name2fakeid.items():
+            if _crawl_state.get("cancel_requested"):
+                _crawl_state["cancelled"] = True
+                _crawl_state["errors"].append("用户手动取消爬取")
+                _append_log(LOG_CRAWL_FINISH, "爬取被用户手动取消", {"done": _crawl_state.get("done", 0), "total": _crawl_state.get("total", 0)})
+                break
             _crawl_state["current"] = oa_name  # 更新"正在处理"的账号名，供前端展示
             try:
                 # 首次爬取该公众号时，初始化其记录结构
@@ -643,21 +664,61 @@ def _run_crawl() -> None:
                     detail_dirty = False
                     # 新文章：下载封面 + 拉取正文写入 message_detail_text.json
                     for article in new_articles:
-                        _download_cover(article["id"], article.get("cover", ""))
+                        download_cover(article["id"], article.get("cover", ""), COVERS_DIR, _DOWNLOAD_HEADERS)
                         if _fetch_article_detail_text(article["id"], article.get("link", "")):
                             detail_dirty = True
+                        article["word_count"] = article_word_count(article, data_manager)
                     if detail_dirty:
                         data_manager.write("message_detail_text")
 
-                    # LLM 打标签（仅当配置了 QWEN35_27B_ENDPOINT；失败不影响爬取）
+                # 模型分析（摘要+标签）：
+                # - 新文章会分析
+                # - 已存在但缺少 summary 的文章，也会在后续爬取时补分析
+                # 注意：这里不依赖 new_articles，避免“无新文时跳过补总结”
+                if llm_enabled_for_crawl:
                     try:
-                        for article in new_articles:
-                            try:
-                                tags = tag_article(article, data_manager)
-                                if tags:
-                                    article["tags"] = tags
-                            except Exception as e:
-                                print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
+                        all_blogs = data_manager.message_info[oa_name]["blogs"]
+                        need_analyze = [a for a in all_blogs if not str(a.get("summary") or "").strip()]
+                        if llm_multithread_for_crawl and len(need_analyze) > 1:
+                            max_workers = min(llm_multithread_workers_cap, len(need_analyze))
+                            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                                future_to_article = {
+                                    executor.submit(tag_article, article, data_manager): article
+                                    for article in need_analyze
+                                }
+                                for future in as_completed(future_to_article):
+                                    if _crawl_state.get("cancel_requested"):
+                                        _crawl_state["cancelled"] = True
+                                        for f in future_to_article:
+                                            if not f.done():
+                                                f.cancel()
+                                        break
+                                    article = future_to_article[future]
+                                    try:
+                                        analysis = future.result()
+                                        tags = analysis.get("tags") if isinstance(analysis, dict) else []
+                                        summary = analysis.get("summary") if isinstance(analysis, dict) else ""
+                                        if tags:
+                                            article["tags"] = tags
+                                        if summary:
+                                            article["summary"] = summary
+                                    except Exception as e:
+                                        print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
+                        else:
+                            for article in need_analyze:
+                                if _crawl_state.get("cancel_requested"):
+                                    _crawl_state["cancelled"] = True
+                                    break
+                                try:
+                                    analysis = tag_article(article, data_manager)
+                                    tags = analysis.get("tags") if isinstance(analysis, dict) else []
+                                    summary = analysis.get("summary") if isinstance(analysis, dict) else ""
+                                    if tags:
+                                        article["tags"] = tags
+                                    if summary:
+                                        article["summary"] = summary
+                                except Exception as e:
+                                    print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
                     except Exception as e:
                         print(f"[tag] 打标模块异常: {e}")
 
@@ -725,6 +786,15 @@ def start_crawl():
     return {"status": "started", "message": "爬取任务已开始"}
 
 
+@app.post("/api/crawl/cancel")
+def cancel_crawl():
+    """请求取消当前爬取任务（协作式中断）。"""
+    if not _crawl_state.get("running"):
+        return {"status": "idle", "message": "当前没有运行中的爬取任务"}
+    _crawl_state["cancel_requested"] = True
+    return {"status": "cancelling", "message": "已请求取消，正在停止当前爬取"}
+
+
 @app.get("/api/crawl/status", response_model=CrawlStatus)
 def get_crawl_status():
     """返回当前爬取任务的实时进度，前端每隔 800ms 轮询一次。"""
@@ -755,6 +825,130 @@ class CacheClearResult(BaseModel):
     removed_articles: int
     removed_covers: int
     removed_detail_texts: int
+
+
+class LlmConfigResponse(BaseModel):
+    """LLM 打标配置（GET 返回；api_key 仅示意，不返回明文）。"""
+    profile_name: str
+    active_profile: str
+    profiles: list[dict]
+    provider: str
+    base_url: str
+    model: str
+    task_profile: str = ""
+    crawl_llm_enabled: bool = False
+    crawl_llm_multithread_enabled: bool = False
+    crawl_llm_multithread_workers: int = 4
+    temperature: float
+    max_tokens: int
+    timeout_seconds: int
+    top_k: int = 20
+    top_p: float = 0.8
+    min_p: float = 0.0
+    repetition_penalty: float = 1.0
+    presence_penalty: float = 1.5
+    enable_thinking: bool = False
+    has_api_key: bool
+    api_key_hint: str
+
+
+class LlmConfigUpdate(BaseModel):
+    """保存 LLM 配置；api_key 不传或 null 表示保留原值，空字符串表示清除。"""
+    profile_name: str = "默认配置"
+    source_profile_name: Optional[str] = Field(default=None)
+    set_active: bool = True
+    provider: str
+    base_url: str
+    model: str
+    task_profile: str = ""
+    crawl_llm_enabled: Optional[bool] = Field(default=None)
+    crawl_llm_multithread_enabled: Optional[bool] = Field(default=None)
+    crawl_llm_multithread_workers: Optional[int] = Field(default=None)
+    temperature: float = 0.2
+    max_tokens: int = 1024
+    timeout_seconds: int = 120
+    top_k: int = 20
+    top_p: float = 0.8
+    min_p: float = 0.0
+    repetition_penalty: float = 1.0
+    presence_penalty: float = 1.5
+    enable_thinking: bool = False
+    api_key: Optional[str] = Field(default=None)
+
+
+class LlmTestResult(BaseModel):
+    """连通性测试结果。"""
+    ok: bool
+    message: str
+    preview: str = ""
+
+
+class LlmTestRequest(BaseModel):
+    """未保存表单上测试连通时可选覆盖的字段（未出现的项沿用当前 profile 已保存值）。"""
+
+    provider: Optional[str] = None
+    base_url: Optional[str] = None
+    api_key: Optional[str] = None
+    model: Optional[str] = None
+    temperature: Optional[float] = None
+    max_tokens: Optional[int] = None
+    timeout_seconds: Optional[int] = None
+    top_k: Optional[int] = None
+    top_p: Optional[float] = None
+    min_p: Optional[float] = None
+    repetition_penalty: Optional[float] = None
+    presence_penalty: Optional[float] = None
+    enable_thinking: Optional[bool] = None
+
+
+class LlmDiscoverRequest(BaseModel):
+    """vLLM 模式：OpenAI SDK 拉取模型列表。HTTP 直连模式不支持。"""
+
+    provider: Optional[str] = None
+    base_url: Optional[str] = None
+    api_key: Optional[str] = None
+    timeout_seconds: Optional[int] = None
+
+
+class LlmDiscoverResult(BaseModel):
+    ok: bool
+    message: str = ""
+    models: list[str] = []
+
+
+class LlmProfileSelect(BaseModel):
+    profile_name: str
+
+
+class LlmProfileReset(BaseModel):
+    profile_name: Optional[str] = Field(default=None)
+
+
+class LlmTaskProfileUpdate(BaseModel):
+    """仅更新任务统一绑定的 profile 名，立即写入 llm_config.json。"""
+
+    task_profile: str = ""
+
+
+class LlmCrawlEnabledUpdate(BaseModel):
+    """仅更新“爬取时启用模型总结和打标”的全局开关。"""
+
+    crawl_llm_enabled: bool
+
+
+class LlmCrawlMultithreadEnabledUpdate(BaseModel):
+    """更新爬取补总结/打标的多线程开关与并发数（可只传其中一项）。"""
+
+    crawl_llm_multithread_enabled: Optional[bool] = None
+    crawl_llm_multithread_workers: Optional[int] = None
+
+
+def _mask_api_key_hint(key: str) -> str:
+    if not key:
+        return ""
+    if len(key) <= 4:
+        return "****"
+    return "****" + key[-4:]
 
 
 def _collect_removable_ids(keep_days: int) -> tuple[str, set[str]]:
@@ -890,6 +1084,256 @@ def clear_cache(body: CacheClearRequest):
     )
 
 
+# ── LLM 打标配置 API（读写 data/llm_config.json）──────────────────────────────
+
+@app.get("/api/llm/config", response_model=LlmConfigResponse)
+def get_llm_config_api():
+    from src.llm.llm_config import (
+        read_crawl_llm_enabled,
+        read_crawl_llm_multithread_enabled,
+        read_crawl_llm_multithread_workers,
+        read_llm_config,
+        read_llm_store,
+    )
+
+    c = read_llm_config()
+    store = read_llm_store()
+    profile_name = store["active_profile"]
+    task_profile = str(store.get("task_profile") or "")
+    profiles = []
+    for p in store["profiles"]:
+        key = str(p.get("api_key") or "")
+        profiles.append({
+            "name": p["name"],
+            "provider": p["provider"],
+            "base_url": p["base_url"],
+            "model": p["model"],
+            "has_api_key": bool(key),
+            "api_key_hint": _mask_api_key_hint(key),
+        })
+    k = str(c.get("api_key") or "")
+    return LlmConfigResponse(
+        profile_name=profile_name,
+        active_profile=store["active_profile"],
+        profiles=profiles,
+        provider=c["provider"],
+        base_url=c["base_url"],
+        model=c["model"],
+        task_profile=task_profile,
+        crawl_llm_enabled=read_crawl_llm_enabled(),
+        crawl_llm_multithread_enabled=read_crawl_llm_multithread_enabled(),
+        crawl_llm_multithread_workers=read_crawl_llm_multithread_workers(),
+        temperature=float(c["temperature"]),
+        max_tokens=int(c["max_tokens"]),
+        timeout_seconds=int(c["timeout_seconds"]),
+        top_k=int(c["top_k"]),
+        top_p=float(c["top_p"]),
+        min_p=float(c["min_p"]),
+        repetition_penalty=float(c["repetition_penalty"]),
+        presence_penalty=float(c["presence_penalty"]),
+        enable_thinking=bool(c["enable_thinking"]),
+        has_api_key=bool(k),
+        api_key_hint=_mask_api_key_hint(k),
+    )
+
+
+@app.put("/api/llm/config", response_model=LlmConfigResponse)
+def put_llm_config_api(body: LlmConfigUpdate):
+    from src.llm.llm_config import (
+        VALID_PROVIDERS,
+        read_llm_config,
+        set_llm_task_profile,
+        write_crawl_llm_enabled,
+        write_crawl_llm_multithread_enabled,
+        write_crawl_llm_multithread_workers,
+        write_llm_config,
+    )
+
+    prov = (body.provider or "").strip()
+    if prov not in VALID_PROVIDERS:
+        raise HTTPException(
+            status_code=400,
+            detail="provider 须为 vllm（OpenAI SDK，根地址 …/v1）或 http_requests（requests 直连完整 Chat URL）",
+        )
+    cur = read_llm_config()
+    merged = {
+        **cur,
+        "provider": prov,
+        "base_url": (body.base_url or "").strip(),
+        "model": (body.model or "").strip(),
+        "temperature": body.temperature,
+        "max_tokens": body.max_tokens,
+        "timeout_seconds": body.timeout_seconds,
+        "top_k": body.top_k,
+        "top_p": body.top_p,
+        "min_p": body.min_p,
+        "repetition_penalty": body.repetition_penalty,
+        "presence_penalty": body.presence_penalty,
+        "enable_thinking": bool(body.enable_thinking),
+    }
+    if body.api_key is not None:
+        merged["api_key"] = (body.api_key or "").strip()
+    try:
+        write_llm_config(
+            merged,
+            profile_name=(body.profile_name or "默认配置").strip() or "默认配置",
+            set_active=bool(body.set_active),
+            source_profile_name=(body.source_profile_name or "").strip() or None,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    try:
+        set_llm_task_profile(body.task_profile)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    if body.crawl_llm_enabled is not None:
+        write_crawl_llm_enabled(bool(body.crawl_llm_enabled))
+    if body.crawl_llm_multithread_enabled is not None:
+        write_crawl_llm_multithread_enabled(bool(body.crawl_llm_multithread_enabled))
+    if body.crawl_llm_multithread_workers is not None:
+        write_crawl_llm_multithread_workers(int(body.crawl_llm_multithread_workers))
+    return get_llm_config_api()
+
+
+@app.put("/api/llm/config/task-profile", response_model=LlmConfigResponse)
+def put_llm_task_profile_api(body: LlmTaskProfileUpdate):
+    """仅更新任务绑定的 profile，不改动各 profile 的连接与模型字段。"""
+    from src.llm.llm_config import set_llm_task_profile
+
+    try:
+        set_llm_task_profile(body.task_profile)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return get_llm_config_api()
+
+
+@app.put("/api/llm/config/crawl-llm-enabled", response_model=LlmConfigResponse)
+def put_llm_crawl_enabled_api(body: LlmCrawlEnabledUpdate):
+    from src.llm.llm_config import write_crawl_llm_enabled
+
+    write_crawl_llm_enabled(bool(body.crawl_llm_enabled))
+    return get_llm_config_api()
+
+
+@app.put("/api/llm/config/crawl-llm-multithread-enabled", response_model=LlmConfigResponse)
+def put_llm_crawl_multithread_enabled_api(body: LlmCrawlMultithreadEnabledUpdate):
+    from src.llm.llm_config import (
+        write_crawl_llm_multithread_enabled,
+        write_crawl_llm_multithread_workers,
+    )
+
+    if body.crawl_llm_multithread_enabled is None and body.crawl_llm_multithread_workers is None:
+        raise HTTPException(
+            status_code=400,
+            detail="至少需要提供 crawl_llm_multithread_enabled 或 crawl_llm_multithread_workers",
+        )
+    if body.crawl_llm_multithread_enabled is not None:
+        write_crawl_llm_multithread_enabled(bool(body.crawl_llm_multithread_enabled))
+    if body.crawl_llm_multithread_workers is not None:
+        write_crawl_llm_multithread_workers(int(body.crawl_llm_multithread_workers))
+    return get_llm_config_api()
+
+
+@app.post("/api/llm/config/select", response_model=LlmConfigResponse)
+def select_llm_profile_api(body: LlmProfileSelect):
+    from src.llm.llm_config import set_active_profile
+
+    name = (body.profile_name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="profile_name 不能为空")
+    if not set_active_profile(name):
+        raise HTTPException(status_code=404, detail=f"配置「{name}」不存在")
+    return get_llm_config_api()
+
+
+@app.delete("/api/llm/config/{profile_name:path}", response_model=LlmConfigResponse)
+def delete_llm_profile_api(profile_name: str):
+    from src.llm.llm_config import delete_profile
+
+    name = (profile_name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="profile_name 不能为空")
+    ok, reason = delete_profile(name)
+    if not ok:
+        if reason == "last_profile":
+            raise HTTPException(status_code=400, detail="至少保留一个配置，无法删除最后一个")
+        raise HTTPException(status_code=404, detail=f"配置「{name}」不存在")
+    return get_llm_config_api()
+
+
+@app.post("/api/llm/config/reset", response_model=LlmConfigResponse)
+def reset_llm_profile_api(body: LlmProfileReset):
+    from src.llm.llm_config import reset_profile
+
+    name = (body.profile_name or "").strip() or None
+    ok, reason = reset_profile(name)
+    if not ok:
+        if name:
+            raise HTTPException(status_code=404, detail=f"配置「{name}」不存在")
+        raise HTTPException(status_code=404, detail="当前配置不存在")
+    return get_llm_config_api()
+
+
+@app.post("/api/llm/test", response_model=LlmTestResult)
+def test_llm_api(body: Optional[LlmTestRequest] = Body(default=None)):
+    """发送一条极简对话；请求体可带当前表单覆盖项，无需先保存（与 QwenPaw 测连思路一致）。"""
+    from src.llm.model_client import (
+        chat_completions_with_config,
+        is_chat_test_ready,
+        merge_llm_config_for_ephemeral,
+    )
+
+    payload = body.model_dump(exclude_unset=True) if body else {}
+    cfg = merge_llm_config_for_ephemeral(payload)
+    if not is_chat_test_ready(cfg):
+        raise HTTPException(status_code=400, detail="请先填写接口地址与模型名（可在表单中填写后直接测试）")
+    try:
+        text = chat_completions_with_config(
+            cfg,
+            [{"role": "user", "content": "只回复一个字：好"}],
+            require_enabled=False,
+        )
+        return LlmTestResult(ok=True, message="请求成功", preview=(text or "")[:300])
+    except Exception as e:
+        return LlmTestResult(ok=False, message=str(e), preview="")
+
+
+@app.post("/api/llm/models/discover", response_model=LlmDiscoverResult)
+def discover_llm_models_api(body: Optional[LlmDiscoverRequest] = Body(default=None)):
+    """vLLM：OpenAI SDK ``models.list()``。HTTP 直连模式不支持拉列表。"""
+    from src.llm.llm_config import PROVIDER_HTTP, PROVIDER_VLLM
+    from src.llm.model_client import fetch_vllm_model_ids_sdk, merge_llm_config_for_ephemeral
+
+    payload = body.model_dump(exclude_unset=True) if body else {}
+    cfg = merge_llm_config_for_ephemeral(payload)
+    prov = str(cfg.get("provider") or PROVIDER_HTTP)
+    if prov == PROVIDER_HTTP:
+        return LlmDiscoverResult(
+            ok=False,
+            message="HTTP 直连模式不拉取模型列表，请手动填写模型名（与 requests 调用一致）。",
+            models=[],
+        )
+    if prov != PROVIDER_VLLM:
+        return LlmDiscoverResult(ok=False, message=f"未知 provider: {prov}", models=[])
+    base = str(cfg.get("base_url") or "").strip()
+    if not base:
+        return LlmDiscoverResult(ok=False, message="请先填写 vLLM 根地址（如 http://host:8055/v1）", models=[])
+    timeout = float(cfg.get("timeout_seconds") or 120)
+    timeout = max(5.0, min(timeout, 120.0))
+    api_key = str(cfg.get("api_key") or "").strip()
+    try:
+        models = fetch_vllm_model_ids_sdk(base, api_key=api_key, timeout=timeout)
+        if not models:
+            return LlmDiscoverResult(ok=False, message="服务端返回的模型列表为空", models=[])
+        return LlmDiscoverResult(
+            ok=True,
+            message=f"共 {len(models)} 个模型",
+            models=models,
+        )
+    except Exception as e:
+        return LlmDiscoverResult(ok=False, message=str(e), models=[])
+
+
 # ── 日志查询 API ────────────────────────────────────────────────────────────────
 
 class LogEntry(BaseModel):
@@ -1022,7 +1466,6 @@ def _run_login() -> None:
       - 检测到 URL 含 token 后，提取 token + cookie 写入 id_info.json
       - 3 分钟内未扫码则超时退出
     """
-    import re
     import time
 
     bro = None

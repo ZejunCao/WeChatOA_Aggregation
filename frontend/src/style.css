@@ -301,6 +301,9 @@
 
 /*文章卡片 */
 .article-glass-card {
+  /* 整块是 <a> 时仍允许划词复制；勿对整卡 dragstart.prevent，否则会打断选中 */
+  user-select: text;
+  -webkit-user-select: text;
   display: flex;
   flex-direction: column;
   border-radius: 16px;
@@ -424,6 +427,8 @@
   opacity: 0;
   transition: all 0.25s;
   z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .dark .article-glass-btn-icon {
@@ -456,18 +461,51 @@
   color: #d97706;
 }
 
-.article-glass-btn-icon--bm.is-on:hover {
-  color: #b45309;
-}
-
+/* 删除 / 收藏：同一套悬停缩放，仅语义色不同 */
 .article-glass-btn-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .article-glass-btn-icon--del:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #ef4444;
+  background: #fee2e2;
+  border-color: #f87171;
+  color: #b91c1c;
+  box-shadow: 0 2px 8px rgb(239 68 68 / 0.28);
+}
+
+.dark .article-glass-btn-icon--del:hover {
+  background: rgb(127 29 29 / 0.88);
+  border-color: rgb(248 113 113 / 0.72);
+  color: #fecaca;
+  box-shadow: 0 2px 8px rgb(248 113 113 / 0.32);
+}
+
+.article-glass-btn-icon--bm:not(.is-on):hover {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+  box-shadow: 0 2px 8px rgb(245 158 11 / 0.3);
+}
+
+.dark .article-glass-btn-icon--bm:not(.is-on):hover {
+  background: rgb(120 53 15 / 0.88);
+  border-color: rgb(251 191 36 / 0.72);
+  color: #fde68a;
+  box-shadow: 0 2px 8px rgb(251 191 36 / 0.34);
+}
+
+.article-glass-btn-icon--bm.is-on:hover {
+  background: #fde68a;
+  border-color: #f59e0b;
+  color: #78350f;
+  box-shadow: 0 2px 8px rgb(245 158 11 / 0.34);
+}
+
+.dark .article-glass-btn-icon--bm.is-on:hover {
+  background: rgb(120 53 15 / 0.9);
+  border-color: rgb(251 191 36 / 0.75);
+  color: #fef3c7;
+  box-shadow: 0 2px 8px rgb(251 191 36 / 0.36);
 }
 
 .article-glass-body {
@@ -563,12 +601,24 @@
   color: #f9a8d4;
 }
 
-/* 列表行 */
+/*
+ * 列表行：固定等高。行高需容纳：标题 2 行 + 摘要 2 行 + 底栏（元信息 + 标签）。
+ * 左侧封面 16:9，高度为行内可用高度的比例（略矮于满高），与右侧文案视觉平衡。
+ */
 .article-glass-row {
+  --article-row-pad-y: 5px;
+  --article-row-height: 9.5rem;
+  user-select: text;
+  -webkit-user-select: text;
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 12px 18px;
+  align-items: stretch;
+  box-sizing: border-box;
+  height: var(--article-row-height);
+  min-height: var(--article-row-height);
+  max-height: var(--article-row-height);
+  gap: 10px;
+  /* 左侧略收紧，减少封面列周围留白；右略大保证文字不贴边 */
+  padding: var(--article-row-pad-y) 12px var(--article-row-pad-y) 10px;
   border-radius: 14px;
   background: var(--feed-glass-bg);
   backdrop-filter: var(--feed-glass-blur);
@@ -577,6 +627,15 @@
   box-shadow: var(--feed-glass-shadow), var(--feed-glass-inset);
   transition: all 0.25s;
   transform: translateZ(0);
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .article-glass-row {
+    --article-row-height: 9rem;
+    gap: 12px;
+    padding: var(--article-row-pad-y) 16px var(--article-row-pad-y) 12px;
+  }
 }
 
 .article-glass-row:hover {
@@ -612,13 +671,200 @@
   font-weight: 500;
 }
 
+/* 列表 16:9 封面：高度 = 行内槽位 × 比例（不满高，垂直居中） */
 .article-glass-row-cover {
-  width: 72px;
-  height: 50px;
+  --article-row-cover-slot: calc(var(--article-row-height) - 2 * var(--article-row-pad-y));
+  /* 略抬高比例，减少封面上下留白；与收紧的左 padding 一起看更满一些 */
+  --article-row-cover-h: calc(var(--article-row-cover-slot) * 0.86);
+  flex-shrink: 0;
+  align-self: center;
+  width: calc(var(--article-row-cover-h) * 16 / 9);
+  max-width: min(calc(var(--article-row-cover-h) * 16 / 9), 44%);
+  height: var(--article-row-cover-h);
   border-radius: 10px;
   overflow: hidden;
-  flex-shrink: 0;
   border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.article-glass-row-body {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* 标题+摘要+底栏作为一整块垂直居中；操作按钮单独绝对定位在右上 */
+  justify-content: center;
+  overflow: visible;
+}
+
+/* 删除 / 收藏 / 外链：贴在正文区域右上角 */
+.article-glass-row-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  pointer-events: auto;
+}
+
+/* 列表行：删除 / 收藏共用基底，悬停均为轻微放大 + 语义色边框/底 */
+.article-glass-row-action-btn {
+  display: flex;
+  height: 1.75rem;
+  width: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / 0.6);
+  background: rgb(255 255 255 / 0.85);
+  color: var(--feed-text-subtle);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  opacity: 0;
+  cursor: pointer;
+  outline: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.article-glass-row-action-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring);
+}
+
+.dark .article-glass-row-action-btn {
+  border-color: rgb(255 255 255 / 0.15);
+  background: rgba(30, 27, 46, 0.8);
+}
+
+.group:hover .article-glass-row-action-btn {
+  opacity: 1;
+}
+
+.article-glass-row-action-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.article-glass-row-action-btn:not(:disabled):hover {
+  transform: scale(1.08);
+}
+
+.article-glass-row-action-btn--del:not(:disabled):hover {
+  border-color: #f87171;
+  background: #fee2e2;
+  color: #b91c1c;
+  box-shadow: 0 2px 8px rgb(239 68 68 / 0.28);
+}
+
+.dark .article-glass-row-action-btn--del:not(:disabled):hover {
+  border-color: rgb(248 113 113 / 0.72);
+  background: rgb(127 29 29 / 0.88);
+  color: #fecaca;
+  box-shadow: 0 2px 8px rgb(248 113 113 / 0.32);
+}
+
+.article-glass-row-action-btn--bm:not(:disabled):hover {
+  border-color: #f59e0b;
+  background: #fef3c7;
+  color: #92400e;
+  box-shadow: 0 2px 8px rgb(245 158 11 / 0.3);
+}
+
+.dark .article-glass-row-action-btn--bm:not(:disabled):hover {
+  border-color: rgb(251 191 36 / 0.72);
+  background: rgb(120 53 15 / 0.88);
+  color: #fde68a;
+  box-shadow: 0 2px 8px rgb(251 191 36 / 0.34);
+}
+
+.article-glass-row-action-btn--bm.is-on {
+  opacity: 1;
+  border-color: rgb(251 191 36 / 0.5);
+  background: rgb(254 243 199 / 0.55);
+  color: #b45309;
+}
+
+.dark .article-glass-row-action-btn--bm.is-on {
+  background: rgb(120 53 15 / 0.35);
+  border-color: rgb(251 191 36 / 0.35);
+  color: #fcd34d;
+}
+
+.article-glass-row-action-btn--bm.is-on:not(:disabled):hover {
+  border-color: #f59e0b;
+  background: #fde68a;
+  color: #78350f;
+  box-shadow: 0 2px 8px rgb(245 158 11 / 0.34);
+}
+
+.dark .article-glass-row-action-btn--bm.is-on:not(:disabled):hover {
+  background: rgb(120 53 15 / 0.9);
+  border-color: rgb(251 191 36 / 0.75);
+  color: #fef3c7;
+  box-shadow: 0 2px 8px rgb(251 191 36 / 0.36);
+}
+
+/* 文章操作按钮的悬停说明（列表行 + 可复用） */
+.article-action-tooltip {
+  z-index: 200;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  padding: 0.35rem 0.6rem;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--color-foreground);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.12);
+  max-width: 12rem;
+}
+
+/* 为右上角按钮预留宽度，避免标题与摘要与图标重叠 */
+.article-glass-row-main {
+  width: 100%;
+  box-sizing: border-box;
+  /* 删除 + 收藏 两个 28px 按钮 + 间距 */
+  padding-right: 4.75rem;
+}
+
+/* 底栏：元信息（单行省略）+ 标签（剩余空间横向滑动），保证标签区域始终占位可见 */
+.article-glass-row-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.article-glass-row-footer .article-glass-row-sub {
+  margin-top: 0;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 46%;
+}
+
+/* 无标签时元信息可占满底栏 */
+.article-glass-row-footer .article-glass-row-sub:only-child {
+  max-width: 100%;
+}
+
+.article-glass-row-tags {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 1px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dark .article-glass-row-cover {
@@ -633,16 +879,16 @@
 
 /* FilterBar 玻璃模式 */
 .feed-filter-glass {
-  --feed-control-surface: rgba(255, 255, 255, 0.34);
-  --feed-control-border: rgba(255, 255, 255, 0.32);
+  --feed-control-surface: rgba(255, 255, 255, 0.88);
+  --feed-control-border: rgba(255, 255, 255, 0.72);
   --feed-control-shadow:
     0 1px 2px rgba(26, 18, 46, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.42);
 }
 
 .dark .feed-filter-glass {
-  --feed-control-surface: rgba(255, 255, 255, 0.07);
-  --feed-control-border: rgba(255, 255, 255, 0.14);
+  --feed-control-surface: rgba(28, 32, 42, 0.9);
+  --feed-control-border: rgba(255, 255, 255, 0.3);
   --feed-control-shadow:
     0 1px 3px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -811,6 +1057,24 @@
 
 .feed-filter-glass .feed-glass-dd > button:hover {
   border-color: rgba(201, 79, 124, 0.2) !important;
+}
+
+/* 下拉面板（如日期范围）提高实体感，避免内容透出过多 */
+.feed-filter-glass .feed-glass-dd > div {
+  border-color: var(--feed-control-border);
+  background: color-mix(in srgb, var(--color-card) 98%, white 2%);
+  box-shadow:
+    0 10px 22px rgba(18, 22, 34, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.dark .feed-filter-glass .feed-glass-dd > div {
+  background: color-mix(in srgb, var(--color-card) 97%, black 3%);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .feed-content-scroll {
@@ -993,9 +1257,11 @@
   font-size: 0.875rem;
   text-align: left;
   transition: all 0.2s ease;
-  cursor: pointer;
+  cursor: grab;
   background: transparent;
   color: var(--sb-text-muted);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .app-sidebar-acct-btn:hover {
@@ -1013,6 +1279,36 @@
   color: var(--sb-accent);
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.app-sidebar-acct-btn--drag-placeholder {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app-sidebar-acct-btn--drag-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 80;
+  width: 208px;
+  max-width: 208px;
+  pointer-events: none;
+  cursor: grabbing;
+  transition: none !important;
+  will-change: transform;
+  border-color: color-mix(in srgb, var(--sb-accent) 38%, transparent);
+  background: color-mix(in srgb, var(--sb-accent) 14%, rgba(255, 255, 255, 0.5));
+  box-shadow: 0 10px 24px rgba(40, 30, 60, 0.2);
+}
+
+.sidebar-acct-move {
+  transition: transform 0.22s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+:global(body.is-account-dragging),
+body.is-account-dragging * {
+  cursor: grabbing !important;
 }
 
 .dark .app-sidebar-acct-btn--active {

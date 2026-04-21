@@ -16,13 +16,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
+  'open-change': [value: boolean]
 }>()
 
 const open = ref(false)
 const containerRef = ref<HTMLElement | null>(null)
 
 onClickOutside(containerRef, () => {
-  open.value = false
+  setOpen(false)
 })
 
 const currentLabel = computed(() => {
@@ -31,7 +32,13 @@ const currentLabel = computed(() => {
 
 function select(value: string) {
   emit('update:modelValue', value)
-  open.value = false
+  setOpen(false)
+}
+
+function setOpen(value: boolean) {
+  if (open.value === value) return
+  open.value = value
+  emit('open-change', value)
 }
 </script>
 
@@ -39,7 +46,7 @@ function select(value: string) {
   <div ref="containerRef" class="relative">
     <button
       type="button"
-      @click="open = !open"
+      @click="setOpen(!open)"
       class="flex h-9 items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm text-[var(--color-foreground)] transition-colors hover:bg-[var(--color-accent)] focus:outline-none"
       :class="open ? 'border-[var(--color-ring)] ring-1 ring-[var(--color-ring)]' : ''"
     >

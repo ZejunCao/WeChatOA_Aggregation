@@ -68,25 +68,25 @@ function selectTheme(id: FeedThemeId) {
 
 <style scoped>
 .feed-theme-picker__trigger {
-  color: var(--sb-text, var(--color-foreground));
-  background: rgba(255, 252, 248, 0.55);
-  border: 1px solid rgba(201, 79, 124, 0.18);
-  box-shadow: 0 1px 2px rgba(80, 60, 70, 0.06);
+  color: var(--color-foreground);
+  background: color-mix(in srgb, var(--color-card) 86%, transparent);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 2px rgba(20, 24, 34, 0.04);
 }
 
 .feed-theme-picker__trigger:hover {
-  border-color: rgba(201, 79, 124, 0.28);
-  background: rgba(255, 252, 248, 0.72);
+  border-color: color-mix(in srgb, var(--color-border) 65%, var(--color-foreground) 35%);
+  background: color-mix(in srgb, var(--color-card) 94%, transparent);
 }
 
 .feed-theme-picker__trigger.is-open {
-  border-color: rgba(201, 79, 124, 0.42);
-  box-shadow: 0 0 0 2px rgba(201, 79, 124, 0.2);
+  border-color: color-mix(in srgb, var(--color-border) 58%, var(--color-foreground) 42%);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-border) 40%, transparent);
 }
 
 .feed-theme-picker__panel {
-  border-color: rgba(201, 79, 124, 0.2);
-  background: rgba(255, 252, 248, 0.94);
+  border-color: var(--color-border);
+  background: color-mix(in srgb, var(--color-card) 95%, transparent);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
 }
@@ -96,41 +96,12 @@ function selectTheme(id: FeedThemeId) {
 }
 
 .feed-theme-picker__item:hover {
-  background: rgba(201, 79, 124, 0.08);
-  color: var(--sb-text, var(--color-foreground));
+  background: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  color: var(--color-foreground);
 }
 
 .feed-theme-picker__item.is-active {
-  color: var(--sb-accent, var(--color-primary));
-  background: rgba(201, 79, 124, 0.12);
-}
-
-:global(html.dark) .feed-theme-picker__trigger {
-  color: var(--sb-text, var(--color-foreground));
-  background: rgba(40, 36, 48, 0.55);
-  border-color: rgba(244, 114, 182, 0.22);
-}
-
-:global(html.dark) .feed-theme-picker__trigger:hover {
-  background: rgba(48, 44, 56, 0.65);
-  border-color: rgba(244, 114, 182, 0.32);
-}
-
-:global(html.dark) .feed-theme-picker__trigger.is-open {
-  border-color: rgba(244, 114, 182, 0.45);
-  box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.18);
-}
-
-:global(html.dark) .feed-theme-picker__panel {
-  border-color: rgba(244, 114, 182, 0.25);
-  background: rgba(32, 28, 40, 0.95);
-}
-
-:global(html.dark) .feed-theme-picker__item:hover {
-  background: rgba(244, 114, 182, 0.12);
-}
-
-:global(html.dark) .feed-theme-picker__item.is-active {
-  background: rgba(244, 114, 182, 0.16);
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
 }
 </style>

@@ -10,6 +10,7 @@ dependencies = [
     "fastapi>=0.135.1",
     "lxml>=6.0.2",
     "nltk>=3.9.3",
+    "openai>=2.31.0",
     "pillow>=12.1.1",
     "requests>=2.32.5",
     "tqdm>=4.67.3",

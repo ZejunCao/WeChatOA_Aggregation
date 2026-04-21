@@ -7,7 +7,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { computed, ref } from 'vue'
-import { ExternalLink, Tag, Bot, Bookmark, BookmarkCheck, Trash2, Loader2 } from 'lucide-vue-next'
+import { TooltipContent, TooltipPortal, TooltipRoot, TooltipTrigger } from 'reka-ui'
+import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, Loader2 } from 'lucide-vue-next'
 import type { Article } from '@/types'
 import { useReadingStore } from '@/stores/reading'
 import { useArticlesStore } from '@/stores/articles'
@@ -24,8 +25,13 @@ const removing = ref(false)
 const isRead = computed(() => readingStore.isRead(props.article.id))
 const isBookmarked = computed(() => readingStore.isBookmarked(props.article.id))
 
-/** 点击卡片跳转原文时，标记为已读 */
-function handleClick() {
+/** 点击卡片跳转原文时，标记为已读（划词选中后松手会触发 click，需避免误跳转） */
+function handleClick(e: MouseEvent) {
+  const sel = window.getSelection()
+  if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+    e.preventDefault()
+    return
+  }
   readingStore.markRead(props.article.id)
 }
 
@@ -120,6 +126,7 @@ function tagToneClass(i: number) {
     :href="article.link"
     target="_blank"
     rel="noopener noreferrer"
+    draggable="false"
     class="group relative article-glass-card"
     :class="isRead ? 'is-read' : ''"
     @click="handleClick"
@@ -131,9 +138,11 @@ function tagToneClass(i: number) {
         v-if="!coverError"
         :src="localCoverSrc"
         :alt="article.title"
+        draggable="false"
         class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
         @error="coverError = true"
+        @dragstart.prevent
       />
       <!-- 封面不存在/加载失败时：用颜色块 + 公众号名前两字代替 -->
       <div
@@ -150,29 +159,43 @@ function tagToneClass(i: number) {
         <span>AI 摘要</span>
       </div>
 
-      <!-- 删除：从列表移除并加入黑名单 -->
-      <button
-        type="button"
-        @click="removeArticle"
-        :disabled="removing"
-        class="article-glass-btn-icon article-glass-btn-icon--del disabled:opacity-50 disabled:cursor-not-allowed"
-        title="从列表删除"
-      >
-        <Loader2 v-if="removing" class="h-3.5 w-3.5 animate-spin" />
-        <Trash2 v-else class="h-[13px] w-[13px]" />
-      </button>
+      <TooltipRoot>
+        <TooltipTrigger as-child>
+          <button
+            type="button"
+            class="article-glass-btn-icon article-glass-btn-icon--del disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="removing"
+            @click="removeArticle"
+          >
+            <Loader2 v-if="removing" class="h-3.5 w-3.5 animate-spin" />
+            <Trash2 v-else class="h-[13px] w-[13px]" />
+          </button>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent side="right" :side-offset="8" class="article-action-tooltip">
+            从列表中删除此文，并不再抓取
+          </TooltipContent>
+        </TooltipPortal>
+      </TooltipRoot>
 
-      <!-- 收藏按钮：悬停时出现，已收藏时常驻显示 -->
-      <button
-        type="button"
-        @click="toggleBookmark"
-        class="article-glass-btn-icon article-glass-btn-icon--bm"
-        :class="isBookmarked ? 'is-on is-visible' : ''"
-        :title="isBookmarked ? '取消收藏' : '收藏'"
-      >
-        <BookmarkCheck v-if="isBookmarked" class="h-3.5 w-3.5" />
-        <Bookmark v-else class="h-3.5 w-3.5" />
-      </button>
+      <TooltipRoot>
+        <TooltipTrigger as-child>
+          <button
+            type="button"
+            class="article-glass-btn-icon article-glass-btn-icon--bm"
+            :class="isBookmarked ? 'is-on is-visible' : ''"
+            @click="toggleBookmark"
+          >
+            <BookmarkCheck v-if="isBookmarked" class="h-3.5 w-3.5" />
+            <Bookmark v-else class="h-3.5 w-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent side="left" :side-offset="8" class="article-action-tooltip">
+            {{ isBookmarked ? '取消收藏' : '加入收藏' }}
+          </TooltipContent>
+        </TooltipPortal>
+      </TooltipRoot>
     </div>
 
     <!-- 文字内容区 -->
@@ -184,9 +207,22 @@ function tagToneClass(i: number) {
         </h3>
       </div>
 
-      <p v-if="displayDigest" class="article-glass-digest line-clamp-3">
-        {{ displayDigest }}
-      </p>
+      <TooltipRoot v-if="displayDigest">
+        <TooltipTrigger as-child>
+          <p class="article-glass-digest line-clamp-2">
+            {{ displayDigest }}
+          </p>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent
+            side="top"
+            :side-offset="6"
+            class="article-digest-tooltip z-[200] max-w-sm rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-xs leading-relaxed text-[var(--color-foreground)] shadow-lg outline-none"
+          >
+            {{ displayDigest }}
+          </TooltipContent>
+        </TooltipPortal>
+      </TooltipRoot>
 
       <div v-if="article.tags && article.tags.length" class="flex flex-wrap gap-1.5">
         <span
@@ -205,8 +241,9 @@ function tagToneClass(i: number) {
           {{ article.account }}
         </span>
         <div class="article-glass-ft-meta">
+          <span v-if="article.word_count && article.word_count > 0">{{ article.word_count }} 字</span>
+          <span v-if="article.word_count && article.word_count > 0">·</span>
           <span>{{ formattedDate }}</span>
-          <ExternalLink class="h-3 w-3 shrink-0" />
         </div>
       </div>
     </div>

@@ -27,6 +27,9 @@ export const useConfigStore = defineStore(
     // 文章 Feed 区界面预设（奶白网格 / 简约 / 蓝青等），持久化到 localStorage
     const feedTheme = ref<FeedThemeId>('cream-mesh')
 
+    // 侧边栏公众号自定义顺序（拖拽后写入，未命中的账号会自动追加）
+    const accountOrder = ref<string[]>([])
+
     // ── 公众号可见性 ──────────────────────────────────────────────────────────
 
     /** 切换某个公众号的可见状态（隐藏/取消隐藏） */
@@ -52,6 +55,17 @@ export const useConfigStore = defineStore(
     /** 隐藏指定的公众号列表（全不选时使用） */
     function hideAll(names: string[]) {
       hiddenAccounts.value = [...names]
+    }
+
+    /** 更新公众号顺序（去重并保留非空项） */
+    function setAccountOrder(names: string[]) {
+      const seen = new Set<string>()
+      accountOrder.value = names.filter((n) => {
+        const v = n.trim()
+        if (!v || seen.has(v)) return false
+        seen.add(v)
+        return true
+      })
     }
 
     // ── 主题 ──────────────────────────────────────────────────────────────────
@@ -103,10 +117,12 @@ export const useConfigStore = defineStore(
       hiddenAccounts,
       theme,
       feedTheme,
+      accountOrder,
       toggleAccount,
       isVisible,
       showAll,
       hideAll,
+      setAccountOrder,
       setTheme,
       setFeedTheme,
       initTheme,

@@ -11,6 +11,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:dateFrom': [value: string]
   'update:dateTo': [value: string]
+  'open-change': [value: boolean]
 }>()
 
 const open = ref(false)
@@ -19,7 +20,7 @@ const customFrom = ref(props.dateFrom)
 const customTo = ref(props.dateTo)
 
 onClickOutside(containerRef, () => {
-  open.value = false
+  setOpen(false)
 })
 
 watch(() => props.dateFrom, (v) => { customFrom.value = v })
@@ -69,18 +70,24 @@ const buttonLabel = computed(() => {
 
 const hasValue = computed(() => !!(props.dateFrom || props.dateTo))
 
+function setOpen(value: boolean) {
+  if (open.value === value) return
+  open.value = value
+  emit('open-change', value)
+}
+
 function applyPreset(preset: (typeof presets)[number]) {
   emit('update:dateFrom', preset.from)
   emit('update:dateTo', preset.to)
   customFrom.value = preset.from
   customTo.value = preset.to
-  if (!preset.from && !preset.to) open.value = false
+  if (!preset.from && !preset.to) setOpen(false)
 }
 
 function applyCustom() {
   emit('update:dateFrom', customFrom.value)
   emit('update:dateTo', customTo.value)
-  open.value = false
+  setOpen(false)
 }
 
 function clear() {
@@ -88,7 +95,7 @@ function clear() {
   emit('update:dateTo', '')
   customFrom.value = ''
   customTo.value = ''
-  open.value = false
+  setOpen(false)
 }
 </script>
 
@@ -96,7 +103,7 @@ function clear() {
   <div ref="containerRef" class="relative">
     <button
       type="button"
-      @click="open = !open"
+      @click="setOpen(!open)"
       class="flex h-9 items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 text-sm transition-colors hover:bg-[var(--color-accent)] focus:outline-none"
       :class="[
         open ? 'border-[var(--color-ring)] ring-1 ring-[var(--color-ring)]' : '',

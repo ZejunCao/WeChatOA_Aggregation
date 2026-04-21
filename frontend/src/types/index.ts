@@ -17,6 +17,7 @@ export interface Article {
   // 预留 LLM 字段，目前为空，后续接入大模型打标签/摘要时填充
   tags?: string[]      // LLM 生成的标签列表
   summary?: string     // LLM 生成的文章摘要（比 digest 更精炼）
+  word_count?: number  // 文章字数（中文按字、英文按词）
 }
 
 // ── 单个公众号的文章集合（message_info.json 中每个 key 对应的 value） ────────
@@ -51,11 +52,14 @@ export type GroupBy = 'date' | 'account' | 'none'  // 按日期 / 按公众号 /
 // 已读/收藏筛选
 export type ReadFilter = 'all' | 'unread' | 'bookmarked'  // 全部 / 未读 / 已收藏
 
+// 标签筛选中的特殊值：表示“未打标签”的文章
+export const TAG_UNTAGGED = '__untagged__'
+
 // FilterBar 组件管理的所有筛选条件
 export interface FilterState {
   keyword: string        // 关键词搜索（匹配标题、摘要、AI 摘要）
   accounts: string[]     // 只显示选中公众号的文章（空数组=显示全部）
-  tags: string[]         // 标签过滤（需同时含有所有选中标签）
+  tags: string[]         // 标签过滤（多选按“命中任一标签”处理；支持特殊值 TAG_UNTAGGED）
   dateFrom: string       // 日期范围起始（格式 "YYYY-MM-DD"）
   dateTo: string         // 日期范围结束（格式 "YYYY-MM-DD"）
   sortOrder: SortOrder   // 排序方式
@@ -96,4 +100,6 @@ export interface CrawlStatus {
   finished_at: string   // 结束时间（未结束时为空）
   new_articles: number  // 本次新增文章数
   auth_error: boolean   // 是否因凭证失效而终止
+  cancel_requested?: boolean // 是否已请求取消
+  cancelled?: boolean   // 是否由用户取消
 }

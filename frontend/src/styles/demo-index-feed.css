@@ -182,8 +182,8 @@ html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill {
   font-size: 12px;
   font-weight: 500;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   box-shadow: none !important;
   color: var(--text-2) !important;
 }
@@ -201,8 +201,8 @@ html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill.is-active {
 }
 
 html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-input {
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   box-shadow: none !important;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -213,8 +213,8 @@ html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-input::placeho
 }
 
 html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle {
-  background: rgba(255, 255, 255, 0.3) !important;
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
   border-radius: 10px;
   box-shadow: none !important;
 }
@@ -233,8 +233,8 @@ html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle button:h
 }
 
 html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-tool {
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   box-shadow: none !important;
   color: var(--text-2) !important;
   backdrop-filter: blur(20px) saturate(180%);
@@ -253,17 +253,22 @@ html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-tool.is-active
 }
 
 html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-dd > button {
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   box-shadow: none !important;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-chip-idle {
-  border: 1px solid rgba(255, 255, 255, 0.4) !important;
-  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   box-shadow: none !important;
+}
+
+html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-dd > div {
+  border-color: rgba(255, 255, 255, 0.75) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
 }
 
 html[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-advanced {
@@ -432,7 +437,7 @@ html[data-feed-theme="demo-glass"] .article-glass-btn-icon--bm.is-on {
 
 /* ── .card-row → .article-glass-row ── */
 html[data-feed-theme="demo-glass"] .article-glass-row {
-  align-items: center;
+  align-items: stretch;
   border-width: 1.5px !important;
   text-decoration: none;
   transition: all 0.25s;
@@ -567,8 +572,8 @@ html.dark[data-feed-theme="demo-glass"] .app-sidebar-acct-btn--active {
 
 /* 深色下筛选控件可读 */
 html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-pill {
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(28, 32, 42, 0.9) !important;
   color: var(--text-2) !important;
 }
 
@@ -582,8 +587,13 @@ html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-input,
 html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-tool,
 html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-view-toggle,
 html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-dd > button {
-  border-color: rgba(255, 255, 255, 0.16) !important;
-  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(28, 32, 42, 0.9) !important;
+}
+
+html.dark[data-feed-theme="demo-glass"] .feed-filter-glass .feed-glass-dd > div {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(24, 28, 38, 0.95) !important;
 }
 
 html.dark[data-feed-theme="demo-glass"] .feed-title {

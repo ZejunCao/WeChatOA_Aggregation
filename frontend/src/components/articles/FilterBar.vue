@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Search, X, SlidersHorizontal, LayoutGrid, List, Bookmark, BookmarkCheck, Circle } from 'lucide-vue-next'
+import { Search, X, Tags, LayoutGrid, List, Bookmark, BookmarkCheck, Circle } from 'lucide-vue-next'
 import { useArticlesStore } from '@/stores/articles'
 import { useReadingStore } from '@/stores/reading'
-import type { FilterState, SortOrder, GroupBy, ReadFilter } from '@/types'
+import { TAG_UNTAGGED, type FilterState, type SortOrder, type ReadFilter } from '@/types'
+import {
+  TAG_SECTION_LABELS,
+  TAG_SECTION_ORDER,
+  classifyTagForFilter,
+  type TagFilterCategory,
+} from '@/lib/tagCategories'
 import Dropdown from '@/components/ui/Dropdown.vue'
 import DateRangePicker from '@/components/ui/DateRangePicker.vue'
 
@@ -26,7 +32,22 @@ const emit = defineEmits<{
 
 const articlesStore = useArticlesStore()
 const readingStore = useReadingStore()
-const showAdvanced = ref(false)
+const showTagFilter = ref(false)
+const expandTags = ref(false)
+
+function onDatePickerOpenChange(isOpen: boolean) {
+  if (!isOpen) return
+  // 打开时间筛选时自动收起标签筛选，避免多个面板叠在一起
+  showTagFilter.value = false
+  expandTags.value = false
+}
+
+function onTopDropdownOpenChange(isOpen: boolean) {
+  if (!isOpen) return
+  // 打开排序下拉时收起标签筛选，保持面板互斥
+  showTagFilter.value = false
+  expandTags.value = false
+}
 
 const readTabs: { value: ReadFilter; label: string; icon: unknown }[] = [
   { value: 'all',        label: '全部',   icon: Circle },
@@ -36,13 +57,6 @@ const readTabs: { value: ReadFilter; label: string; icon: unknown }[] = [
 
 function update<K extends keyof FilterState>(key: K, value: FilterState[K]) {
   emit('update:filters', { ...props.filters, [key]: value })
-}
-
-function toggleAccount(name: string) {
-  const accounts = props.filters.accounts.includes(name)
-    ? props.filters.accounts.filter((a) => a !== name)
-    : [...props.filters.accounts, name]
-  update('accounts', accounts)
 }
 
 function toggleTag(tag: string) {
@@ -57,25 +71,83 @@ const sortOptions = [
   { value: 'oldest' as SortOrder, label: '最旧优先' },
 ]
 
-const groupOptions = [
-  { value: 'none' as GroupBy, label: '不分组' },
-  { value: 'date' as GroupBy, label: '按日期' },
-  { value: 'account' as GroupBy, label: '按公众号' },
-]
-
 const activeFilters = computed(() => {
   const list: { label: string; remove: () => void }[] = []
   if (props.filters.keyword) {
     list.push({ label: `"${props.filters.keyword}"`, remove: () => update('keyword', '') })
   }
-  props.filters.accounts.forEach((acc) => {
-    list.push({ label: acc, remove: () => toggleAccount(acc) })
-  })
   props.filters.tags.forEach((tag) => {
-    list.push({ label: `#${tag}`, remove: () => toggleTag(tag) })
+    list.push({
+      label: tag === TAG_UNTAGGED ? '未打标签' : `#${tag}`,
+      remove: () => toggleTag(tag),
+    })
   })
   return list
 })
+
+/** 标签在列表中展示的最小篇数（低于此数量不出现在筛选面板，减少噪声） */
+const MIN_TAG_LIST_COUNT = 5
+
+const tagOptions = computed(() => {
+  const counts = new Map<string, number>()
+  let untaggedCount = 0
+
+  for (const article of articlesStore.allArticles) {
+    const tags = article.tags ?? []
+    if (tags.length === 0) {
+      untaggedCount++
+      continue
+    }
+    for (const tag of tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1)
+    }
+  }
+
+  const result = Array.from(counts.entries())
+    .filter(([, count]) => count >= MIN_TAG_LIST_COUNT)
+    .sort((a, b) => (b[1] - a[1]) || a[0].localeCompare(b[0]))
+    .map(([value, count]) => ({ value, label: value, count }))
+
+  if (untaggedCount >= MIN_TAG_LIST_COUNT) {
+    result.push({ value: TAG_UNTAGGED, label: '未打标签', count: untaggedCount })
+  }
+
+  return result
+})
+
+type TagOptionItem = { value: string; label: string; count: number }
+
+/** 展开后按「内容类型 / 核心主题 / 技术范围 / 特殊标记 / 未打标签」分组 */
+const tagSectionsForDisplay = computed(() => {
+  const buckets = new Map<TagFilterCategory, TagOptionItem[]>()
+  for (const k of TAG_SECTION_ORDER) buckets.set(k, [])
+  for (const opt of tagOptions.value) {
+    const cat: TagFilterCategory =
+      opt.value === TAG_UNTAGGED ? 'untagged' : classifyTagForFilter(opt.value)
+    buckets.get(cat)!.push(opt)
+  }
+  const sortBucket = (items: TagOptionItem[]) =>
+    [...items].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+  return TAG_SECTION_ORDER.map((key) => ({
+    key,
+    label: TAG_SECTION_LABELS[key],
+    items: sortBucket(buckets.get(key) ?? []),
+  })).filter((s) => s.items.length > 0)
+})
+
+const showExpandTagsBtn = computed(() => tagOptions.value.length > 10)
+
+function tagChipClasses(tagValue: string) {
+  const active = props.filters.tags.includes(tagValue)
+  if (props.glass) {
+    return active
+      ? 'feed-chip-active font-medium'
+      : 'feed-chip-idle hover:border-[var(--feed-accent-soft)]/40'
+  }
+  return active
+    ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
+    : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--color-foreground)]/20 hover:text-[var(--color-foreground)]'
+}
 </script>
 
 <template>
@@ -140,6 +212,7 @@ const activeFilters = computed(() => {
         :class="glass ? 'feed-glass-dd' : ''"
         :date-from="filters.dateFrom"
         :date-to="filters.dateTo"
+        @open-change="onDatePickerOpenChange"
         @update:dateFrom="update('dateFrom', $event)"
         @update:dateTo="update('dateTo', $event)"
       />
@@ -150,38 +223,31 @@ const activeFilters = computed(() => {
         :class="glass ? 'feed-glass-dd' : ''"
         :options="sortOptions"
         :model-value="filters.sortOrder"
+        @open-change="onTopDropdownOpenChange"
         @update:modelValue="update('sortOrder', $event as SortOrder)"
       />
 
-      <!-- Group dropdown -->
-      <Dropdown
-        class="hidden sm:block"
-        :class="glass ? 'feed-glass-dd' : ''"
-        :options="groupOptions"
-        :model-value="filters.groupBy"
-        @update:modelValue="update('groupBy', $event as GroupBy)"
-      />
-
-      <!-- Advanced toggle -->
+      <!-- Tag toggle -->
       <button
         type="button"
-        @click="showAdvanced = !showAdvanced"
+        @click="showTagFilter = !showTagFilter"
         class="shrink-0 text-sm transition-colors"
         :class="glass
           ? [
               'feed-glass-tool',
-              showAdvanced || activeCount > 0 ? 'is-active' : '',
+              showTagFilter || filters.tags.length > 0 ? 'is-active' : '',
             ]
           : [
               'flex h-9 items-center gap-1.5 rounded-lg border px-3',
-              showAdvanced || activeCount > 0
+              showTagFilter || filters.tags.length > 0
                 ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                 : 'border-[var(--color-border)] bg-[var(--color-card)] text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:text-[var(--color-foreground)]',
             ]"
-        :title="showAdvanced ? '收起筛选' : '展开筛选'"
+        :title="showTagFilter ? '收起标签筛选' : '展开标签筛选'"
       >
-        <SlidersHorizontal class="h-4 w-4" />
-        <span v-if="activeCount > 0" class="text-xs font-semibold tabular-nums">{{ activeCount }}</span>
+        <Tags class="h-4 w-4" />
+        <span class="hidden sm:inline">标签</span>
+        <span v-if="filters.tags.length > 0" class="text-xs font-semibold tabular-nums">{{ filters.tags.length }}</span>
       </button>
 
       <!-- View mode toggle -->
@@ -222,7 +288,7 @@ const activeFilters = computed(() => {
       </div>
     </div>
 
-    <!-- Advanced filters panel -->
+    <!-- Tag filters panel -->
     <Transition
       enter-active-class="transition duration-150 ease-out"
       enter-from-class="opacity-0 -translate-y-1"
@@ -232,62 +298,77 @@ const activeFilters = computed(() => {
       leave-to-class="opacity-0 -translate-y-1"
     >
       <div
-        v-if="showAdvanced"
+        v-if="showTagFilter"
         class="p-4 space-y-4 rounded-xl"
         :class="glass ? 'feed-glass-advanced' : 'border border-[var(--color-border)] bg-[var(--color-card)]'"
       >
-        <!-- Account filter -->
-        <div v-if="articlesStore.accounts.length">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">公众号</p>
-          <div class="flex flex-wrap gap-1.5">
-            <button
-              v-for="acc in articlesStore.accounts"
-              :key="acc.name"
-              type="button"
-              @click="toggleAccount(acc.name)"
-              class="rounded-full border px-2.5 py-1 text-xs transition-colors"
-              :class="
-                glass
-                  ? filters.accounts.includes(acc.name)
-                    ? 'feed-chip-active font-medium'
-                    : 'feed-chip-idle hover:border-[var(--feed-accent-soft)]/40'
-                  : filters.accounts.includes(acc.name)
-                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
-                    : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--color-foreground)]/20 hover:text-[var(--color-foreground)]'
-              "
-            >
-              {{ acc.name }}
-              <span class="ml-1 opacity-50">{{ acc.article_count }}</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Tag filter -->
-        <div v-if="articlesStore.allTags.length">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)] mb-2">标签</p>
-          <div class="flex flex-wrap gap-1.5">
+        <div v-if="tagOptions.length">
+          <div class="mb-2 flex items-center justify-between gap-2">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">标签</p>
             <button
-              v-for="tag in articlesStore.allTags"
-              :key="tag"
+              v-if="showExpandTagsBtn"
               type="button"
-              @click="toggleTag(tag)"
-              class="rounded-full border px-2.5 py-1 text-xs transition-colors"
-              :class="
-                glass
-                  ? filters.tags.includes(tag)
-                    ? 'feed-chip-active font-medium'
-                    : 'feed-chip-idle hover:border-[var(--feed-accent-soft)]/40'
-                  : filters.tags.includes(tag)
-                    ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium'
-                    : 'border-[var(--color-border)] text-[var(--color-muted-foreground)] hover:border-[var(--color-foreground)]/20 hover:text-[var(--color-foreground)]'
-              "
+              class="shrink-0 text-[11px] text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
+              :title="expandTags ? '收起标签列表' : '展开标签列表'"
+              @click="expandTags = !expandTags"
             >
-              #{{ tag }}
+              {{ expandTags ? '收起' : '展开' }}
             </button>
+          </div>
+          <!-- 收起：单行横向滚动；展开：分类展示 + 独立滚动区域，避免撑满屏且无法翻动 -->
+          <div
+            class="flex gap-1.5"
+            :class="
+              expandTags
+                ? 'flex-col space-y-4 max-h-[min(70vh,28rem)] overflow-y-auto overscroll-contain pr-1 -mr-0.5'
+                : 'flex-nowrap overflow-x-auto hide-scrollbar pr-1'
+            "
+          >
+            <template v-if="!expandTags">
+              <button
+                v-for="tag in tagOptions"
+                :key="tag.value"
+                type="button"
+                @click="toggleTag(tag.value)"
+                class="shrink-0 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs transition-colors"
+                :class="tagChipClasses(tag.value)"
+              >
+                {{ tag.value === TAG_UNTAGGED ? '未打标签' : `#${tag.label}` }}
+                <span class="ml-1 opacity-50">{{ tag.count }}</span>
+              </button>
+            </template>
+            <template v-else>
+              <div
+                v-for="section in tagSectionsForDisplay"
+                :key="section.key"
+                class="space-y-2 min-w-0"
+              >
+                <p
+                  class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]"
+                >
+                  {{ section.label }}
+                  <span class="ml-1 font-normal normal-case opacity-70">({{ section.items.length }})</span>
+                </p>
+                <div class="flex flex-wrap gap-1.5">
+                  <button
+                    v-for="tag in section.items"
+                    :key="tag.value"
+                    type="button"
+                    @click="toggleTag(tag.value)"
+                    class="shrink-0 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs transition-colors"
+                    :class="tagChipClasses(tag.value)"
+                  >
+                    {{ tag.value === TAG_UNTAGGED ? '未打标签' : `#${tag.label}` }}
+                    <span class="ml-1 opacity-50">{{ tag.count }}</span>
+                  </button>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
 
-        <!-- Mobile-only: date / sort / group -->
+        <!-- Mobile-only: date / sort -->
         <div class="md:hidden space-y-2">
           <p class="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">日期范围</p>
           <DateRangePicker
@@ -298,20 +379,14 @@ const activeFilters = computed(() => {
             @update:dateTo="update('dateTo', $event)"
           />
         </div>
-        <div class="sm:hidden flex gap-2">
+        <div class="sm:hidden">
           <Dropdown
-            class="flex-1"
+            class="w-full"
             :class="glass ? 'feed-glass-dd' : ''"
             :options="sortOptions"
             :model-value="filters.sortOrder"
+            @open-change="onTopDropdownOpenChange"
             @update:modelValue="update('sortOrder', $event as SortOrder)"
-          />
-          <Dropdown
-            class="flex-1"
-            :class="glass ? 'feed-glass-dd' : ''"
-            :options="groupOptions"
-            :model-value="filters.groupBy"
-            @update:modelValue="update('groupBy', $event as GroupBy)"
           />
         </div>
 

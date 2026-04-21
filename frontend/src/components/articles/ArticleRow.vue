@@ -2,12 +2,13 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // ArticleRow — 文章行组件（列表/行视图模式）
 //
-// 外观：横向布局，左边是小缩略图（128×80），右边是标题、摘要、元信息。
+// 外观：固定等高行；左 16:9 封面（高度为行内槽位约 86%，垂直居中）；右为标题 + 摘要 + 底栏。
 // 使用场景：FeedView 切换到"列表视图"时渲染，适合密集阅读。
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { computed, ref } from 'vue'
-import { ExternalLink, Tag, Bot, Bookmark, BookmarkCheck, Trash2, Loader2 } from 'lucide-vue-next'
+import { TooltipContent, TooltipPortal, TooltipRoot, TooltipTrigger } from 'reka-ui'
+import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, Loader2 } from 'lucide-vue-next'
 import type { Article } from '@/types'
 import { useReadingStore } from '@/stores/reading'
 import { useArticlesStore } from '@/stores/articles'
@@ -24,8 +25,13 @@ const removing = ref(false)
 const isRead = computed(() => readingStore.isRead(props.article.id))
 const isBookmarked = computed(() => readingStore.isBookmarked(props.article.id))
 
-/** 点击行时标记为已读 */
-function handleClick() {
+/** 点击行打开链接并标记已读；划词结束时的 click 不跳转 */
+function handleClick(e: MouseEvent) {
+  const sel = window.getSelection()
+  if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+    e.preventDefault()
+    return
+  }
   readingStore.markRead(props.article.id)
 }
 
@@ -100,19 +106,21 @@ function tagToneClass(i: number) {
     :href="article.link"
     target="_blank"
     rel="noopener noreferrer"
+    draggable="false"
     class="group article-glass-row"
     :class="isRead ? 'is-read' : ''"
     @click="handleClick"
   >
-    <!-- 左侧缩略图（与 demo 列表视图一致的 72×50） -->
-    <div class="article-glass-row-cover relative bg-[var(--color-muted)] sm:mt-0.5">
+    <div class="article-glass-row-cover relative bg-[var(--color-muted)]">
       <img
         v-if="!coverError"
         :src="localCoverSrc"
         :alt="article.title"
+        draggable="false"
         class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
         @error="coverError = true"
+        @dragstart.prevent
       />
       <!-- 封面失败时的颜色占位块 -->
       <div
@@ -124,64 +132,85 @@ function tagToneClass(i: number) {
       </div>
     </div>
 
-    <!-- 右侧内容区 -->
-    <div class="flex-1 min-w-0 space-y-1">
-      <div class="flex items-start justify-between gap-2">
-        <div class="flex items-start gap-2 flex-1 min-w-0">
-          <span v-if="!isRead" class="feed-dot-unread mt-1" />
-          <div class="min-w-0 flex-1 space-y-1">
-            <h3 class="article-glass-row-title line-clamp-2 leading-snug">
+    <div class="article-glass-row-body">
+      <div class="article-glass-row-actions">
+        <button
+          type="button"
+          @click="removeArticle"
+          :disabled="removing"
+          class="article-glass-row-action-btn article-glass-row-action-btn--del"
+          title="从列表删除"
+        >
+          <Loader2 v-if="removing" class="h-3.5 w-3.5 animate-spin" />
+          <Trash2 v-else class="h-3.5 w-3.5" />
+        </button>
+        <button
+          type="button"
+          @click="toggleBookmark"
+          class="article-glass-row-action-btn article-glass-row-action-btn--bm"
+          :class="isBookmarked ? 'is-on' : ''"
+          :title="isBookmarked ? '取消收藏' : '收藏'"
+        >
+          <BookmarkCheck v-if="isBookmarked" class="h-3.5 w-3.5" />
+          <Bookmark v-else class="h-3.5 w-3.5" />
+        </button>
+      </div>
+      <div class="article-glass-row-main">
+        <div class="flex items-start gap-2 min-w-0 min-h-0">
+          <span v-if="!isRead" class="feed-dot-unread mt-1 shrink-0" />
+          <div class="min-w-0 flex-1 flex flex-col gap-1 min-h-0">
+            <h3 class="article-glass-row-title line-clamp-2 leading-snug shrink-0">
               {{ article.title }}
             </h3>
-            <p v-if="displayDigest" class="line-clamp-2 text-xs leading-relaxed text-[var(--feed-text-muted)] dark:text-[var(--feed-text-muted)]">
-              {{ displayDigest }}
-            </p>
-            <div class="article-glass-row-sub flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span>{{ article.account }}</span>
-              <span>·</span>
-              <span>{{ formattedDate }}</span>
-              <span v-if="article.summary" class="inline-flex items-center gap-0.5 rounded-md bg-violet-500/15 px-1.5 py-px text-[10px] font-semibold text-violet-700 dark:text-violet-300">
-                <Bot class="h-3 w-3" />
-                AI
-              </span>
-            </div>
-            <div v-if="article.tags && article.tags.length" class="flex flex-wrap gap-1 pt-0.5">
-              <span
-                v-for="(tag, ti) in article.tags.slice(0, 3)"
-                :key="tag"
-                class="article-glass-tag inline-flex items-center gap-0.5 py-px"
-                :class="tagToneClass(ti)"
+            <TooltipRoot v-if="displayDigest">
+              <TooltipTrigger as-child>
+                <p
+                  class="line-clamp-2 text-xs leading-snug text-[var(--feed-text-muted)] dark:text-[var(--feed-text-muted)] shrink-0"
+                >
+                  {{ displayDigest }}
+                </p>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent
+                  side="top"
+                  :side-offset="6"
+                  class="article-digest-tooltip z-[200] max-w-sm rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-xs leading-relaxed text-[var(--color-foreground)] shadow-lg outline-none"
+                >
+                  {{ displayDigest }}
+                </TooltipContent>
+              </TooltipPortal>
+            </TooltipRoot>
+            <div class="article-glass-row-footer">
+              <div class="article-glass-row-sub flex min-w-0 items-center gap-x-1.5">
+                <span class="min-w-0 truncate">{{ article.account }}</span>
+                <span class="shrink-0">·</span>
+                <span v-if="article.word_count && article.word_count > 0" class="shrink-0">{{ article.word_count }} 字</span>
+                <span v-if="article.word_count && article.word_count > 0" class="shrink-0">·</span>
+                <span class="shrink-0">{{ formattedDate }}</span>
+                <span
+                  v-if="article.summary"
+                  class="inline-flex shrink-0 items-center gap-0.5 rounded-md bg-violet-500/15 px-1.5 py-px text-[10px] font-semibold text-violet-700 dark:text-violet-300"
+                >
+                  <Bot class="h-3 w-3" />
+                  AI
+                </span>
+              </div>
+              <div
+                v-if="article.tags && article.tags.length"
+                class="article-glass-row-tags hide-scrollbar"
               >
-                <Tag class="h-2.5 w-2.5 opacity-80" />
-                {{ tag }}
-              </span>
+                <span
+                  v-for="(tag, ti) in article.tags.slice(0, 3)"
+                  :key="tag"
+                  class="article-glass-tag inline-flex shrink-0 items-center gap-0.5 py-px"
+                  :class="tagToneClass(ti)"
+                >
+                  <Tag class="h-2.5 w-2.5 opacity-80" />
+                  {{ tag }}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="flex items-center gap-1 shrink-0 pt-0.5">
-          <button
-            type="button"
-            @click="removeArticle"
-            :disabled="removing"
-            class="flex h-7 w-7 items-center justify-center rounded-[10px] border border-white/60 bg-white/85 text-[var(--feed-text-subtle)] opacity-0 shadow-sm transition-all hover:border-red-300 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:opacity-40 dark:border-white/15 dark:bg-[rgba(30,27,46,0.8)] dark:hover:bg-red-950/40"
-            title="从列表删除"
-          >
-            <Loader2 v-if="removing" class="h-3.5 w-3.5 animate-spin" />
-            <Trash2 v-else class="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            @click="toggleBookmark"
-            class="flex h-7 w-7 items-center justify-center rounded-[10px] border border-white/60 bg-white/85 text-[var(--feed-text-subtle)] shadow-sm transition-all group-hover:opacity-100 dark:border-white/15 dark:bg-[rgba(30,27,46,0.8)]"
-            :class="isBookmarked
-              ? 'opacity-100 border-amber-300/50 bg-amber-100/50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
-              : 'opacity-0 hover:border-amber-200 hover:text-amber-600 dark:hover:text-amber-400'"
-            :title="isBookmarked ? '取消收藏' : '收藏'"
-          >
-            <BookmarkCheck v-if="isBookmarked" class="h-3.5 w-3.5" />
-            <Bookmark v-else class="h-3.5 w-3.5" />
-          </button>
-          <ExternalLink class="h-3.5 w-3.5 shrink-0 text-[var(--feed-accent)] opacity-0 group-hover:opacity-60 transition-opacity mt-0.5" />
         </div>
       </div>
     </div>

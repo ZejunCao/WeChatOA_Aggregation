@@ -15,7 +15,7 @@ import { computed, reactive } from 'vue'
 import { useArticlesStore } from '@/stores/articles'
 import { useConfigStore } from '@/stores/config'
 import { useReadingStore } from '@/stores/reading'
-import type { FilterState, GroupBy } from '@/types'
+import { TAG_UNTAGGED, type FilterState, type GroupBy } from '@/types'
 
 export function useFilters() {
   const articlesStore = useArticlesStore()
@@ -55,9 +55,13 @@ export function useFilters() {
       )
     }
 
-    // 第四步：标签筛选（文章必须含有所有选中标签，即 AND 逻辑）
+    // 第四步：标签筛选（多选按 OR；支持“未打标签”）
     if (filters.tags.length > 0) {
-      list = list.filter((a) => filters.tags.every((t) => a.tags?.includes(t)))
+      list = list.filter((a) => {
+        const tags = a.tags ?? []
+        const hasUntagged = tags.length === 0
+        return filters.tags.some((t) => (t === TAG_UNTAGGED ? hasUntagged : tags.includes(t)))
+      })
     }
 
     // 第五步：日期范围过滤（create_time 格式为 "YYYY-MM-DD HH:MM"，字符串可直接比较）
@@ -129,13 +133,13 @@ export function useFilters() {
   /**
    * 当前激活的筛选条件数量（用于 FilterBar 上的"已筛选"徽标）。
    * readFilter 不计入（它有独立的 Tab 展示），groupBy 也不计入。
+   * 日期范围在顶栏单独可见，因此不计入"高级筛选"徽标，避免误导。
    */
   const activeFilterCount = computed(() => {
     let count = 0
     if (filters.keyword) count++
     if (filters.accounts.length) count++
     if (filters.tags.length) count++
-    if (filters.dateFrom || filters.dateTo) count++
     return count
   })
 

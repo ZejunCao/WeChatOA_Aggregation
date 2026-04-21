@@ -4,11 +4,6 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
 
-# 可在执行前 export 覆盖；不覆盖时使用默认地址
-export QWEN35_27B_ENDPOINT="${QWEN35_27B_ENDPOINT:-http://qwen35-27b-69ca4364.nlp.weibo.com/v2/models/llm/chat/completions}"
-
-echo "[env] QWEN35_27B_ENDPOINT=$QWEN35_27B_ENDPOINT"
-
 echo "[start] 启动后端: http://127.0.0.1:8000"
 uv run uvicorn api:app --reload --port 8000 &
 BACKEND_PID=$!
