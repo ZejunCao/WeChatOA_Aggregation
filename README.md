@@ -105,6 +105,30 @@ uv run uvicorn api:app --reload --port 8000
 cd frontend && npm run dev
 ```
 
+### 4. Docker 部署（推荐用于长期自托管）
+
+仓库已提供 `Dockerfile` + `docker-compose.yml`，构建为单容器、单进程，**前后端同域**通过 `http://127.0.0.1:8000` 访问，`data/` 以 volume 形式挂到宿主持久化。
+
+| 项 | 说明 |
+|----|------|
+| **镜像内容** | Python 3.11 + uv + 项目依赖 + Chromium（无头，供扫码登录） + 前端构建产物 |
+| **入口** | `uvicorn server:app`（见仓库根目录 `server.py`，复用 `api.app` 并挂载前端 dist 与 `/data`） |
+| **端口** | 容器内 `8000`，默认只绑定到宿主 `127.0.0.1:8000`（避免把扫码凭证暴露到公网） |
+| **持久化** | 宿主 `./data` ↔ 容器 `/app/data`；迁移 = 拷贝 `data/` 目录 |
+| **时区** | 默认 `Asia/Shanghai`，可通过 `TZ` 环境变量覆盖 |
+
+```bash
+docker compose up -d --build     # 构建并后台启动
+docker compose logs -f           # 跟随日志
+docker compose down              # 停止并移除容器（data/ 仍保留在宿主）
+```
+
+启动成功后浏览器打开 <http://127.0.0.1:8000> → **配置页 → 扫码登录** 即可使用，和本地跑 `./start_all.sh` 体验一致。
+
+> 首次构建会下载 Chromium 与前端依赖，体积约 1.2~1.5 GB；后续变更代码只会重跑受影响的层。
+>
+> 若需要跨机访问，自行改 `docker-compose.yml` 里的端口映射，并在上游挡一层反向代理 + HTTPS；**不建议将 `8000` 直接暴露到公网**，因为 `data/` 中的 `id_info.json`、`llm_config.json` 含有敏感凭证。
+
 ---
 
 ## 配置说明
@@ -125,8 +149,6 @@ cd frontend && npm run dev
 |------|------|
 | **配置文件** | `data/llm_config.json`，由前端「模型配置」等界面读写；支持多 profile、任务绑定、爬取时是否启用总结/打标、多线程并发档位等。 |
 | **代码入口** | `src/llm/`（如 `llm_config.py`、`article_tagging.py`、`model_client.py`），爬取侧逻辑见 `api.py` 中与 LLM 相关的调用。 |
-
-若你仍使用旧版仅环境变量方式（如 `QWEN35_27B_*`），说明见 **`README.legacy.md`** 第四节表格。
 
 ---
 

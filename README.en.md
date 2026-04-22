@@ -126,8 +126,6 @@ When the session expires, the banner on Config prompts you; scan again to refres
 | **Config file** | `data/llm_config.json`, edited via the **Model config** UI: multiple profiles, task binding, crawl-time summary/tag toggles, multithread preset, etc. |
 | **Code** | `src/llm/` (`llm_config.py`, `article_tagging.py`, `model_client.py`, …); crawl integration in `api.py`. |
 
-Legacy env-only setup (`QWEN35_27B_*`, …) is documented in **`README.legacy.md`** (section 4 table). The legacy file is mostly Chinese.
-
 ---
 
 ## Data & storage
