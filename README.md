@@ -189,5 +189,3 @@ npm run build
 
 - [wechat-article-exporter](https://github.com/jooooock/wechat-article-exporter)
 - [WeChat_Article](https://github.com/1061700625/WeChat_Article)
-
-更多链接与历史段落见 `README.legacy.md`。

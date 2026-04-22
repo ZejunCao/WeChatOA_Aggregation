@@ -190,5 +190,3 @@ Output: `frontend/dist/`. You still need to wire **API + static hosting** (same 
 
 - [wechat-article-exporter](https://github.com/jooooock/wechat-article-exporter)
 - [WeChat_Article](https://github.com/1061700625/WeChat_Article)
-
-More links and history: `README.legacy.md`.
