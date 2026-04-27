@@ -1129,6 +1129,8 @@ onMounted(async () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('mousedown', handleGlobalMouseDown)
   }
+  // 配置页可能在爬取完成后才被打开；主动刷新一次，避免“最近更新”仍显示旧值。
+  await articlesStore.loadData()
   restoreAuthStatusFromCache()
   void checkAuthStatus()
   await resumeCrawlBannerIfRunning()

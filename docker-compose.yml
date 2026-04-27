@@ -1,0 +1,37 @@
+# WeChatOA Aggregation — Docker Compose
+#
+# 用法：
+#   docker compose up -d --build        # 构建并后台启动
+#   docker compose logs -f              # 跟随日志
+#   docker compose down                 # 停止并移除容器（data/ 保留在宿主）
+#   docker compose pull && docker compose up -d  # 拉最新镜像并重启
+#
+# 访问：http://127.0.0.1:8000   （前端 + API 同域，前端使用 hash 路由）
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wechatoa-aggregation:latest
+    container_name: wechatoa-aggregation
+    restart: unless-stopped
+    # 只对本机暴露，避免把扫码凭证与 LLM Key 直接发到公网；
+    # 需要跨机访问时改成 "8000:8000" 或用反向代理 + HTTPS 自行收口。
+    ports:
+      - "127.0.0.1:8000:8000"
+    # 本地自托管持久化：data/ 里包含凭证、文章数据、封面、日志、LLM 配置
+    volumes:
+      - ./data:/app/data
+    environment:
+      - TZ=Asia/Shanghai
+      # LLM 打标 / 摘要配置请在前端「模型配置」页面维护，会写入 data/llm_config.json
+      # （该文件已随 data/ 挂载持久化，重建容器不会丢）
+    # Chromium 在容器里对共享内存敏感，调大 /dev/shm 避免无头截图偶发崩溃
+    shm_size: "1gb"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/docs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
