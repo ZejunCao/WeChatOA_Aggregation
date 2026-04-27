@@ -182,28 +182,8 @@ WeChatOA_Aggregation/
 │   ├── llm/               # 配置读写、打标/摘要、模型客户端
 │   └── utils/             # 数据管理、通用工具
 ├── frontend/              # Vue 3 前端工程
-├── scripts/               # 运维或定时任务示例脚本
-├── figures/               # README 等用图
-└── README.legacy.md       # 历史完整说明备份（TODO、MinHash 实验、长目录树）
+└── figures/               # README 等用图
 ```
-
----
-
-## 生产构建
-
-```bash
-cd frontend
-npm run build
-```
-
-静态资源输出在 `frontend/dist/`。生产部署需自行处理：**API 与静态资源同域或反向代理**、**CORS**、**`data/` 的持久化卷挂载** 等，本仓库不绑定单一部署形态。
-
----
-
-## 扩展阅读与路线图
-
-- **`README.legacy.md`**：保留原 README 的详细功能表、完整 `data/` 目录树、**TODO 路线图**、**MinHash 实验数据**、以及更多参考链接。  
-- 本 README 的章节组织参考了常见大型开源仓库的做法（例如 [MiroFish](https://github.com/666ghj/MiroFish) 的「概述 → 工作流 → 环境表 → 快速启动」分层），内容则严格对应本仓库实际文件与行为。
 
 ---
 
