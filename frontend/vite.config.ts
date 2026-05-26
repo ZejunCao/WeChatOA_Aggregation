@@ -18,6 +18,7 @@ export default defineConfig({
           if (filePath.endsWith('.json')) {
             res.setHeader('Content-Type', 'application/json; charset=utf-8')
             res.setHeader('Access-Control-Allow-Origin', '*')
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
             res.end(fs.readFileSync(filePath))
           } else if (/\.(jpg|jpeg|png|gif|webp)$/i.test(filePath)) {
             const ext = filePath.split('.').pop()!.toLowerCase()

@@ -8,7 +8,9 @@
 
 import json
 import re
+import time
 from dataclasses import asdict
+from typing import Any
 
 import requests
 
@@ -30,10 +32,73 @@ class WechatRequest:
     """
 
     def __init__(self):
-        # 复用全局 headers，再注入当前的 Cookie
-        self.headers = headers
-        self.headers['Cookie'] = data_manager.id_info['cookie']
-        self.token = data_manager.id_info['token']
+        # 独立副本，避免污染全局 headers；每次请求前 sync_credentials 对齐磁盘凭证
+        self.headers = dict(headers)
+        self.sync_credentials()
+
+    def sync_credentials(self) -> None:
+        """从 data_manager 同步 token / cookie（爬取循环中 id_info 可能被更新）。"""
+        self.token = str(data_manager.id_info.get('token') or '')
+        cookie = str(data_manager.id_info.get('cookie') or '').strip()
+        if cookie:
+            self.headers['Cookie'] = cookie
+        elif 'Cookie' in self.headers:
+            del self.headers['Cookie']
+
+    def _mp_get_json(self, url: str, params: dict, *, retries: int = 4) -> dict[str, Any]:
+        """
+        请求微信公众平台 JSON 接口，带重试。
+        空响应 / 非 JSON 多见于 freq control 或瞬时网络问题。
+        """
+        last_err = '微信接口无响应'
+        params = dict(params)
+        params['token'] = self.token
+
+        for attempt in range(retries):
+            self.sync_credentials()
+            resp = requests.get(
+                url=url,
+                params=params,
+                headers=self.headers,
+                timeout=30,
+            )
+            text = (resp.text or '').strip()
+            if not text:
+                last_err = f'微信返回空内容（HTTP {resp.status_code}），可能被限流'
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            try:
+                data = resp.json()
+            except json.JSONDecodeError:
+                preview = text[:120].replace('\n', ' ')
+                last_err = f'微信返回非 JSON（HTTP {resp.status_code}）: {preview}'
+                time.sleep(2.0 * (attempt + 1))
+                continue
+
+            if not isinstance(data, dict):
+                last_err = f'微信返回异常结构: {type(data).__name__}'
+                continue
+
+            if self.session_is_overdue(data):
+                params['token'] = self.token
+                continue
+
+            base = data.get('base_resp') or {}
+            err_msg = str(base.get('err_msg') or '')
+            ret = base.get('ret', 0)
+            if err_msg == 'freq control' or ret in (200013, 200014):
+                last_err = '请求过快，请稍后重试（freq control）'
+                time.sleep(2.5 * (attempt + 1))
+                continue
+            if ret not in (0, None) and err_msg and err_msg not in ('ok', 'success'):
+                last_err = f'微信接口错误: {err_msg} (ret={ret})'
+                if ret in (-1, 200003):
+                    time.sleep(1.5 * (attempt + 1))
+                    continue
+                raise RuntimeError(last_err)
+            return data
+
+        raise RuntimeError(last_err)
 
     def name2fakeid(self, name):
         """
@@ -57,15 +122,9 @@ class WechatRequest:
 
         nickname = {}
         url = 'https://mp.weixin.qq.com/cgi-bin/searchbiz?'
-        response = requests.get(url=url, params=params, headers=self.headers).json()
-
-        # 如果检测到 session 过期，login() 会更新 self.token，然后用新 token 重试
-        if self.session_is_overdue(response):
-            params['token'] = self.token
-            response = requests.get(url=url, params=params, headers=headers).json()
-            self.session_is_overdue(response)
-
-        for l in response['list']:
+        response = self._mp_get_json(url, params)
+        biz_list = response.get('list') or []
+        for l in biz_list:
             nickname[l['nickname']] = l['fakeid']
 
         if name in nickname.keys():
@@ -120,16 +179,20 @@ class WechatRequest:
 
         crawl_message_info = []
         url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
-        response = requests.get(url=url, params=params, headers=headers).json()
+        response = self._mp_get_json(url, params)
 
-        # session 过期时自动登录后重试
-        if self.session_is_overdue(response):
-            params['token'] = self.token
-            response = requests.get(url=url, params=params, headers=headers).json()
-            self.session_is_overdue(response)
+        publish_page = response.get('publish_page')
+        if not publish_page:
+            base = response.get('base_resp') or {}
+            raise RuntimeError(
+                f"无 publish_page: {base.get('err_msg') or base} (ret={base.get('ret')})"
+            )
 
         # 解析返回的 publish_page 字段（JSON 字符串中嵌套 JSON 字符串）
-        messages = json.loads(response['publish_page'])['publish_list']
+        try:
+            messages = json.loads(publish_page)['publish_list']
+        except (json.JSONDecodeError, KeyError, TypeError) as e:
+            raise RuntimeError(f"publish_page 解析失败: {e}") from e
         for message_i in range(len(messages)):
             message = json.loads(messages[message_i]['publish_info'])
             for i in range(len(message['appmsgex'])):
@@ -190,7 +253,7 @@ class WechatRequest:
         注意事项：
         - 此方法会阻塞，直到用户完成扫码或手动关闭浏览器
         - 在 api.py 的后台爬取流程中不会调用此方法（避免在服务进程中打开浏览器）
-        - api.py 的 _run_login() 直接用 DrissionPage 实现了类似逻辑，并支持截图
+        - api.py 的 _run_login() 使用 HTTP 扫码接口（见 src.auth.mp_scan_login）
         """
         from DrissionPage import ChromiumPage, ChromiumOptions
 
@@ -239,7 +302,10 @@ class WechatRequest:
         特殊情况：
         - "freq control"：请求频率过快，抛出异常提示等待
         """
-        err_msg = response['base_resp']['err_msg']
+        base = response.get('base_resp') if isinstance(response, dict) else None
+        if not isinstance(base, dict):
+            return False
+        err_msg = base.get('err_msg') or ''
         if err_msg in ['invalid session', 'invalid csrf token']:
             # 凭证失效，自动登录后调用方应用新的 token 重试
             self.login()

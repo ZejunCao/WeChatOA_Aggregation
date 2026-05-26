@@ -9,7 +9,7 @@
 //   4. 立即爬取（后台任务 + 进度轮询横幅）
 //   5. 缓存清理（预览弹窗 + 确认删除）
 //   6. 凭证状态检测（横幅提示 + 重新检测）
-//   7. 扫码登录（无头 Chrome 截图 + 前端展示弹窗）
+//   7. 扫码登录（后端 HTTP 拉取二维码 + 前端弹窗轮询）
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -246,21 +246,32 @@ const crawlStarting = ref(false)  // 点击按钮后到后端确认启动之间�
 const crawlCancelling = ref(false)
 const showCrawlBanner = ref(false) // 是否展示进度横幅
 let _pollTimer: ReturnType<typeof setInterval> | null = null
+/** 已对哪次 finished_at 做过 loadData，避免重复请求 */
+let _lastReloadedCrawlFinishAt = ''
+
+/** 爬取结束后刷新文章 JSON（与横幅是否关闭无关） */
+async function reloadArticlesAfterCrawl(data: CrawlStatus) {
+  if (data.running || !data.finished_at || data.finished_at === _lastReloadedCrawlFinishAt) {
+    return
+  }
+  _lastReloadedCrawlFinishAt = data.finished_at
+  await articlesStore.loadData()
+  await loadAuthStatus()
+}
 
 /** 轮询爬取进度，爬取完成后自动停止并刷新数据 */
 async function fetchCrawlStatus() {
   try {
-    const res = await fetch('/api/crawl/status')
+    const res = await fetch('/api/crawl/status', { cache: 'no-store' })
     if (res.ok) {
       const data: CrawlStatus = await res.json()
+      const wasRunning = crawlStatus.value.running
       crawlStatus.value = data
-      // 爬取完成（running=false 且有结束时间）时自动收尾
-      if (!data.running && showCrawlBanner.value && data.finished_at) {
-        await articlesStore.loadData()  // 重新加载文章数据，展示新爬取的内容
+      await reloadArticlesAfterCrawl(data)
+      // 爬取刚结束：停止轮询（即使用户已关闭横幅）
+      if (wasRunning && !data.running && data.finished_at) {
         stopPolling()
         crawlCancelling.value = false
-        // 后端在爬取结束时已更新 _auth_state，直接读缓存同步前端显示
-        await loadAuthStatus()
       }
     }
   } catch { /* 忽略轮询网络错误，下次轮询会自动重试 */ }
@@ -333,11 +344,13 @@ async function cancelCrawl() {
   }
 }
 
-/** 用户手动关闭进度横幅（不影响后台爬取任务的继续运行） */
+/** 用户手动关闭进度横幅；后台爬取继续时保留轮询以便结束后刷新数据 */
 function dismissCrawlBanner() {
-  stopPolling()
   showCrawlBanner.value = false
-  crawlStatus.value = { ...defaultCrawlStatus }
+  if (!crawlStatus.value.running) {
+    stopPolling()
+    crawlStatus.value = { ...defaultCrawlStatus }
+  }
 }
 
 // 组件卸载时清理所有轮询定时器，避免内存泄漏
@@ -1149,9 +1162,16 @@ watch(configTab, (t) => {
 const showLoginModal = ref(false)
 const loginPending = ref(false)     // 正在等待扫码
 const loginError = ref('')
-const qrcodeImg = ref('')           // 最新二维码截图（base64）
-const qrcodeAt = ref('')            // 截图时间
+const loginScanStatus = ref(-1)     // 与 mp ask 的 status 对齐；-1 未扫码
+const loginScanMessage = ref('')    // 后端轮询 ask 返回的提示文案
+const qrcodeImg = ref('')           // 最新二维码（base64）
+const qrcodeAt = ref('')            // 二维码更新时间
 const qrcodeLoading = ref(true)     // 二维码尚未就绪
+
+/** 已扫码待手机确认（exporter 在此阶段会隐藏二维码） */
+const loginAwaitingConfirm = computed(
+  () => loginScanStatus.value === 4 || loginScanStatus.value === 6,
+)
 
 let _loginPollTimer: ReturnType<typeof setInterval> | null = null
 let _qrcodePollTimer: ReturnType<typeof setInterval> | null = null
@@ -1180,7 +1200,16 @@ async function pollLoginStatus() {
     const res = await fetch('/api/auth/login/status')
     if (!res.ok) return
     const data = await res.json()
-    if (!data.running && data.done) {
+    if (data.running) {
+      if (typeof data.scan_status === 'number') {
+        loginScanStatus.value = data.scan_status
+      }
+      if (data.scan_message) {
+        loginScanMessage.value = data.scan_message
+      }
+      return
+    }
+    if (data.done) {
       stopLoginPoll()
       loginPending.value = false
       if (data.error) {
@@ -1197,6 +1226,8 @@ async function startLogin() {
   if (loginPending.value) return
   loginPending.value = true
   loginError.value = ''
+  loginScanStatus.value = -1
+  loginScanMessage.value = '正在启动登录…'
   qrcodeImg.value = ''
   qrcodeLoading.value = true
   showLoginModal.value = true
@@ -1210,7 +1241,7 @@ async function startLogin() {
     await fetchQrcode()
     _qrcodePollTimer = setInterval(fetchQrcode, 2000)
     // 每 2 秒检查是否扫码完成
-    _loginPollTimer = setInterval(pollLoginStatus, 2000)
+    _loginPollTimer = setInterval(pollLoginStatus, 1500)
   } catch {
     loginPending.value = false
     showLoginModal.value = false
@@ -1218,8 +1249,13 @@ async function startLogin() {
   }
 }
 
+function canCloseLoginModal() {
+  return !qrcodeLoading.value || !!loginError.value
+}
+
 function closeLoginModal() {
-  if (loginPending.value) return   // 扫码过程中不允许关闭
+  if (!canCloseLoginModal()) return
+  loginPending.value = false
   showLoginModal.value = false
   stopLoginPoll()
 }
@@ -2358,7 +2394,9 @@ async function doCacheClear() {
                 <h3 class="text-sm font-semibold text-[var(--color-foreground)]">扫码登录微信公众平台</h3>
               </div>
               <button
-                v-if="!loginPending"
+                v-if="canCloseLoginModal()"
+                type="button"
+                aria-label="关闭"
                 @click="closeLoginModal"
                 class="rounded-md p-1 text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] transition-colors"
               >
@@ -2377,9 +2415,18 @@ async function doCacheClear() {
                 <span class="text-xs">正在加载二维码...</span>
               </div>
 
+              <!-- 已扫码：等待手机确认（与 exporter 一致，隐藏二维码） -->
+              <div
+                v-else-if="loginAwaitingConfirm"
+                class="h-56 w-56 flex flex-col items-center justify-center gap-3 rounded-xl bg-[var(--color-muted)]/30 text-[var(--color-foreground)] px-4 text-center"
+              >
+                <Loader2 class="h-8 w-8 animate-spin text-[var(--color-primary)]" />
+                <span class="text-sm font-medium">{{ loginScanMessage || '扫码成功，请在手机上确认登录' }}</span>
+              </div>
+
               <!-- 二维码图片 -->
               <img
-                v-else-if="qrcodeImg"
+                v-else-if="qrcodeImg && !loginAwaitingConfirm"
                 :src="qrcodeImg"
                 alt="微信登录二维码"
                 class="h-56 w-56 rounded-xl object-cover border border-[var(--color-border)]"
@@ -2394,9 +2441,24 @@ async function doCacheClear() {
               </div>
 
               <div v-if="!loginError" class="text-center space-y-1">
-                <p class="text-sm text-[var(--color-foreground)]">用微信扫一扫登录</p>
-                <p class="text-xs text-[var(--color-muted-foreground)]">登录后 token 和 cookie 将自动保存</p>
-                <p v-if="qrcodeAt" class="text-xs text-[var(--color-muted-foreground)] opacity-60">截图更新于 {{ qrcodeAt }}</p>
+                <p
+                  class="text-sm font-medium"
+                  :class="loginScanStatus === 1 ? 'text-[var(--color-primary)]' : 'text-[var(--color-foreground)]'"
+                >
+                  {{ loginScanMessage || (qrcodeLoading ? '正在加载二维码…' : '请使用微信扫一扫登录') }}
+                </p>
+                <p
+                  v-if="!loginAwaitingConfirm && loginScanStatus !== 1"
+                  class="text-xs text-[var(--color-muted-foreground)]"
+                >
+                  登录后 token 和 cookie 将自动保存
+                </p>
+                <p
+                  v-if="qrcodeAt && !loginAwaitingConfirm && loginScanStatus <= 0"
+                  class="text-xs text-[var(--color-muted-foreground)] opacity-60"
+                >
+                  二维码更新于 {{ qrcodeAt }}
+                </p>
               </div>
 
               <!-- 出错后可重试 -->

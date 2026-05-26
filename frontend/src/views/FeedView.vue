@@ -9,7 +9,7 @@
 //   - 提供"全部已读"快捷操作
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { ref, computed, watch, onMounted, onUnmounted, nextTick, TransitionGroup } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, onActivated, nextTick, TransitionGroup } from 'vue'
 import { Loader2, AlertCircle, Inbox, CheckCheck } from 'lucide-vue-next'
 import { useArticlesStore } from '@/stores/articles'
 import { useReadingStore } from '@/stores/reading'
@@ -81,6 +81,10 @@ const displayedCount = computed(() => displayedGroups.value.reduce((s, g) => s +
 const hasMore = computed(() => displayedCount.value < totalCount.value)
 
 onMounted(() => {
+  // 每次进入文章页都主动拉最新数据，避免与配置页状态不同步
+  // （例如：爬取在其它页面完成、或 Docker 场景下前端状态未及时刷新）
+  void articlesStore.loadData()
+
   observer = new IntersectionObserver(
     (entries) => {
       if (entries[0]?.isIntersecting && hasMore.value) {
@@ -90,6 +94,11 @@ onMounted(() => {
     { root: scrollRef.value, rootMargin: '200px' },
   )
   if (sentinelRef.value) observer.observe(sentinelRef.value)
+})
+
+// 若 Router 使用 keep-alive，重新激活文章页时也强制同步一次数据
+onActivated(() => {
+  void articlesStore.loadData()
 })
 
 // sentinel 可能在 onMounted 之后才渲染（条件渲染），需要 watch 补充观察

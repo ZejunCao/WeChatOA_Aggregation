@@ -23,14 +23,19 @@ export const useArticlesStore = defineStore('articles', () => {
   const error = ref<string | null>(null)      // 加载失败的错误信息
 
   // ── 数据加载 ─────────────────────────────────────────────────────────────────
+  /** 避免浏览器缓存静态 JSON（爬取写入磁盘后前端仍读到旧数据） */
+  function dataJsonUrl(path: string) {
+    return `${path}?t=${Date.now()}`
+  }
+
   async function loadData() {
     loading.value = true
     error.value = null
     try {
-      // 并发请求两个文件，减少等待时间
+      // 并发请求两个文件，减少等待时间；cache: no-store + 时间戳参数双保险
       const [msgRes, nameRes] = await Promise.all([
-        fetch('/data/message_info.json'),
-        fetch('/data/name2fakeid.json'),
+        fetch(dataJsonUrl('/data/message_info.json'), { cache: 'no-store' }),
+        fetch(dataJsonUrl('/data/name2fakeid.json'), { cache: 'no-store' }),
       ])
       if (!msgRes.ok) throw new Error('无法加载文章数据')
       if (!nameRes.ok) throw new Error('无法加载公众号数据')
@@ -113,7 +118,7 @@ export const useArticlesStore = defineStore('articles', () => {
    */
   async function reloadAccounts() {
     try {
-      const nameRes = await fetch('/data/name2fakeid.json')
+      const nameRes = await fetch(dataJsonUrl('/data/name2fakeid.json'), { cache: 'no-store' })
       if (nameRes.ok) name2fakeid.value = await nameRes.json()
     } catch {
       // 静默失败，不影响页面正常显示
