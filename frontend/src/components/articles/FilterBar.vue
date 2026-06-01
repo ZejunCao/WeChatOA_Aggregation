@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Search, X, Tags, LayoutGrid, List, Bookmark, BookmarkCheck, Circle } from 'lucide-vue-next'
+import { Search, X, Tags, LayoutGrid, List, Bookmark, BookmarkCheck, Circle, Link2 } from 'lucide-vue-next'
 import { useArticlesStore } from '@/stores/articles'
 import { useReadingStore } from '@/stores/reading'
 import { TAG_UNTAGGED, type FilterState, type SortOrder, type ReadFilter } from '@/types'
@@ -12,6 +12,7 @@ import {
 } from '@/lib/tagCategories'
 import Dropdown from '@/components/ui/Dropdown.vue'
 import DateRangePicker from '@/components/ui/DateRangePicker.vue'
+import ImportLinkPopover from '@/components/articles/ImportLinkPopover.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -28,6 +29,7 @@ const emit = defineEmits<{
   'update:filters': [value: FilterState]
   'update:viewMode': [value: 'grid' | 'list']
   reset: []
+  'link-imported': [payload: { articleId: string; status: 'created' | 'exists' }]
 }>()
 
 const articlesStore = useArticlesStore()
@@ -53,7 +55,16 @@ const readTabs: { value: ReadFilter; label: string; icon: unknown }[] = [
   { value: 'all',        label: '全部',   icon: Circle },
   { value: 'unread',     label: '未读',   icon: Circle },
   { value: 'bookmarked', label: '收藏',   icon: Bookmark },
+  { value: 'imported',   label: '导入',   icon: Link2 },
 ]
+
+function selectReadTab(value: ReadFilter) {
+  const next: FilterState = { ...props.filters, readFilter: value }
+  if (value === 'imported') {
+    next.accounts = []
+  }
+  emit('update:filters', next)
+}
 
 function update<K extends keyof FilterState>(key: K, value: FilterState[K]) {
   emit('update:filters', { ...props.filters, [key]: value })
@@ -158,7 +169,7 @@ function tagChipClasses(tagValue: string) {
         v-for="tab in readTabs"
         :key="tab.value"
         type="button"
-        @click="update('readFilter', tab.value)"
+        @click="selectReadTab(tab.value)"
         class="relative inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
         :class="glass
           ? ['feed-pill', filters.readFilter === tab.value ? 'is-active' : '']
@@ -170,6 +181,7 @@ function tagChipClasses(tagValue: string) {
             ]"
       >
         <BookmarkCheck v-if="tab.value === 'bookmarked'" class="h-3.5 w-3.5" />
+        <Link2 v-else-if="tab.value === 'imported'" class="h-3.5 w-3.5" />
         <span
           v-else-if="tab.value === 'unread' && readingStore.unreadCount > 0"
           class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] px-1.5 text-[10px] font-bold tabular-nums leading-none text-white"
@@ -179,6 +191,10 @@ function tagChipClasses(tagValue: string) {
           v-if="tab.value === 'bookmarked' && readingStore.bookmarkCount > 0"
           class="rounded-full bg-[var(--color-primary)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]"
         >{{ readingStore.bookmarkCount }}</span>
+        <span
+          v-if="tab.value === 'imported' && articlesStore.importTotalCount > 0"
+          class="rounded-full bg-[var(--color-primary)]/15 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]"
+        >{{ articlesStore.importTotalCount }}</span>
       </button>
     </div>
 
@@ -205,6 +221,8 @@ function tagChipClasses(tagValue: string) {
           <X class="h-3.5 w-3.5" />
         </button>
       </div>
+
+      <ImportLinkPopover :glass="glass" @imported="emit('link-imported', $event)" />
 
       <!-- Date range picker -->
       <DateRangePicker

@@ -22,6 +22,11 @@ export interface Article {
   /** SQLite：用户阅读/收藏状态（由 API 返回） */
   is_read?: boolean
   starred?: boolean
+
+  /** SQLite：进库来源 crawl=订阅抓取，import=纯链接导入（不可变） */
+  source?: 'crawl' | 'import'
+  /** SQLite：是否出现在「导入」分栏 */
+  import_listed?: boolean
 }
 
 // ── 单个公众号的文章集合（message_info.json 中每个 key 对应的 value） ────────
@@ -54,7 +59,7 @@ export type SortOrder = 'newest' | 'oldest'  // 最新优先 / 最早优先
 export type GroupBy = 'date' | 'account' | 'none'  // 按日期 / 按公众号 / 不分组
 
 // 已读/收藏筛选
-export type ReadFilter = 'all' | 'unread' | 'bookmarked'  // 全部 / 未读 / 已收藏
+export type ReadFilter = 'all' | 'unread' | 'bookmarked' | 'imported'  // 全部 / 未读 / 收藏 / 链接导入
 
 // 标签筛选中的特殊值：表示“未打标签”的文章
 export const TAG_UNTAGGED = '__untagged__'

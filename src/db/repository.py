@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from src.db.body_text import normalize_body_text
-from src.db.connection import DATA_DIR, get_connection, init_database
+from src.db.connection import DATA_DIR, ensure_database_ready, get_connection
 from src.db import fts as fts_mod
 from src.utils.helpers import time_now
 
@@ -41,8 +41,8 @@ def _cover_path_for_id(article_id: str) -> str | None:
 class ArticleRepository:
     def __init__(self, conn: sqlite3.Connection | None = None) -> None:
         self._own_conn = conn is None
+        ensure_database_ready()
         self.conn = conn or get_connection()
-        init_database(self.conn)
 
     def close(self) -> None:
         if self._own_conn:
@@ -144,6 +144,10 @@ class ArticleRepository:
             item["is_read"] = bool(row["is_read"])
         if "starred" in keys:
             item["starred"] = bool(row["starred"])
+        if "source" in keys:
+            item["source"] = str(row["source"] or "crawl")
+        if "import_listed" in keys:
+            item["import_listed"] = bool(row["import_listed"])
         return item
 
     def upsert_article_from_blog(
@@ -152,6 +156,7 @@ class ArticleRepository:
         blog: dict[str, Any],
         *,
         update_fts: bool = True,
+        source: str = "crawl",
     ) -> None:
         aid = str(blog.get("id") or "").strip()
         if not aid:
@@ -160,13 +165,16 @@ class ArticleRepository:
         create_time = str(blog.get("create_time") or "")
         cover_url = str(blog.get("cover") or "")
         cover_path = _cover_path_for_id(aid)
+        article_source = "import" if source == "import" else "crawl"
+        import_listed = 1 if source == "import" else 0
         self.conn.execute(
             """
             INSERT INTO articles (
               id, account_name, title, digest, link, cover_url, cover_path,
               create_time, create_time_unix, is_wx_deleted, is_user_deleted,
-              item_show_type, llm_summary, word_count, ingested_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
+              item_show_type, llm_summary, word_count, ingested_at, updated_at,
+              source, import_listed
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
               account_name=excluded.account_name,
               title=excluded.title,
@@ -180,7 +188,12 @@ class ArticleRepository:
               item_show_type=excluded.item_show_type,
               llm_summary=COALESCE(excluded.llm_summary, articles.llm_summary),
               word_count=COALESCE(excluded.word_count, articles.word_count),
-              updated_at=excluded.updated_at
+              updated_at=excluded.updated_at,
+              source=articles.source,
+              import_listed=CASE
+                WHEN excluded.import_listed = 1 THEN 1
+                ELSE articles.import_listed
+              END
             """,
             (
                 aid,
@@ -198,6 +211,8 @@ class ArticleRepository:
                 blog.get("word_count"),
                 now,
                 now,
+                article_source,
+                import_listed,
             ),
         )
         tags = blog.get("tags")
@@ -271,6 +286,40 @@ class ArticleRepository:
             (article_id,),
         ).fetchone()
         return row["body_text"] if row else None
+
+    def get_body_html(self, article_id: str) -> str | None:
+        row = self.conn.execute(
+            "SELECT body_html FROM article_bodies WHERE article_id=?",
+            (article_id,),
+        ).fetchone()
+        if not row:
+            return None
+        html = row["body_html"]
+        return html if html else None
+
+    def has_body_html(self, article_id: str) -> bool:
+        row = self.conn.execute(
+            """
+            SELECT 1 FROM article_bodies
+            WHERE article_id=? AND body_html IS NOT NULL AND length(trim(body_html)) > 0
+            LIMIT 1
+            """,
+            (article_id,),
+        ).fetchone()
+        return row is not None
+
+    def set_body_html(self, article_id: str, html: str) -> None:
+        now = time_now()
+        self.conn.execute(
+            """
+            INSERT INTO article_bodies (article_id, body_text, body_html, source_kind, fetched_at, updated_at)
+            VALUES (?, '', ?, 'crawl', ?, ?)
+            ON CONFLICT(article_id) DO UPDATE SET
+              body_html=excluded.body_html,
+              updated_at=excluded.updated_at
+            """,
+            (article_id, html, now, now),
+        )
 
     def has_body(self, article_id: str) -> bool:
         row = self.conn.execute(
@@ -361,8 +410,11 @@ class ArticleRepository:
         cursor: str | None = None,
         read_filter: str | None = None,
         starred_only: bool = False,
+        import_only: bool = False,
     ) -> tuple[str, list[str], list[Any]]:
         where = ["ar.is_wx_deleted=0", "ar.is_user_deleted=0"]
+        if import_only:
+            where.append("ar.import_listed=1")
         params: list[Any] = []
         need_ann = bool(read_filter) or starred_only
 
@@ -433,6 +485,7 @@ class ArticleRepository:
         article_ids: list[str] | None = None,
         read_filter: str | None = None,
         starred_only: bool = False,
+        import_only: bool = False,
     ) -> int:
         if article_ids is not None and not article_ids:
             return 0
@@ -444,6 +497,7 @@ class ArticleRepository:
             article_ids=article_ids,
             read_filter=read_filter,
             starred_only=starred_only,
+            import_only=import_only,
         )
         row = self.conn.execute(
             f"SELECT COUNT(*) AS c {from_sql} WHERE {' AND '.join(where)}",
@@ -463,6 +517,7 @@ class ArticleRepository:
         article_ids: list[str] | None = None,
         read_filter: str | None = None,
         starred_only: bool = False,
+        import_only: bool = False,
     ) -> tuple[list[dict[str, Any]], str | None]:
         limit = max(1, min(limit, 100))
         from_sql, where, params = self._articles_where(
@@ -474,6 +529,7 @@ class ArticleRepository:
             cursor=cursor,
             read_filter=read_filter,
             starred_only=starred_only,
+            import_only=import_only,
         )
         if article_ids is not None and not article_ids:
             return [], None
@@ -508,6 +564,7 @@ class ArticleRepository:
         account: str | None = None,
         read_filter: str | None = None,
         starred_only: bool = False,
+        import_only: bool = False,
     ) -> tuple[list[dict[str, Any]], str | None]:
         ids = fts_mod.search_article_ids(self.conn, query, limit=500)
         if not ids:
@@ -519,7 +576,57 @@ class ArticleRepository:
             article_ids=ids,
             read_filter=read_filter,
             starred_only=starred_only,
+            import_only=import_only,
         )
+
+    def find_article_by_link(self, link: str) -> dict[str, Any] | None:
+        row = self.conn.execute(
+            "SELECT id, account_name, title, link FROM articles WHERE link=? AND is_user_deleted=0",
+            (link.strip(),),
+        ).fetchone()
+        if not row:
+            return None
+        return dict(row)
+
+    def mark_article_as_imported(self, article_id: str) -> None:
+        """链接导入命中已存在文章时，仅加入「导入」列表，不改变 origin。"""
+        self.conn.execute(
+            """
+            UPDATE articles SET import_listed=1, updated_at=?
+            WHERE id=? AND is_user_deleted=0
+            """,
+            (time_now(), article_id),
+        )
+
+    def remove_from_import(self, article_id: str, account: str) -> str | None:
+        """
+        从「导入」移出。
+        - origin=import：彻底删除
+        - origin=crawl：仅 import_listed=0
+        返回 'deleted' | 'unlisted'；不存在时返回 None。
+        """
+        row = self.conn.execute(
+            """
+            SELECT id, source FROM articles
+            WHERE id=? AND account_name=? AND is_user_deleted=0
+            """,
+            (article_id, account),
+        ).fetchone()
+        if not row:
+            return None
+        origin = str(row["source"] or "crawl")
+        if origin == "import":
+            if not self.remove_article(article_id, account):
+                return None
+            return "deleted"
+        self.conn.execute(
+            """
+            UPDATE articles SET import_listed=0, updated_at=?
+            WHERE id=? AND account_name=?
+            """,
+            (time_now(), article_id, account),
+        )
+        return "unlisted"
 
     def get_article_detail(self, article_id: str) -> dict[str, Any] | None:
         row = self.conn.execute(
@@ -537,6 +644,7 @@ class ArticleRepository:
             return None
         item = self.row_to_feed_item(row)
         item["body_text"] = self.get_body_text(article_id) or ""
+        item["body_html"] = self.get_body_html(article_id) or ""
         return item
 
     def all_llm_tags(self) -> list[str]:

@@ -4,9 +4,13 @@
 from __future__ import annotations
 
 import sqlite3
+import threading
 from pathlib import Path
 
-SCHEMA_VERSION = 2
+_init_lock = threading.Lock()
+_db_ready = False
+
+SCHEMA_VERSION = 5
 
 _BASE = Path(__file__).resolve().parents[2]
 DATA_DIR = _BASE / "data"
@@ -35,13 +39,13 @@ def get_connection(*, readonly: bool = False) -> sqlite3.Connection:
     return conn
 
 
-def init_database(conn: sqlite3.Connection | None = None) -> None:
-    own = conn is None
-    conn = conn or get_connection()
-    schema_sql = _SCHEMA_FILE.read_text(encoding="utf-8")
-    conn.executescript(schema_sql)
+def _apply_schema_and_migrations(conn: sqlite3.Connection) -> None:
     from src.db.migrations import apply_migrations
 
+    # 旧库先迁移（补列），再跑 schema.sql；否则 CREATE INDEX 可能因列不存在而失败
+    apply_migrations(conn)
+    schema_sql = _SCHEMA_FILE.read_text(encoding="utf-8")
+    conn.executescript(schema_sql)
     apply_migrations(conn)
     row = conn.execute(
         "SELECT MAX(version) AS v FROM schema_migrations"
@@ -57,8 +61,30 @@ def init_database(conn: sqlite3.Connection | None = None) -> None:
             (SCHEMA_VERSION, time_now()),
         )
         conn.commit()
-    if own:
-        conn.close()
+
+
+def ensure_database_ready() -> None:
+    """进程内只初始化一次，避免每个请求重复 executescript 抢锁。"""
+    global _db_ready
+    if _db_ready:
+        return
+    with _init_lock:
+        if _db_ready:
+            return
+        conn = get_connection()
+        try:
+            _apply_schema_and_migrations(conn)
+        finally:
+            conn.close()
+        _db_ready = True
+
+
+def init_database(conn: sqlite3.Connection | None = None) -> None:
+    """初始化 schema/迁移。传入 conn 时在该连接上执行；否则进程内只执行一次。"""
+    if conn is not None:
+        _apply_schema_and_migrations(conn)
+        return
+    ensure_database_ready()
 
 
 def database_exists() -> bool:

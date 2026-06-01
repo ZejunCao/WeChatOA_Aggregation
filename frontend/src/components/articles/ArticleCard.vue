@@ -8,32 +8,27 @@
 
 import { computed, ref } from 'vue'
 import { TooltipContent, TooltipPortal, TooltipRoot, TooltipTrigger } from 'reka-ui'
-import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, Loader2 } from 'lucide-vue-next'
+import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, LogOut, Loader2 } from 'lucide-vue-next'
 import type { Article } from '@/types'
 import { useReadingStore } from '@/stores/reading'
-import { useArticlesStore } from '@/stores/articles'
+import { useArticleOpen } from '@/composables/useArticleOpen'
+import { useArticleRemove } from '@/composables/useArticleRemove'
 
 const props = defineProps<{
   article: Article & { account: string }  // 文章数据 + 所属公众号名称
+  importMode?: boolean
 }>()
 
 const readingStore = useReadingStore()
-const articlesStore = useArticlesStore()
-const removing = ref(false)
+const { onArticleClick, onArticleKeydown } = useArticleOpen()
+const { removing, handleRemove } = useArticleRemove(
+  () => props.article,
+  () => !!props.importMode,
+)
 
 // 当前文章的已读/收藏状态（响应式，store 变化时自动更新）
 const isRead = computed(() => readingStore.isRead(props.article.id))
 const isBookmarked = computed(() => readingStore.isBookmarked(props.article.id))
-
-/** 点击卡片跳转原文时，标记为已读（划词选中后松手会触发 click，需避免误跳转） */
-function handleClick(e: MouseEvent) {
-  const sel = window.getSelection()
-  if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-    e.preventDefault()
-    return
-  }
-  readingStore.markRead(props.article.id)
-}
 
 /**
  * 切换收藏状态。
@@ -44,41 +39,6 @@ function toggleBookmark(e: MouseEvent) {
   e.preventDefault()
   e.stopPropagation()
   readingStore.toggleBookmark(props.article.id)
-}
-
-/** 从本地列表删除并写入黑名单，后续爬取会跳过该 id */
-async function removeArticle(e: MouseEvent) {
-  e.preventDefault()
-  e.stopPropagation()
-  if (
-    !confirm(
-      `从列表中删除「${props.article.title}」？\n将从本地数据移除，且以后爬取也不会再入库。`,
-    )
-  ) {
-    return
-  }
-  removing.value = true
-  try {
-    const res = await fetch('/api/articles/remove', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        article_id: props.article.id,
-        account: props.article.account,
-      }),
-    })
-    const data = (await res.json().catch(() => ({}))) as { detail?: string }
-    if (!res.ok) {
-      alert(data.detail || '删除失败')
-      return
-    }
-    readingStore.removeArticleTracking(props.article.id)
-    articlesStore.removeArticleLocally(props.article.account, props.article.id)
-  } catch {
-    alert('无法连接后端，请确认 api.py 已启动')
-  } finally {
-    removing.value = false
-  }
 }
 
 /**
@@ -122,14 +82,14 @@ function tagToneClass(i: number) {
 </script>
 
 <template>
-   <a
-    :href="article.link"
-    target="_blank"
-    rel="noopener noreferrer"
+  <div
+    role="button"
+    tabindex="0"
     draggable="false"
-    class="group relative article-glass-card"
+    class="group relative article-glass-card cursor-pointer"
     :class="isRead ? 'is-read' : ''"
-    @click="handleClick"
+    @click="onArticleClick($event, article)"
+    @keydown="onArticleKeydown($event, article)"
   >
     <!-- 封面图区域（16:9 比例） -->
     <div class="article-glass-cover bg-[var(--color-muted)] shrink-0">
@@ -165,15 +125,20 @@ function tagToneClass(i: number) {
             type="button"
             class="article-glass-btn-icon article-glass-btn-icon--del disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="removing"
-            @click="removeArticle"
+            @click="handleRemove"
           >
             <Loader2 v-if="removing" class="h-3.5 w-3.5 animate-spin" />
+            <LogOut v-else-if="importMode" class="h-[13px] w-[13px]" />
             <Trash2 v-else class="h-[13px] w-[13px]" />
           </button>
         </TooltipTrigger>
         <TooltipPortal>
           <TooltipContent side="right" :side-offset="8" class="article-action-tooltip">
-            从列表中删除此文，并不再抓取
+            {{
+              importMode
+                ? (article.source === 'import' ? '移出导入并删除' : '从导入列表移出')
+                : '从列表中删除此文，并不再抓取'
+            }}
           </TooltipContent>
         </TooltipPortal>
       </TooltipRoot>
@@ -247,5 +212,5 @@ function tagToneClass(i: number) {
         </div>
       </div>
     </div>
-  </a>
+  </div>
 </template>

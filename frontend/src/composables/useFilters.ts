@@ -73,12 +73,14 @@ export function useFilters() {
       list = list.filter((a) => a.create_time <= filters.dateTo + ' 23:59')
     }
 
-    // 第六步：已读/收藏（SQLite 已由 API 筛选；JSON 模式在客户端筛）
+    // 第六步：已读/收藏/导入（SQLite 已由 API 筛选；JSON 模式在客户端筛）
     if (!articlesStore.isSqlite) {
       if (filters.readFilter === 'unread') {
         list = list.filter((a) => !readingStore.isRead(a.id))
       } else if (filters.readFilter === 'bookmarked') {
         list = list.filter((a) => readingStore.isBookmarked(a.id))
+      } else if (filters.readFilter === 'imported') {
+        list = list.filter((a) => a.source === 'import')
       }
     }
     // 'all' 时不过滤

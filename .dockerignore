@@ -1,0 +1,42 @@
+# ── 版本控制与 IDE ───────────────────────────────────────────────
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+.cursor
+
+# ── Python ───────────────────────────────────────────────────────
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.venv
+venv
+.python-version
+
+# ── Node / 前端 ──────────────────────────────────────────────────
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+# ── 本地数据与机密 ───────────────────────────────────────────────
+# data/ 应该以 volume 形式挂进容器，不随镜像打包
+data
+demo
+
+# ── 文档与杂物 ───────────────────────────────────────────────────
+figures
+*.md
+!README.md
+test.ipynb
+1.md
+uv.lock.backup
+
+# ── 系统噪音 ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.log

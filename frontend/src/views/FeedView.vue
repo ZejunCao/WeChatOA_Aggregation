@@ -18,6 +18,7 @@ import { useFilters } from '@/composables/useFilters'
 import FilterBar from '@/components/articles/FilterBar.vue'
 import ArticleCard from '@/components/articles/ArticleCard.vue'
 import ArticleRow from '@/components/articles/ArticleRow.vue'
+import { useArticlePreviewStore } from '@/stores/articlePreview'
 
 // selectedAccount：侧边栏点击公众号时传入，用于快速筛选该公众号的文章
 const props = defineProps<{
@@ -32,16 +33,35 @@ const emit = defineEmits<{
 const articlesStore = useArticlesStore()
 const readingStore = useReadingStore()
 const configStore = useConfigStore()
+const previewStore = useArticlePreviewStore()
 
 /** 与 demo/index.html 一致：四块色团 + 同源 CSS（data-feed-theme="demo-glass"） */
 const isDemoGlassFeed = computed(() => configStore.feedTheme === 'demo-glass')
 // useFilters 提供响应式筛选条件和计算后的文章列表
 const { filters, filteredArticles, groupedArticles, resetFilters, activeFilterCount } = useFilters()
 
+watch(
+  filteredArticles,
+  (list) => {
+    previewStore.setNavigationIds(list.map((a) => a.id))
+  },
+  { immediate: true },
+)
+
 /** 将当前视图（筛选后）所有文章标为已读 */
 function markAllReadInView() {
   const ids = filteredArticles.value.map((a) => a.id)
   readingStore.markAllRead(ids)
+}
+
+async function onLinkImported(payload: { articleId: string }) {
+  filters.readFilter = 'imported'
+  filters.accounts = []
+  await articlesStore.loadData(filters)
+  const article = articlesStore.allArticles.find((a) => a.id === payload.articleId)
+  if (article) {
+    void previewStore.openPreview(article)
+  }
 }
 
 // 视图模式：'grid'=卡片视图（多列）/ 'list'=列表视图（单列紧凑）
@@ -226,10 +246,23 @@ function onThumbMouseup() {
 }
 
 // ── 侧边栏 ↔ FilterBar 双向同步 ───────────────────────────────────────────────
+watch(
+  () => filters.readFilter,
+  (v) => {
+    if (v === 'imported') {
+      filters.accounts = []
+      if (props.selectedAccount) emit('update:selectedAccount', '')
+    }
+  },
+)
+
 // 侧边栏点击公众号 → selectedAccount prop 变化 → 同步到 filters.accounts
 watch(
   () => props.selectedAccount,
   (val) => {
+    if (val && filters.readFilter === 'imported') {
+      filters.readFilter = 'all'
+    }
     filters.accounts = val ? [val] : []
   },
 )
@@ -277,7 +310,13 @@ function handleReset() {
       <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 class="feed-title">
-            {{ filters.accounts.length === 1 ? filters.accounts[0] : '全部文章' }}
+            {{
+              filters.readFilter === 'imported'
+                ? '链接导入'
+                : filters.accounts.length === 1
+                  ? filters.accounts[0]
+                  : '全部文章'
+            }}
           </h1>
           <p class="feed-subtitle">
             共 <strong>{{ totalCount }}</strong> 篇
@@ -287,7 +326,7 @@ function handleReset() {
           </p>
         </div>
         <button
-          v-if="filters.readFilter !== 'bookmarked' && totalCount > 0"
+          v-if="filters.readFilter !== 'bookmarked' && filters.readFilter !== 'imported' && totalCount > 0"
           type="button"
           @click="markAllReadInView"
           class="feed-mark-all-btn"
@@ -305,6 +344,7 @@ function handleReset() {
         @update:filters="Object.assign(filters, $event)"
         @update:viewMode="viewMode = $event"
         @reset="handleReset"
+        @link-imported="onLinkImported"
       />
       </div>
     </div>
@@ -366,7 +406,12 @@ function handleReset() {
                 : 'relative grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
             "
           >
-            <ArticleCard v-for="article in group.articles" :key="article.id" :article="article" />
+            <ArticleCard
+              v-for="article in group.articles"
+              :key="article.id"
+              :article="article"
+              :import-mode="filters.readFilter === 'imported'"
+            />
           </TransitionGroup>
 
           <!-- List view -->
@@ -376,7 +421,12 @@ function handleReset() {
             tag="div"
             class="relative flex flex-col gap-2"
           >
-            <ArticleRow v-for="article in group.articles" :key="article.id" :article="article" />
+            <ArticleRow
+              v-for="article in group.articles"
+              :key="article.id"
+              :article="article"
+              :import-mode="filters.readFilter === 'imported'"
+            />
           </TransitionGroup>
         </div>
 

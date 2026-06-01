@@ -8,72 +8,33 @@
 
 import { computed, ref } from 'vue'
 import { TooltipContent, TooltipPortal, TooltipRoot, TooltipTrigger } from 'reka-ui'
-import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, Loader2 } from 'lucide-vue-next'
+import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, LogOut, Loader2 } from 'lucide-vue-next'
 import type { Article } from '@/types'
 import { useReadingStore } from '@/stores/reading'
-import { useArticlesStore } from '@/stores/articles'
+import { useArticleOpen } from '@/composables/useArticleOpen'
+import { useArticleRemove } from '@/composables/useArticleRemove'
 
 const props = defineProps<{
   article: Article & { account: string }
+  importMode?: boolean
 }>()
 
 const readingStore = useReadingStore()
-const articlesStore = useArticlesStore()
-const removing = ref(false)
+const { onArticleClick, onArticleKeydown } = useArticleOpen()
+const { removing, handleRemove } = useArticleRemove(
+  () => props.article,
+  () => !!props.importMode,
+)
 
 // 已读/收藏状态（与 ArticleCard 相同的逻辑）
 const isRead = computed(() => readingStore.isRead(props.article.id))
 const isBookmarked = computed(() => readingStore.isBookmarked(props.article.id))
 
-/** 点击行打开链接并标记已读；划词结束时的 click 不跳转 */
-function handleClick(e: MouseEvent) {
-  const sel = window.getSelection()
-  if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
-    e.preventDefault()
-    return
-  }
-  readingStore.markRead(props.article.id)
-}
-
-/** 切换收藏，阻止冒泡避免触发外层链接跳转 */
+/** 切换收藏，阻止冒泡避免触发卡片点击打开预览 */
 function toggleBookmark(e: MouseEvent) {
   e.preventDefault()
   e.stopPropagation()
   readingStore.toggleBookmark(props.article.id)
-}
-
-async function removeArticle(e: MouseEvent) {
-  e.preventDefault()
-  e.stopPropagation()
-  if (
-    !confirm(
-      `从列表中删除「${props.article.title}」？\n将从本地数据移除，且以后爬取也不会再入库。`,
-    )
-  ) {
-    return
-  }
-  removing.value = true
-  try {
-    const res = await fetch('/api/articles/remove', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        article_id: props.article.id,
-        account: props.article.account,
-      }),
-    })
-    const data = (await res.json().catch(() => ({}))) as { detail?: string }
-    if (!res.ok) {
-      alert(data.detail || '删除失败')
-      return
-    }
-    readingStore.removeArticleTracking(props.article.id)
-    articlesStore.removeArticleLocally(props.article.account, props.article.id)
-  } catch {
-    alert('无法连接后端，请确认 api.py 已启动')
-  } finally {
-    removing.value = false
-  }
 }
 
 /** 封面加载失败时的备用颜色（与 ArticleCard 算法相同，保证同公众号颜色一致） */
@@ -102,14 +63,14 @@ function tagToneClass(i: number) {
 </script>
 
 <template>
-  <a
-    :href="article.link"
-    target="_blank"
-    rel="noopener noreferrer"
+  <div
+    role="button"
+    tabindex="0"
     draggable="false"
-    class="group article-glass-row"
+    class="group article-glass-row cursor-pointer"
     :class="isRead ? 'is-read' : ''"
-    @click="handleClick"
+    @click="onArticleClick($event, article)"
+    @keydown="onArticleKeydown($event, article)"
   >
     <div class="article-glass-row-cover relative bg-[var(--color-muted)]">
       <img
@@ -136,12 +97,15 @@ function tagToneClass(i: number) {
       <div class="article-glass-row-actions">
         <button
           type="button"
-          @click="removeArticle"
+          @click="handleRemove"
           :disabled="removing"
           class="article-glass-row-action-btn article-glass-row-action-btn--del"
-          title="从列表删除"
+          :title="importMode
+            ? (article.source === 'import' ? '移出导入并删除' : '从导入列表移出')
+            : '从列表删除'"
         >
           <Loader2 v-if="removing" class="h-3.5 w-3.5 animate-spin" />
+          <LogOut v-else-if="importMode" class="h-3.5 w-3.5" />
           <Trash2 v-else class="h-3.5 w-3.5" />
         </button>
         <button
@@ -214,5 +178,5 @@ function tagToneClass(i: number) {
         </div>
       </div>
     </div>
-  </a>
+  </div>
 </template>

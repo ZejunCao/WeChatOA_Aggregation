@@ -8,8 +8,8 @@ import type { Article, Name2FakeId, AccountInfo, FilterState } from '@/types'
 import { TAG_UNTAGGED } from '@/types'
 import { useReadingStore } from './reading'
 
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, { cache: 'no-store' })
+async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, { cache: 'no-store', ...init })
   const contentType = res.headers.get('content-type') || ''
   if (!contentType.includes('application/json')) {
     const snippet = (await res.text()).slice(0, 160)
@@ -30,9 +30,19 @@ type FeedArticle = Article & {
   account: string
   is_read?: boolean
   starred?: boolean
+  source?: 'crawl' | 'import'
 }
 
 const PAGE_SIZE = 40
+
+export type ImportArticleResult = {
+  status: 'created' | 'exists'
+  article_id: string
+  account: string
+  title: string
+  link: string
+  message: string
+}
 
 export const useArticlesStore = defineStore('articles', () => {
   const name2fakeid = ref<Name2FakeId>({})
@@ -45,6 +55,7 @@ export const useArticlesStore = defineStore('articles', () => {
   const loadingMore = ref(false)
   const globalTotalCount = ref(0)
   const filterTotalCount = ref(0)
+  const importTotalCount = ref(0)
   const accountsList = ref<AccountInfo[]>([])
 
   const isSqlite = computed(() => true)
@@ -125,7 +136,21 @@ export const useArticlesStore = defineStore('articles', () => {
     if (filters.dateTo) params.set('date_to', filters.dateTo)
     if (filters.readFilter === 'unread') params.set('read_filter', 'unread')
     if (filters.readFilter === 'bookmarked') params.set('starred_only', 'true')
+    if (filters.readFilter === 'imported') params.set('import_only', 'true')
     return params
+  }
+
+  async function fetchImportTotal() {
+    try {
+      const data = await fetchJson<{ total?: number }>(
+        '/api/articles?limit=1&import_only=true',
+      )
+      if (typeof data.total === 'number') {
+        importTotalCount.value = data.total
+      }
+    } catch {
+      importTotalCount.value = 0
+    }
   }
 
   async function loadArticlesPage(
@@ -188,7 +213,7 @@ export const useArticlesStore = defineStore('articles', () => {
     error.value = null
     try {
       await fetchJson<{ backend: string }>('/api/storage/backend')
-      await Promise.all([loadAccounts(), loadTags()])
+      await Promise.all([loadAccounts(), loadTags(), fetchImportTotal()])
       await fetchGlobalTotal()
       await useReadingStore().syncFromServer()
       await loadArticlesPage(filters || {}, { reset: true })
@@ -227,6 +252,16 @@ export const useArticlesStore = defineStore('articles', () => {
     items.value = items.value.filter((a) => a.id !== articleId)
   }
 
+  async function importByUrl(url: string): Promise<ImportArticleResult> {
+    const result = await fetchJson<ImportArticleResult>('/api/articles/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    })
+    await fetchImportTotal()
+    return result
+  }
+
   return {
     name2fakeid,
     loading,
@@ -235,6 +270,7 @@ export const useArticlesStore = defineStore('articles', () => {
     isSqlite,
     sqliteGlobalTotalCount,
     sqliteFilterTotalCount,
+    importTotalCount,
     sqliteHasMore,
     sqliteLoadingMore,
     sqliteItems,
@@ -245,6 +281,8 @@ export const useArticlesStore = defineStore('articles', () => {
     loadMoreArticles,
     reloadAccounts,
     removeArticleLocally,
+    fetchImportTotal,
+    importByUrl,
     accounts,
     allArticles,
     allTags,

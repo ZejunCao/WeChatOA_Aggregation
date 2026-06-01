@@ -60,57 +60,13 @@ def time_now():
 
 def url2text(url, num=0):
     '''
-    提取文本方法1：直接获取对应div下的所有文本，未处理
-    :param url:
-    :return: 列表形式，每个元素对应 div 下的一个子标签内的文本
+    提取 rich_media_content 下的纯文本（供 LLM / 字数统计）。
+    :return: 列表形式，每个元素对应一段；失败时为「已删除」「请求错误」
     '''
-    response = requests.get(url, headers=headers).text
-    tree = etree.HTML(response, parser=etree.HTMLParser(encoding='utf-8'))
-    # 不同文章存储字段的class标签名不同
-    div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]')
-    if not div:
-        div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       defaultNoSetting\n            "]')
-    # 点进去显示分享一篇文章，然后需要再点阅读原文跳转
-    if not div:
-        data_url = tree.xpath('//div[@class="original_panel_tool"]/span/@data-url')
-        if data_url:
-            response = requests.get(data_url[0], headers=headers).text
-            tree = etree.HTML(response, parser=etree.HTMLParser(encoding='utf-8'))
-            # 不同文章存储字段的class标签名不同
-            div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       autoTypeSetting24psection\n            "]')
-            if not div:
-                div = tree.xpath('//div[@class="rich_media_content js_underline_content\n                       defaultNoSetting\n            "]')
+    from src.utils.wechat_body import fetch_article_body
 
-    # 判断是博文删除了还是请求错误
-    if not div:
-        if message_is_delete(response=response):
-            return '已删除'
-        else:
-            # '请求错误'则再次重新请求，最多3次
-            if num == 3:
-                return '请求错误'
-            return url2text(url, num=num+1)
-
-    s_p = [p for p in div[0].iter() if p.tag in ['section', 'p']]
-    text_list = []
-    tag = []
-    filter_char = ['\xa0', '\u200d', '&nbsp;', '■', ' ']
-    pattern = '|'.join(filter_char)
-    for s in s_p:
-        text = ''.join([re.sub(pattern, '', i) for i in s.xpath('.//text()') if i != '\u200d'])
-        if not text:
-            continue
-        if text_list and text in text_list[-1]:
-            parent_tag = []
-            tmp = s
-            while tmp.tag != 'div':
-                tmp = tmp.getparent()
-                parent_tag.append(tmp)
-            if tag[-1] in parent_tag:
-                del text_list[-1]
-        tag.append(s)
-        text_list.append(text)
-    return text_list
+    text, _html = fetch_article_body(url, num=num)
+    return text
 
 
 def message_is_delete(url='', response=None):

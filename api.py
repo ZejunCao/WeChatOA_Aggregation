@@ -91,6 +91,7 @@ def list_articles_api(
         None, description="unread=仅未读, read=仅已读；默认全部"
     ),
     starred_only: bool = Query(False, description="true=仅收藏"),
+    import_only: bool = Query(False, description="true=仅链接导入的文章"),
 ):
     _require_database()
     rf = (read_filter or "").strip().lower() or None
@@ -108,6 +109,7 @@ def list_articles_api(
             date_to=date_to,
             read_filter=rf,
             starred_only=starred_only,
+            import_only=import_only,
         )
         total = repo.count_articles(
             account=account or None,
@@ -116,6 +118,7 @@ def list_articles_api(
             date_to=date_to,
             read_filter=rf,
             starred_only=starred_only,
+            import_only=import_only,
         )
         repo.commit()
     return ArticleListResponse(items=items, next_cursor=next_c, total=total)
@@ -129,6 +132,7 @@ def search_articles_api(
     account: str | None = None,
     read_filter: str | None = None,
     starred_only: bool = False,
+    import_only: bool = False,
 ):
     _require_database()
     rf = (read_filter or "").strip().lower() or None
@@ -148,12 +152,14 @@ def search_articles_api(
             article_ids=ids,
             read_filter=rf,
             starred_only=starred_only,
+            import_only=import_only,
         )
         total = repo.count_articles(
             account=account or None,
             article_ids=ids,
             read_filter=rf,
             starred_only=starred_only,
+            import_only=import_only,
         )
         repo.commit()
     return ArticleListResponse(items=items, next_cursor=next_c, total=total)
@@ -267,6 +273,121 @@ def list_article_tags_api():
     return {"tags": tags}
 
 
+class ImportArticleRequest(BaseModel):
+    url: str = Field(..., min_length=8, description="微信公众号文章链接")
+    run_llm: bool = Field(True, description="导入后是否自动跑 AI 摘要/标签")
+
+
+class ImportArticleResponse(BaseModel):
+    status: str  # created | exists
+    article_id: str
+    account: str
+    title: str
+    link: str
+    message: str = ""
+
+
+@app.post("/api/articles/import", response_model=ImportArticleResponse)
+def import_article_api(body: ImportArticleRequest):
+    """通过文章链接导入单篇（参考 wechat-article-exporter 单篇抓取）。"""
+    _require_database()
+    from src.db.repository import ArticleRepository
+    from src.utils.article_import import ArticleImportError, build_blog_from_url
+
+    try:
+        blog = build_blog_from_url(body.url)
+    except ArticleImportError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+    account_name = (
+        str(blog.get("_import_account") or "链接导入").strip() or "链接导入"
+    )
+    biz = str(blog.get("_import_biz") or "").strip()
+    fakeid = biz if biz else f"import:{account_name}"
+    blog_row = {k: v for k, v in blog.items() if not str(k).startswith("_import")}
+
+    with ArticleRepository() as repo:
+        existing = repo.find_article_by_link(str(blog_row["link"]))
+        if existing:
+            article_id = str(existing["id"])
+            repo.mark_article_as_imported(article_id)
+            repo.commit()
+            return ImportArticleResponse(
+                status="exists",
+                article_id=article_id,
+                account=str(existing["account_name"]),
+                title=str(existing["title"]),
+                link=str(existing["link"]),
+                message="该链接已在库中，已归入「导入」",
+            )
+
+        repo.upsert_account(account_name, fakeid)
+        repo.upsert_article_from_blog(
+            account_name, blog_row, update_fts=False, source="import"
+        )
+        article_id = str(blog_row["id"])
+        link = str(blog_row.get("link") or "")
+        repo.commit()
+
+        download_cover(
+            article_id,
+            str(blog_row.get("cover") or ""),
+            COVERS_DIR,
+            _DOWNLOAD_HEADERS,
+        )
+        _fetch_article_detail_text(article_id, link)
+
+        from src.db import fts as fts_mod
+        from src.utils.data_manager import data_manager
+
+        repo.update_cover_path(article_id)
+        body_raw = repo.get_body_text(article_id) or ""
+        if isinstance(body_raw, list):
+            body_for_fts = "\n".join(str(x) for x in body_raw)
+        else:
+            body_for_fts = str(body_raw)
+        fts_mod.upsert_article_fts(
+            repo.conn,
+            article_id,
+            str(blog_row.get("title") or ""),
+            str(blog_row.get("digest") or ""),
+            body_for_fts,
+        )
+        wc = article_word_count(blog_row, data_manager)
+        repo.set_word_count(article_id, wc)
+
+        if body.run_llm:
+            from src.llm.article_tagging import tag_article
+            from src.llm.llm_config import llm_tagging_enabled
+
+            if llm_tagging_enabled():
+                detail = repo.get_article_detail(article_id)
+                if detail:
+                    try:
+                        analysis = tag_article(detail, data_manager)
+                        if isinstance(analysis, dict):
+                            repo.update_llm_fields(
+                                article_id,
+                                str(analysis.get("summary") or ""),
+                                analysis.get("tags")
+                                if isinstance(analysis.get("tags"), list)
+                                else [],
+                            )
+                    except Exception as e:
+                        print(f"[import] LLM 标注失败 {article_id}: {e}")
+
+        repo.commit()
+
+    return ImportArticleResponse(
+        status="created",
+        article_id=article_id,
+        account=account_name,
+        title=str(blog_row.get("title") or ""),
+        link=str(blog_row.get("link") or ""),
+        message="导入成功",
+    )
+
+
 @app.get("/api/articles/{article_id}")
 def get_article_api(article_id: str):
     _require_database()
@@ -277,6 +398,48 @@ def get_article_api(article_id: str):
     if not item:
         raise HTTPException(status_code=404, detail="文章不存在")
     return item
+
+
+@app.get("/api/articles/{article_id}/preview")
+def get_article_preview_api(article_id: str, refresh: bool = Query(False)):
+    """
+    预览用 HTML：服务端抓取微信页并生成文档，前端 iframe srcdoc 展示。
+    （微信禁止外链 iframe，不能直接加载 mp.weixin.qq.com）
+    refresh=1 时忽略缓存并重新抓取。
+    """
+    _require_database()
+    return _build_article_preview_html(article_id, refresh=refresh)
+
+
+@app.post("/api/articles/{article_id}/ensure-html")
+def ensure_article_html_api(article_id: str):
+    """兼容旧接口：同 GET /preview。"""
+    _require_database()
+    data = _build_article_preview_html(article_id)
+    return {"ok": True, "cached": data.get("cached"), "body_html": data.get("html")}
+
+
+@app.get("/api/wechat-image")
+def proxy_wechat_image(url: str = Query(..., min_length=8)):
+    """代理微信 CDN 图片，避免预览里防盗链导致裂图。"""
+    from src.utils.wechat_body import is_allowed_wechat_image_url
+
+    if not is_allowed_wechat_image_url(url):
+        raise HTTPException(status_code=400, detail="不允许的图片域名")
+    try:
+        import requests
+        from fastapi.responses import Response
+
+        from src.utils.data_manager import headers as wechat_headers
+
+        h = dict(wechat_headers)
+        h["Referer"] = "https://mp.weixin.qq.com/"
+        resp = requests.get(url, headers=h, timeout=20)
+        resp.raise_for_status()
+        media = resp.headers.get("content-type") or "image/jpeg"
+        return Response(content=resp.content, media_type=media)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"图片加载失败：{e}") from e
 
 
 
@@ -411,26 +574,82 @@ def article_word_count(article: dict, data_manager) -> int:
 
 def _fetch_article_detail_text(article_id: str, link: str) -> bool:
     """
-    根据文章链接拉取 HTML 正文（url2text），写入 article_bodies 表。
-
-    若该 article_id 已有正文则跳过。返回 True 表示本次写入了新数据。
+    根据文章链接拉取正文：纯文本（LLM/检索）+ HTML（预览排版），写入 article_bodies。
     """
     if not link or not article_id:
         return False
-    from src.utils.helpers import url2text
     from src.db.repository import ArticleRepository
+    from src.utils.wechat_body import fetch_article_body
 
     with ArticleRepository() as repo:
         if repo.has_body(article_id):
             return False
         try:
-            text = url2text(link)
+            text, _html = fetch_article_body(link)
             repo.set_body_text(article_id, text)
             repo.commit()
             return True
         except Exception as e:
             print(f"[detail] 抓取正文失败 {article_id}: {e}")
             return False
+
+
+def _build_article_preview_html(article_id: str, *, refresh: bool = False) -> dict:
+    """生成可 srcdoc 嵌入的预览 HTML（对齐 wechat-article-exporter，非 iframe 外链）。"""
+    from src.db.repository import ArticleRepository
+    from src.utils.wechat_body import fetch_article_body
+    from src.utils.wechat_preview import (
+        build_preview_document,
+        fetch_article_page_html,
+        is_full_preview_document,
+    )
+
+    with ArticleRepository() as repo:
+        row = repo.conn.execute(
+            "SELECT link, title, create_time, create_time_unix, llm_summary FROM articles WHERE id=?",
+            (article_id,),
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="文章不存在")
+        link = str(row["link"] or "").strip()
+        title = str(row["title"] or "")
+        if not link:
+            raise HTTPException(status_code=400, detail="文章无链接，无法预览")
+
+        cached = repo.get_body_html(article_id) or ""
+        if not refresh and is_full_preview_document(cached):
+            return {"html": cached, "cached": True}
+
+        raw_page = fetch_article_page_html(link)
+        if not raw_page:
+            if is_full_preview_document(cached):
+                return {"html": cached, "cached": True}
+            raise HTTPException(
+                status_code=410,
+                detail="无法获取原文（可能已删除或需检查 data/id_info.json 凭证）",
+            )
+
+        ai_tags = repo._tags_for_row(article_id)
+        preview_html = build_preview_document(
+            raw_page,
+            title=title,
+            ai_summary=str(row["llm_summary"] or ""),
+            ai_tags=ai_tags,
+            fallback_pub_time=str(row["create_time"] or ""),
+            fallback_pub_unix=row["create_time_unix"],
+        )
+        if not preview_html.strip():
+            raise HTTPException(status_code=502, detail="未能解析微信正文")
+
+        if not repo.has_body(article_id):
+            text, _frag = fetch_article_body(link)
+            if text and not isinstance(text, str):
+                repo.set_body_text(article_id, text)
+            elif isinstance(text, str) and text not in ("已删除", "请求错误"):
+                repo.set_body_text(article_id, text)
+        repo.set_body_html(article_id, preview_html)
+        repo.commit()
+        return {"html": preview_html, "cached": False}
 
 
 def _get_wechat():
@@ -621,6 +840,43 @@ def remove_article(body: ArticleDeleteRequest):
         {"article_id": aid, "account": acc},
     )
     return {"ok": True, "article_id": aid}
+
+
+class RemoveFromImportRequest(BaseModel):
+    article_id: str
+    account: str
+
+
+@app.post("/api/articles/remove-from-import")
+def remove_from_import_api(body: RemoveFromImportRequest):
+    """从「导入」分栏移出：订阅文章仅取消列出，纯导入文章则删除。"""
+    aid = body.article_id.strip()
+    acc = body.account.strip()
+    if not aid or not acc:
+        raise HTTPException(status_code=400, detail="article_id 和 account 不能为空")
+
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        action = repo.remove_from_import(aid, acc)
+        if not action:
+            raise HTTPException(status_code=404, detail="文章不存在或已删除")
+        repo.commit()
+
+    if action == "deleted":
+        cover_path = COVERS_DIR / (aid.replace("/", "_") + ".jpg")
+        if cover_path.exists():
+            try:
+                cover_path.unlink()
+            except OSError:
+                pass
+        _append_log(
+            LOG_ARTICLE_DELETE,
+            f"移出导入并删除「{aid}」（{acc}）",
+            {"article_id": aid, "account": acc},
+        )
+
+    return {"ok": True, "article_id": aid, "action": action}
 
 
 # ── 凭证状态（内存缓存） ─────────────────────────────────────────────────────────

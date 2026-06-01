@@ -6,6 +6,7 @@ import { Menu, Settings2, X, ExternalLink } from 'lucide-vue-next'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import ThemeToggle from '@/components/layout/ThemeToggle.vue'
 import FeedThemePicker from '@/components/layout/FeedThemePicker.vue'
+import ArticlePreviewPanel from '@/components/articles/ArticlePreviewPanel.vue'
 import { useArticlesStore } from '@/stores/articles'
 import { useConfigStore } from '@/stores/config'
 
@@ -122,5 +123,6 @@ onMounted(async () => {
       />
     </main>
   </div>
+    <ArticlePreviewPanel />
   </TooltipProvider>
 </template>
