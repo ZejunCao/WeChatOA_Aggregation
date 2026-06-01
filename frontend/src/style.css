@@ -1080,6 +1080,12 @@
 .feed-content-scroll {
   position: relative;
   z-index: 1;
+  overflow-anchor: auto;
+}
+
+/* 懒加载哨兵不参与滚动锚定，避免加载更多后视口被顶下去 */
+.feed-scroll-sentinel {
+  overflow-anchor: none;
 }
 
 /* ── 侧边栏 · 玻璃拟态（奶白底 + 柔和玫瑰粉 accent，略降饱和更贴 #f2ede6） ─ */

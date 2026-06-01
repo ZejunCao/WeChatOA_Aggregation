@@ -1,125 +1,209 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // 已读 & 收藏 Store（Pinia）
 //
-// 职责：
-//   - 记录用户已阅读过的文章 ID 列表（readIds）
-//   - 记录用户收藏的文章 ID 列表（bookmarkIds）
-//   - 提供已读数、收藏数的统计
-//
-// 持久化：
-//   使用 pinia-plugin-persistedstate，自动将 readIds 和 bookmarkIds
-//   保存到 localStorage（key: "wechat-reading"），刷新页面后不丢失。
-//
-// 性能优化：
-//   ID 存为数组（方便序列化），但查询时通过 computed Set 加速（O(1) 查找）。
+// 已读/收藏存于 SQLite article_annotations，经 API 读写
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { useArticlesStore } from './articles'
 
-export const useReadingStore = defineStore(
-  'reading',
-  () => {
-    // ── 状态：ID 数组（持久化到 localStorage） ────────────────────────────────
-    // 用数组而非 Set，因为 JSON.stringify(Set) 会序列化为 {}
-    const readIds = ref<string[]>([])
-    const bookmarkIds = ref<string[]>([])
+const READING_STORAGE_KEY = 'wechat-reading'
 
-    // ── 计算 Set：用于 O(1) 查找（不直接持久化，每次从数组重建） ──────────────
-    const readSet = computed(() => new Set(readIds.value))
-    const bookmarkSet = computed(() => new Set(bookmarkIds.value))
+type FeedReadingSlice = { id: string; is_read?: boolean; starred?: boolean }
 
-    // ── 已读操作 ──────────────────────────────────────────────────────────────
-
-    /** 判断某篇文章是否已读 */
-    function isRead(id: string) {
-      return readSet.value.has(id)
-    }
-
-    /** 标记为已读（幂等：已经已读则不重复添加） */
-    function markRead(id: string) {
-      if (!readSet.value.has(id)) readIds.value.push(id)
-    }
-
-    /** 标记为未读（从已读列表中移除） */
-    function markUnread(id: string) {
-      readIds.value = readIds.value.filter((i) => i !== id)
-    }
-
-    /** 切换已读/未读状态 */
-    function toggleRead(id: string) {
-      isRead(id) ? markUnread(id) : markRead(id)
-    }
-
-    // ── 收藏操作 ──────────────────────────────────────────────────────────────
-
-    /** 判断某篇文章是否已收藏 */
-    function isBookmarked(id: string) {
-      return bookmarkSet.value.has(id)
-    }
-
-    /** 切换收藏/取消收藏状态 */
-    function toggleBookmark(id: string) {
-      if (bookmarkSet.value.has(id)) {
-        bookmarkIds.value = bookmarkIds.value.filter((i) => i !== id)
-      } else {
-        bookmarkIds.value.push(id)
-      }
-    }
-
-    /**
-     * 将给定 ID 列表全部标为已读。
-     * 用于 FeedView 的"全部已读"按钮——只标记当前筛选结果中的文章。
-     */
-    function markAllRead(ids: string[]) {
-      const existing = readSet.value
-      for (const id of ids) {
-        if (!existing.has(id)) readIds.value.push(id)
-      }
-    }
-
-    /** 文章从列表删除后，同步清除已读/收藏中的 id */
-    function removeArticleTracking(id: string) {
-      readIds.value = readIds.value.filter((i) => i !== id)
-      bookmarkIds.value = bookmarkIds.value.filter((i) => i !== id)
-    }
-
-    // ── 统计 ──────────────────────────────────────────────────────────────────
-
-    /**
-     * 未读文章数：从 articlesStore 的全部文章中排除已读的。
-     * 注意：在 store 内部使用另一个 store（articlesStore）是合法的，
-     * 但必须在函数体内调用 useArticlesStore()，不能放在顶层（避免循环依赖）。
-     */
-    const unreadCount = computed(() => {
-      const articlesStore = useArticlesStore()
-      return articlesStore.allArticles.filter((a) => !readSet.value.has(a.id)).length
-    })
-
-    /** 收藏文章数（直接取数组长度） */
-    const bookmarkCount = computed(() => bookmarkIds.value.length)
-
+function loadJsonReadingFromStorage(): { readIds: string[]; bookmarkIds: string[] } {
+  try {
+    const raw = localStorage.getItem(READING_STORAGE_KEY)
+    if (!raw) return { readIds: [], bookmarkIds: [] }
+    const data = JSON.parse(raw) as { readIds?: string[]; bookmarkIds?: string[] }
     return {
-      readIds,
-      bookmarkIds,
-      isRead,
-      markRead,
-      markUnread,
-      toggleRead,
-      isBookmarked,
-      toggleBookmark,
-      markAllRead,
-      removeArticleTracking,
-      unreadCount,
-      bookmarkCount,
+      readIds: Array.isArray(data.readIds) ? data.readIds : [],
+      bookmarkIds: Array.isArray(data.bookmarkIds) ? data.bookmarkIds : [],
     }
-  },
-  {
-    // 持久化配置：指定 key 和存储方式（localStorage）
-    persist: {
-      key: 'wechat-reading',
-      storage: localStorage,
-    },
-  },
-)
+  } catch {
+    return { readIds: [], bookmarkIds: [] }
+  }
+}
+
+async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, { cache: 'no-store', ...init })
+  const data = (await res.json()) as T & { detail?: string }
+  if (!res.ok) {
+    throw new Error(data.detail || `请求失败 (${res.status})`)
+  }
+  return data
+}
+
+export const useReadingStore = defineStore('reading', () => {
+  const readIds = ref<string[]>([])
+  const bookmarkIds = ref<string[]>([])
+  const serverUnreadCount = ref(0)
+  const serverStarredCount = ref(0)
+  const synced = ref(false)
+
+  const readSet = computed(() => new Set(readIds.value))
+  const bookmarkSet = computed(() => new Set(bookmarkIds.value))
+
+  /** 将列表接口返回的 is_read / starred 同步到内存 */
+  function mergeFeedStates(items: FeedReadingSlice[]) {
+    const read = new Set(readIds.value)
+    const starred = new Set(bookmarkIds.value)
+    for (const it of items) {
+      if (it.is_read) read.add(it.id)
+      else read.delete(it.id)
+      if (it.starred) starred.add(it.id)
+      else starred.delete(it.id)
+    }
+    readIds.value = [...read]
+    bookmarkIds.value = [...starred]
+  }
+
+  async function syncFromServer() {
+    let state = await fetchJson<{
+      read_ids: string[]
+      starred_ids: string[]
+      unread_count: number
+      starred_count: number
+    }>('/api/reading/state')
+
+    const local = loadJsonReadingFromStorage()
+    const hasLocal =
+      local.readIds.length > 0 || local.bookmarkIds.length > 0
+    const dbEmpty =
+      state.read_ids.length === 0 && state.starred_ids.length === 0
+    if (hasLocal && dbEmpty) {
+      await fetchJson('/api/reading/import-local', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          read_ids: local.readIds,
+          starred_ids: local.bookmarkIds,
+        }),
+      })
+      localStorage.removeItem(READING_STORAGE_KEY)
+      state = await fetchJson('/api/reading/state')
+    }
+
+    readIds.value = state.read_ids ?? []
+    bookmarkIds.value = state.starred_ids ?? []
+    serverUnreadCount.value = state.unread_count ?? 0
+    serverStarredCount.value = state.starred_count ?? 0
+    synced.value = true
+  }
+
+  function isRead(id: string) {
+    return readSet.value.has(id)
+  }
+
+  async function markRead(id: string) {
+    if (!readSet.value.has(id)) readIds.value.push(id)
+    serverUnreadCount.value = Math.max(0, serverUnreadCount.value - 1)
+    try {
+      await fetchJson(`/api/articles/${encodeURIComponent(id)}/reading`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_read: true }),
+      })
+    } catch {
+      /* 本地已更新，失败时下次 sync 纠正 */
+    }
+  }
+
+  async function markUnread(id: string) {
+    readIds.value = readIds.value.filter((i) => i !== id)
+    serverUnreadCount.value += 1
+    try {
+      await fetchJson(`/api/articles/${encodeURIComponent(id)}/reading`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_read: false }),
+      })
+    } catch {
+      /* 静默 */
+    }
+  }
+
+  async function toggleRead(id: string) {
+    if (isRead(id)) await markUnread(id)
+    else await markRead(id)
+  }
+
+  function isBookmarked(id: string) {
+    return bookmarkSet.value.has(id)
+  }
+
+  async function toggleBookmark(id: string) {
+    const was = bookmarkSet.value.has(id)
+    if (was) {
+      bookmarkIds.value = bookmarkIds.value.filter((i) => i !== id)
+      serverStarredCount.value = Math.max(0, serverStarredCount.value - 1)
+    } else {
+      bookmarkIds.value.push(id)
+      serverStarredCount.value += 1
+    }
+    try {
+      await fetchJson(`/api/articles/${encodeURIComponent(id)}/reading`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ starred: !was }),
+      })
+    } catch {
+      /* 静默 */
+    }
+  }
+
+  async function markAllRead(ids: string[]) {
+    const existing = readSet.value
+    for (const id of ids) {
+      if (!existing.has(id)) readIds.value.push(id)
+    }
+    try {
+      await fetchJson('/api/reading/mark-all-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article_ids: ids }),
+      })
+      serverUnreadCount.value = Math.max(
+        0,
+        serverUnreadCount.value - ids.filter((id) => !existing.has(id)).length,
+      )
+    } catch {
+      /* 静默 */
+    }
+  }
+
+  function removeArticleTracking(id: string) {
+    const wasRead = readSet.value.has(id)
+    const wasStar = bookmarkSet.value.has(id)
+    readIds.value = readIds.value.filter((i) => i !== id)
+    bookmarkIds.value = bookmarkIds.value.filter((i) => i !== id)
+    if (wasRead) serverUnreadCount.value += 1
+    if (wasStar) serverStarredCount.value = Math.max(0, serverStarredCount.value - 1)
+  }
+
+  const unreadCount = computed(() =>
+    synced.value ? serverUnreadCount.value : 0,
+  )
+
+  const bookmarkCount = computed(() =>
+    synced.value ? serverStarredCount.value : bookmarkIds.value.length,
+  )
+
+  return {
+    readIds,
+    bookmarkIds,
+    synced,
+    isRead,
+    markRead,
+    markUnread,
+    toggleRead,
+    isBookmarked,
+    toggleBookmark,
+    markAllRead,
+    removeArticleTracking,
+    syncFromServer,
+    mergeFeedStates,
+    unreadCount,
+    bookmarkCount,
+  }
+})

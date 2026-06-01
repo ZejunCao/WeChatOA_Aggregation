@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""微信公众平台扫码登录（HTTP 调 scanloginqrcode / bizlogin，无需浏览器截图）。"""
+"""
+微信公众平台扫码登录（HTTP 四步：startlogin → getqrcode → ask → bizlogin）。
+
+流程与 wechat-article-exporter 一致，同一会话须共用 requests.Session（自动维护 uuid Cookie）。
+"""
 
 from __future__ import annotations
 
@@ -8,24 +12,42 @@ import base64
 import random
 import re
 import time
-from typing import Callable
-from urllib.parse import urlencode, urlparse, parse_qs
+from dataclasses import dataclass
+from typing import Any
+from urllib.parse import parse_qs, urlencode, urlparse
 
 import requests
-
-from src.utils.data_manager import headers as MP_HEADERS
 
 MP_ORIGIN = "https://mp.weixin.qq.com"
 SCAN_QR_URL = f"{MP_ORIGIN}/cgi-bin/scanloginqrcode"
 BIZ_LOGIN_URL = f"{MP_ORIGIN}/cgi-bin/bizlogin"
 
+# 与 wechat-article-exporter config/index.ts USER_AGENT 一致
+MP_USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/117.0.0.0 Safari/537.36 WAE/1.0"
+)
+
 _QR_CONTENT_TYPES = ("image/png", "image/jpeg", "image/jpg", "image/gif")
 
-# 与 wechat-article-exporter Login.vue 中 ask 的 status 含义一致
+# ask 接口 status（与 exporter Login.vue 一致）
 SCAN_STATUS_WAITING = 0
 SCAN_STATUS_CONFIRMED = 1
 SCAN_STATUS_EXPIRED = (2, 3)
 SCAN_STATUS_SCANNED = (4, 6)
+
+
+@dataclass
+class ScanAskResult:
+    """解析后的 ask 轮询结果。"""
+
+    ret: int
+    err_msg: str
+    status: int
+    acct_size: int
+    message: str
+    raw: dict[str, Any]
 
 
 def scan_status_message(status: int, data: dict | None = None) -> str:
@@ -45,9 +67,36 @@ def scan_status_message(status: int, data: dict | None = None) -> str:
     return "等待扫码…"
 
 
+def parse_ask_response(data: dict[str, Any]) -> ScanAskResult:
+    base = data.get("base_resp") or {}
+    ret = int(base.get("ret", 0))
+    err_msg = str(base.get("err_msg") or "")
+    status = int(data.get("status", 0)) if "status" in data else -1
+    acct_size = int(data.get("acct_size", 0) or 0)
+    if ret != 0 and status < 0:
+        return ScanAskResult(
+            ret=ret,
+            err_msg=err_msg or "扫码状态查询失败",
+            status=-1,
+            acct_size=acct_size,
+            message=err_msg or "扫码状态查询失败",
+            raw=data,
+        )
+    if status < 0:
+        status = SCAN_STATUS_WAITING
+    return ScanAskResult(
+        ret=ret,
+        err_msg=err_msg,
+        status=status,
+        acct_size=acct_size,
+        message=scan_status_message(status, data),
+        raw=data,
+    )
+
+
 def _session_headers() -> dict[str, str]:
     return {
-        "User-Agent": MP_HEADERS["User-Agent"],
+        "User-Agent": MP_USER_AGENT,
         "Referer": f"{MP_ORIGIN}/",
         "Origin": MP_ORIGIN,
         "Accept-Encoding": "identity",
@@ -69,14 +118,15 @@ def _qrcode_data_url(raw: bytes, content_type: str) -> str:
 
 
 class MpScanLogin:
-    """仿 wechat-article-exporter：startlogin → getqrcode → ask 轮询 → bizlogin。"""
+    """扫码登录会话：startlogin → getqrcode → ask 轮询 → bizlogin。"""
 
-    def __init__(self) -> None:
+    def __init__(self, session_id: str | None = None) -> None:
         self.session = requests.Session()
         self.session.headers.update(_session_headers())
-        self.sid = f"{int(time.time() * 1000)}{random.randint(0, 99)}"
+        self.sid = session_id or f"{int(time.time() * 1000)}{random.randint(0, 99)}"
 
     def start_session(self) -> None:
+        """① bizlogin?action=startlogin — 获得 uuid Cookie。"""
         body = {
             "userlang": "zh_CN",
             "redirect_url": "",
@@ -99,8 +149,11 @@ class MpScanLogin:
         base = data.get("base_resp") or {}
         if base.get("ret", 0) != 0:
             raise RuntimeError(base.get("err_msg") or "创建登录会话失败")
+        if not self.session.cookies.get("uuid"):
+            raise RuntimeError("startlogin 未返回 uuid Cookie，无法继续扫码")
 
     def fetch_qrcode_bytes(self) -> bytes:
+        """② scanloginqrcode?action=getqrcode — 须携带 uuid。"""
         resp = self.session.get(
             SCAN_QR_URL,
             params={"action": "getqrcode", "random": int(time.time() * 1000)},
@@ -110,7 +163,6 @@ class MpScanLogin:
         ct = (resp.headers.get("Content-Type") or "").lower()
         if "image" in ct:
             return resp.content
-        # 少数情况下为 JSON，尝试解析内嵌图片
         try:
             payload = resp.json()
         except ValueError as e:
@@ -138,10 +190,10 @@ class MpScanLogin:
         ct = resp.headers.get("Content-Type") or ""
         if "image" in ct.lower():
             return _qrcode_data_url(resp.content, ct)
-        raw = self.fetch_qrcode_bytes()
-        return _qrcode_data_url(raw, "image/png")
+        return _qrcode_data_url(self.fetch_qrcode_bytes(), "image/png")
 
-    def ask_once(self) -> dict:
+    def ask_once(self) -> dict[str, Any]:
+        """③ scanloginqrcode?action=ask — 单次轮询。"""
         resp = self.session.get(
             SCAN_QR_URL,
             params={
@@ -156,77 +208,11 @@ class MpScanLogin:
         resp.raise_for_status()
         return resp.json()
 
-    def wait_for_scan(
-        self,
-        *,
-        timeout: float = 180,
-        poll_interval: float = 2,
-        on_qrcode: Callable[[str], None] | None = None,
-        on_status: Callable[[int, str], None] | None = None,
-    ) -> None:
-        """轮询 ask，直到 status=1（可执行 bizlogin）。"""
-        deadline = time.time() + timeout
-        last_qr_at = 0.0
-
-        def emit_status(status: int, data: dict | None = None) -> None:
-            if on_status:
-                on_status(status, scan_status_message(status, data))
-
-        def push_qr(force: bool = False) -> None:
-            nonlocal last_qr_at
-            if not on_qrcode:
-                return
-            now = time.time()
-            if not force and now - last_qr_at < poll_interval:
-                return
-            data_url = self.fetch_qrcode_data_url()
-            on_qrcode(data_url)
-            last_qr_at = now
-
-        push_qr(force=True)
-        emit_status(SCAN_STATUS_WAITING)
-
-        while time.time() < deadline:
-            data = self.ask_once()
-            base = data.get("base_resp") or {}
-            if base.get("ret", 0) != 0:
-                if "status" in data:
-                    status = int(data["status"])
-                    emit_status(status, data)
-                    if status == SCAN_STATUS_CONFIRMED:
-                        return
-                else:
-                    emit_status(-1)
-                time.sleep(poll_interval)
-                continue
-
-            status = int(data.get("status", 0))
-            emit_status(status, data)
-
-            if status == SCAN_STATUS_WAITING:
-                time.sleep(poll_interval)
-                continue
-            if status == SCAN_STATUS_CONFIRMED:
-                if on_status:
-                    on_status(status, scan_status_message(status, data))
-                return
-            if status in SCAN_STATUS_EXPIRED:
-                push_qr(force=True)
-                time.sleep(poll_interval)
-                continue
-            if status in SCAN_STATUS_SCANNED:
-                if data.get("acct_size", 0) < 1:
-                    raise RuntimeError("没有可登录账号")
-                time.sleep(poll_interval)
-                continue
-            if status == 5:
-                raise RuntimeError("该账号尚未绑定邮箱，无法扫码登录")
-            time.sleep(poll_interval)
-
-        raise TimeoutError("等待扫码超时（3 分钟），请重试")
+    def poll_scan(self) -> ScanAskResult:
+        return parse_ask_response(self.ask_once())
 
     def complete_login(self) -> tuple[str, str]:
-        """执行 bizlogin login，返回 (token, cookie 字符串)。"""
+        """④ bizlogin?action=login — 返回 (token, cookie 字符串)。"""
         body = {
             "userlang": "zh_CN",
             "redirect_url": "",
@@ -260,13 +246,20 @@ class MpScanLogin:
         if not token:
             raise RuntimeError(f"无法从 redirect_url 解析 token: {redirect_url}")
 
-        cookie_str = "; ".join(
-            f"{c.name}={c.value}" for c in self.session.cookies
-        )
+        cookie_str = self._cookie_header_string(resp)
         if not cookie_str:
             raise RuntimeError("登录成功但未获得 Cookie")
 
         return token, cookie_str
+
+    def _cookie_header_string(self, _login_resp: requests.Response) -> str:
+        """登录后的 Cookie 串（排除扫码阶段的 uuid）。"""
+        pairs: dict[str, str] = {}
+        for c in self.session.cookies:
+            if c.name.lower() == "uuid":
+                continue
+            pairs[c.name] = c.value
+        return "; ".join(f"{k}={v}" for k, v in pairs.items())
 
     @staticmethod
     def _token_from_redirect(redirect_url: str) -> str:

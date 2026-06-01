@@ -48,8 +48,17 @@ function markAllReadInView() {
 const viewMode = ref<'grid' | 'list'>('grid')
 
 // ── 增量渲染（懒加载） ──────────────────────────────────────────────────────
-/** 当前视图展示的文章总数（跨所有分组求和） */
-const totalCount = computed(() => groupedArticles.value.reduce((s, g) => s + g.articles.length, 0))
+/** JSON 模式：客户端已加载文章数；SQLite：服务端总数 */
+const loadedInViewCount = computed(() =>
+  groupedArticles.value.reduce((s, g) => s + g.articles.length, 0),
+)
+
+const totalCount = computed(() => {
+  if (articlesStore.isSqlite) {
+    return articlesStore.sqliteFilterTotalCount || loadedInViewCount.value
+  }
+  return loadedInViewCount.value
+})
 
 const INITIAL_COUNT = 30
 const PAGE_SIZE = 20
@@ -57,10 +66,49 @@ const displayLimit = ref(INITIAL_COUNT)
 const sentinelRef = ref<HTMLElement | null>(null)
 const scrollRef = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | null = null
+let loadMoreLocked = false
 
-/** 截断 groupedArticles 到 displayLimit 篇 */
+/** SQLite 加载更多后保持滚动位置，避免列表增高后视口被顶下去 */
+async function loadMoreSqlitePreserveScroll() {
+  const el = scrollRef.value
+  const sentinel = sentinelRef.value
+  if (!el || articlesStore.sqliteLoadingMore || loadMoreLocked) return
+  loadMoreLocked = true
+  if (sentinel) observer?.unobserve(sentinel)
+  const scrollTop = el.scrollTop
+  try {
+    await articlesStore.loadMoreArticles(filters)
+    await nextTick()
+    el.scrollTop = scrollTop
+  } finally {
+    await nextTick()
+    if (sentinel && observer) observer.observe(sentinel)
+    loadMoreLocked = false
+  }
+}
+
+function setupScrollObserver() {
+  observer?.disconnect()
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries[0]?.isIntersecting || !hasMore.value || loadMoreLocked) return
+      if (articlesStore.isSqlite) {
+        void loadMoreSqlitePreserveScroll()
+      } else {
+        displayLimit.value += PAGE_SIZE
+      }
+    },
+    { root: scrollRef.value, rootMargin: '80px' },
+  )
+  if (sentinelRef.value) observer.observe(sentinelRef.value)
+}
+
+/** JSON 模式截断渲染；SQLite 展示已拉取的全部条目 */
 const displayedGroups = computed(() => {
   const groups = groupedArticles.value
+  if (articlesStore.isSqlite) {
+    return groups
+  }
   const limit = displayLimit.value
   let remaining = limit
   const result: typeof groups = []
@@ -77,34 +125,34 @@ const displayedGroups = computed(() => {
   return result
 })
 
-const displayedCount = computed(() => displayedGroups.value.reduce((s, g) => s + g.articles.length, 0))
-const hasMore = computed(() => displayedCount.value < totalCount.value)
+const displayedCount = computed(() =>
+  displayedGroups.value.reduce((s, g) => s + g.articles.length, 0),
+)
+const hasMoreLocal = computed(() => displayedCount.value < loadedInViewCount.value)
+const hasMore = computed(() =>
+  articlesStore.isSqlite ? articlesStore.sqliteHasMore : hasMoreLocal.value,
+)
 
 onMounted(() => {
-  // 每次进入文章页都主动拉最新数据，避免与配置页状态不同步
-  // （例如：爬取在其它页面完成、或 Docker 场景下前端状态未及时刷新）
-  void articlesStore.loadData()
-
-  observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0]?.isIntersecting && hasMore.value) {
-        displayLimit.value += PAGE_SIZE
-      }
-    },
-    { root: scrollRef.value, rootMargin: '200px' },
-  )
-  if (sentinelRef.value) observer.observe(sentinelRef.value)
+  void articlesStore.loadData(filters).then(() => {
+    displayLimit.value = INITIAL_COUNT
+    nextTick(() => setupScrollObserver())
+  })
 })
 
-// 若 Router 使用 keep-alive，重新激活文章页时也强制同步一次数据
 onActivated(() => {
-  void articlesStore.loadData()
+  if (!articlesStore.isSqlite) {
+    void articlesStore.loadData(filters)
+  }
 })
 
-// sentinel 可能在 onMounted 之后才渲染（条件渲染），需要 watch 补充观察
+// sentinel / 滚动容器在 loading 结束后才挂载，需重新绑定 observer
 watch(sentinelRef, (el, oldEl) => {
   if (oldEl) observer?.unobserve(oldEl)
-  if (el) observer?.observe(el)
+  if (el && observer) observer.observe(el)
+})
+watch(scrollRef, () => {
+  if (scrollRef.value && observer) setupScrollObserver()
 })
 
 onUnmounted(() => {
@@ -117,6 +165,9 @@ watch(
   () => {
     displayLimit.value = INITIAL_COUNT
     nextTick(() => scrollRef.value?.scrollTo({ top: 0 }))
+    if (articlesStore.isSqlite) {
+      void articlesStore.loadArticlesPage(filters, { reset: true })
+    }
   },
 )
 
@@ -273,7 +324,7 @@ function handleReset() {
         <p class="text-sm font-medium text-[var(--color-foreground)]">加载失败</p>
         <p class="text-xs text-[var(--color-muted-foreground)]">{{ articlesStore.error }}</p>
         <button
-          @click="articlesStore.loadData()"
+          @click="articlesStore.loadData(filters)"
           class="mt-2 rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-opacity"
         >
           重试
@@ -330,10 +381,10 @@ function handleReset() {
         </div>
 
         <!-- 懒加载哨兵 -->
-        <div ref="sentinelRef" class="flex items-center justify-center py-6">
+        <div ref="sentinelRef" class="feed-scroll-sentinel flex items-center justify-center py-6">
           <p v-if="hasMore" class="text-xs text-[var(--color-muted-foreground)]">
             <Loader2 class="inline h-3.5 w-3.5 animate-spin align-text-bottom mr-1" />
-            已加载 {{ displayedCount }} / {{ totalCount }} 篇，滚动加载更多...
+            已加载 {{ displayedCount }} / {{ totalCount }} 篇<template v-if="articlesStore.sqliteLoadingMore">（加载中）</template><template v-else>，滚动加载更多...</template>
           </p>
           <p v-else class="text-xs text-[var(--color-muted-foreground)]">
             共 {{ totalCount }} 篇，已全部加载

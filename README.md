@@ -111,7 +111,7 @@ cd frontend && npm run dev
 
 | 项 | 说明 |
 |----|------|
-| **镜像内容** | Python 3.11 + uv + 项目依赖 + Chromium（无头，供扫码登录） + 前端构建产物 |
+| **镜像内容** | Python 3.11 + uv + 项目依赖 + Chromium（可选，CLI 脚本 `WechatRequest.login()` 仍用） + 前端构建产物 |
 | **入口** | `uvicorn server:app`（见仓库根目录 `server.py`，复用 `api.app` 并挂载前端 dist 与 `/data`） |
 | **端口** | 容器内 `8000`，默认只绑定到宿主 `127.0.0.1:8000`（避免把扫码凭证暴露到公网） |
 | **持久化** | 宿主 `./data` ↔ 容器 `/app/data`；迁移 = 拷贝 `data/` 目录 |
@@ -122,6 +122,17 @@ docker compose up -d --build     # 构建并后台启动
 docker compose logs -f           # 跟随日志
 docker compose down              # 停止并移除容器（data/ 仍保留在宿主）
 ```
+
+**SQLite 存储（推荐，数据量大时）**：
+
+```bash
+# 首次：将 data/*.json 或 data/old_data/*.json 迁入 data/wechatoa.db
+uv run python scripts/migrate_json_to_sqlite.py
+```
+
+服务**仅使用** SQLite（`data/wechatoa.db`）；历史 JSON 可归档在 `data/old_data/`。
+
+信息流改为分页加载（`GET /api/articles`），关键词搜索走 FTS（`GET /api/articles/search`）。
 
 启动成功后浏览器打开 <http://127.0.0.1:8000> → **配置页 → 扫码登录** 即可使用，和本地跑 `./start_all.sh` 体验一致。
 
@@ -156,14 +167,13 @@ docker compose down              # 停止并移除容器（data/ 仍保留在宿
 
 | 路径 | 用途 |
 |------|------|
+| `data/wechatoa.db` | 文章、公众号、正文、已读/收藏、删除黑名单（SQLite） |
 | `data/id_info.json` | 微信会话凭证 |
-| `data/name2fakeid.json` | 已添加公众号 |
-| `data/message_info.json` | 文章主数据（列表、元数据、标签、摘要等） |
-| `data/message_detail_text.json` | 正文缓存 |
-| `data/covers/` | 封面图 |
-| `data/deleted_article_ids.json` | 删除黑名单 |
-| `data/operation_logs.jsonl` | 操作日志 |
 | `data/llm_config.json` | 大模型与任务配置 |
+| `data/issues_message.json` | 爬取问题记录（去重等） |
+| `data/covers/` | 封面图 |
+| `data/operation_logs.jsonl` | 操作日志 |
+| `data/old_data/` | 迁移前的 JSON 归档（日常不读） |
 
 **安全提示**：上述文件多含隐私与密钥，公开仓库请勿提交；请配合 `.gitignore` 与团队规范使用。
 
@@ -189,5 +199,5 @@ WeChatOA_Aggregation/
 
 ## 致谢与参考
 
-- [wechat-article-exporter](https://github.com/jooooock/wechat-article-exporter)
+- [wechat-article-exporter](https://github.com/wechat-article/wechat-article-exporter)
 - [WeChat_Article](https://github.com/1061700625/WeChat_Article)

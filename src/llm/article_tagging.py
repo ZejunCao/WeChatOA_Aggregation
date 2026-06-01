@@ -130,8 +130,10 @@ def tag_article(article: dict[str, Any], data_manager: Any) -> dict[str, Any]:
     title = (article.get("title") or "").strip()
     digest = (article.get("digest") or "").strip()
     detail = None
-    if aid and hasattr(data_manager, "message_detail_text"):
-        detail = data_manager.message_detail_text.get(aid)
+    if aid:
+        from src.storage.helpers import get_article_body
+
+        detail = get_article_body(aid, data_manager)
     excerpt = _body_excerpt(detail)
 
     user = f"""标题：{title}

@@ -44,8 +44,8 @@ export function useFilters() {
       list = list.filter((a) => filters.accounts.includes(a.account))
     }
 
-    // 第三步：关键词搜索（同时匹配标题、摘要、AI 摘要，不区分大小写）
-    if (filters.keyword.trim()) {
+    // 第三步：关键词（SQLite 由服务端 FTS 处理，避免对已加载分页数据二次过滤）
+    if (filters.keyword.trim() && !articlesStore.isSqlite) {
       const kw = filters.keyword.trim().toLowerCase()
       list = list.filter(
         (a) =>
@@ -73,11 +73,13 @@ export function useFilters() {
       list = list.filter((a) => a.create_time <= filters.dateTo + ' 23:59')
     }
 
-    // 第六步：已读/收藏状态过滤
-    if (filters.readFilter === 'unread') {
-      list = list.filter((a) => !readingStore.isRead(a.id))
-    } else if (filters.readFilter === 'bookmarked') {
-      list = list.filter((a) => readingStore.isBookmarked(a.id))
+    // 第六步：已读/收藏（SQLite 已由 API 筛选；JSON 模式在客户端筛）
+    if (!articlesStore.isSqlite) {
+      if (filters.readFilter === 'unread') {
+        list = list.filter((a) => !readingStore.isRead(a.id))
+      } else if (filters.readFilter === 'bookmarked') {
+        list = list.filter((a) => readingStore.isBookmarked(a.id))
+      }
     }
     // 'all' 时不过滤
 

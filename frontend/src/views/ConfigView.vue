@@ -1157,91 +1157,142 @@ watch(configTab, (t) => {
   }
 })
 
-// ---------- 扫码登录 ----------
+// ---------- 扫码登录（四步：session → qrcode → scan 轮询 → complete）----------
 
 const showLoginModal = ref(false)
-const loginPending = ref(false)     // 正在等待扫码
+const loginPending = ref(false)
 const loginError = ref('')
-const loginScanStatus = ref(-1)     // 与 mp ask 的 status 对齐；-1 未扫码
-const loginScanMessage = ref('')    // 后端轮询 ask 返回的提示文案
-const qrcodeImg = ref('')           // 最新二维码（base64）
-const qrcodeAt = ref('')            // 二维码更新时间
-const qrcodeLoading = ref(true)     // 二维码尚未就绪
+const loginScanStatus = ref(-1)
+const loginScanMessage = ref('')
+const qrcodeImg = ref('')
+const qrcodeAt = ref('')
+const qrcodeLoading = ref(true)
+const loginCompleting = ref(false)
 
-/** 已扫码待手机确认（exporter 在此阶段会隐藏二维码） */
+/** 已扫码待手机确认（与 wechat-article-exporter Login.vue 一致，隐藏二维码） */
 const loginAwaitingConfirm = computed(
   () => loginScanStatus.value === 4 || loginScanStatus.value === 6,
 )
 
-let _loginPollTimer: ReturnType<typeof setInterval> | null = null
-let _qrcodePollTimer: ReturnType<typeof setInterval> | null = null
+let _scanPollTimer: ReturnType<typeof setInterval> | null = null
 
 function stopLoginPoll() {
-  if (_loginPollTimer !== null) { clearInterval(_loginPollTimer); _loginPollTimer = null }
-  if (_qrcodePollTimer !== null) { clearInterval(_qrcodePollTimer); _qrcodePollTimer = null }
+  if (_scanPollTimer !== null) {
+    clearInterval(_scanPollTimer)
+    _scanPollTimer = null
+  }
 }
 
-async function fetchQrcode() {
+async function refreshLoginQrcode() {
   try {
-    const res = await fetch('/api/auth/qrcode')
-    if (res.ok) {
-      const data = await res.json()
-      if (data.img) {
-        qrcodeImg.value = data.img
-        qrcodeAt.value = data.refreshed_at
-        qrcodeLoading.value = false
-      }
-    }
-  } catch { /* 忽略 */ }
-}
-
-async function pollLoginStatus() {
-  try {
-    const res = await fetch('/api/auth/login/status')
+    const res = await fetch('/api/auth/login/qrcode', { cache: 'no-store' })
     if (!res.ok) return
     const data = await res.json()
-    if (data.running) {
-      if (typeof data.scan_status === 'number') {
-        loginScanStatus.value = data.scan_status
-      }
-      if (data.scan_message) {
-        loginScanMessage.value = data.scan_message
-      }
-      return
-    }
-    if (data.done) {
-      stopLoginPoll()
-      loginPending.value = false
-      if (data.error) {
-        loginError.value = data.error
-      } else {
-        showLoginModal.value = false
-        await loadAuthStatus()
-      }
+    if (data.img) {
+      qrcodeImg.value = data.img
+      qrcodeAt.value = data.refreshed_at || ''
+      qrcodeLoading.value = false
     }
   } catch { /* 忽略 */ }
+}
+
+async function completeWechatLogin() {
+  loginCompleting.value = true
+  loginScanMessage.value = '已确认，正在登录…'
+  loginScanStatus.value = 1
+  try {
+    const res = await fetch('/api/auth/login/complete', { method: 'POST' })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      loginError.value = data.detail || '登录失败，请重试'
+      return
+    }
+    stopLoginPoll()
+    loginPending.value = false
+    showLoginModal.value = false
+    await loadAuthStatus()
+  } catch {
+    loginError.value = '无法连接到后端服务'
+  } finally {
+    loginCompleting.value = false
+  }
+}
+
+/** ③ ask 轮询（约 2s，对齐 exporter） */
+async function pollScanStatus() {
+  if (!loginPending.value || loginCompleting.value) return
+  try {
+    const res = await fetch('/api/auth/login/scan', { cache: 'no-store' })
+    if (res.status === 404) {
+      loginError.value = '登录会话已失效，请重新扫码'
+      stopLoginPoll()
+      loginPending.value = false
+      return
+    }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      loginError.value = data.detail || '查询扫码状态失败'
+      return
+    }
+    const data = await res.json()
+    loginScanStatus.value = data.status
+    loginScanMessage.value = data.message || ''
+
+    switch (data.status) {
+      case 0:
+        break
+      case 1:
+        await completeWechatLogin()
+        break
+      case 2:
+      case 3:
+        await refreshLoginQrcode()
+        break
+      case 4:
+      case 6:
+        if (data.acct_size < 1) {
+          loginError.value = '没有可登录账号'
+        }
+        break
+      case 5:
+        loginError.value = '该账号尚未绑定邮箱，无法扫码登录'
+        stopLoginPoll()
+        loginPending.value = false
+        break
+      default:
+        break
+    }
+  } catch { /* 忽略单次网络抖动 */ }
 }
 
 async function startLogin() {
   if (loginPending.value) return
+  stopLoginPoll()
   loginPending.value = true
+  loginCompleting.value = false
   loginError.value = ''
   loginScanStatus.value = -1
-  loginScanMessage.value = '正在启动登录…'
+  loginScanMessage.value = '正在获取登录二维码…'
   qrcodeImg.value = ''
   qrcodeLoading.value = true
   showLoginModal.value = true
   try {
-    const res = await fetch('/api/auth/login', { method: 'POST' })
+    const res = await fetch('/api/auth/login/session', { method: 'POST' })
+    const data = await res.json().catch(() => ({}))
     if (!res.ok) {
+      loginError.value = data.detail || '无法创建登录会话'
       loginPending.value = false
-      showLoginModal.value = false
       return
     }
-    await fetchQrcode()
-    _qrcodePollTimer = setInterval(fetchQrcode, 2000)
-    // 每 2 秒检查是否扫码完成
-    _loginPollTimer = setInterval(pollLoginStatus, 1500)
+    if (data.img) {
+      qrcodeImg.value = data.img
+      qrcodeAt.value = data.refreshed_at || ''
+      qrcodeLoading.value = false
+    }
+    loginScanStatus.value = data.scan_status ?? 0
+    loginScanMessage.value = data.scan_message || '请使用微信扫一扫登录'
+    _scanPollTimer = setInterval(pollScanStatus, 2000)
+    void pollScanStatus()
   } catch {
     loginPending.value = false
     showLoginModal.value = false
@@ -1250,14 +1301,17 @@ async function startLogin() {
 }
 
 function canCloseLoginModal() {
-  return !qrcodeLoading.value || !!loginError.value
+  return !qrcodeLoading.value || !!loginError.value || loginCompleting.value
 }
 
-function closeLoginModal() {
+async function closeLoginModal() {
   if (!canCloseLoginModal()) return
+  stopLoginPoll()
   loginPending.value = false
   showLoginModal.value = false
-  stopLoginPoll()
+  try {
+    await fetch('/api/auth/login/cancel', { method: 'POST' })
+  } catch { /* 忽略 */ }
 }
 
 // ---------- 缓存清理 ----------
@@ -2422,6 +2476,15 @@ async function doCacheClear() {
               >
                 <Loader2 class="h-8 w-8 animate-spin text-[var(--color-primary)]" />
                 <span class="text-sm font-medium">{{ loginScanMessage || '扫码成功，请在手机上确认登录' }}</span>
+              </div>
+
+              <!-- 手机已确认：正在写入凭证 -->
+              <div
+                v-else-if="loginCompleting"
+                class="h-56 w-56 flex flex-col items-center justify-center gap-3 rounded-xl bg-[var(--color-muted)]/30 text-[var(--color-foreground)] px-4 text-center"
+              >
+                <Loader2 class="h-8 w-8 animate-spin text-[var(--color-primary)]" />
+                <span class="text-sm font-medium">{{ loginScanMessage || '已确认，正在登录…' }}</span>
               </div>
 
               <!-- 二维码图片 -->

@@ -5,10 +5,19 @@ ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT_DIR"
 
 echo "[start] 启动后端: http://127.0.0.1:8000"
-uv run uvicorn api:app --reload --port 8000 &
+uv run uvicorn api:app --reload --host 127.0.0.1 --port 8000 &
 BACKEND_PID=$!
 
-echo "[start] 启动前端: http://127.0.0.1:5173"
+echo "[start] 等待后端就绪..."
+for _ in $(seq 1 40); do
+  if curl -sf "http://127.0.0.1:8000/api/storage/backend" >/dev/null 2>&1; then
+    echo "[start] 后端已就绪"
+    break
+  fi
+  sleep 0.25
+done
+
+echo "[start] 启动前端: http://127.0.0.1:5173 （开发请用此地址，不要直接开 8000）"
 (
   cd frontend
   npm run dev

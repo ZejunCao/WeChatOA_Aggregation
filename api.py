@@ -7,19 +7,18 @@
 import json
 import re
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 # ── 数据目录和文件路径 ──────────────────────────────────────────────────────────
 DATA_DIR = Path(__file__).parent / "data"
-NAME2FAKEID_FILE = DATA_DIR / "name2fakeid.json"
-MESSAGE_INFO_FILE = DATA_DIR / "message_info.json"
 COVERS_DIR = DATA_DIR / "covers"
 LOGS_FILE = DATA_DIR / "operation_logs.jsonl"
 
@@ -33,30 +32,252 @@ app.add_middleware(
 )
 
 
-# ── 数据文件读写工具 ────────────────────────────────────────────────────────────
-# 这几个函数封装了对 JSON 文件的直接读写，每次调用都会从磁盘读取最新内容，
-# 避免内存中的旧数据影响结果。
+# ── SQLite 存储 ────────────────────────────────────────────────────────────────
+
+def _require_database() -> None:
+    from src.storage import require_database
+
+    try:
+        require_database()
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+
 
 def _read_name2fakeid() -> dict[str, str]:
-    """读取公众号名称→fakeid 映射，文件不存在时返回空字典。"""
-    if not NAME2FAKEID_FILE.exists():
-        return {}
-    with open(NAME2FAKEID_FILE, encoding="utf-8") as f:
-        return json.load(f)
+    """从 accounts 表读取公众号名称→fakeid 映射。"""
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        return repo.get_name2fakeid()
 
 
 def _write_name2fakeid(data: dict[str, str]) -> None:
-    """将公众号名称→fakeid 映射写回磁盘（格式化 JSON，方便人工查看）。"""
-    with open(NAME2FAKEID_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+    """将公众号名称→fakeid 映射写入 accounts 表。"""
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        for name, fakeid in data.items():
+            repo.upsert_account(str(name), str(fakeid))
+        repo.commit()
 
 
-def _read_message_info() -> dict:
-    """读取全部公众号的文章信息，文件不存在时返回空字典。"""
-    if not MESSAGE_INFO_FILE.exists():
-        return {}
-    with open(MESSAGE_INFO_FILE, encoding="utf-8") as f:
-        return json.load(f)
+@app.get("/api/storage/backend")
+def get_storage_backend():
+    _require_database()
+    return {"backend": "sqlite"}
+
+
+@app.get("/api/name2fakeid")
+def get_name2fakeid_api():
+    _require_database()
+    return _read_name2fakeid()
+
+
+class ArticleListResponse(BaseModel):
+    items: list[dict]
+    next_cursor: str | None = None
+    total: int = 0
+
+
+@app.get("/api/articles", response_model=ArticleListResponse)
+def list_articles_api(
+    limit: int = Query(30, ge=1, le=100),
+    cursor: str | None = None,
+    account: str | None = None,
+    tag: str | None = None,
+    date_from: str = "",
+    date_to: str = "",
+    read_filter: str | None = Query(
+        None, description="unread=仅未读, read=仅已读；默认全部"
+    ),
+    starred_only: bool = Query(False, description="true=仅收藏"),
+):
+    _require_database()
+    rf = (read_filter or "").strip().lower() or None
+    if rf not in (None, "unread", "read"):
+        raise HTTPException(status_code=400, detail="read_filter 须为 unread 或 read")
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        items, next_c = repo.list_articles(
+            limit=limit,
+            cursor=cursor,
+            account=account or None,
+            tag=tag or None,
+            date_from=date_from,
+            date_to=date_to,
+            read_filter=rf,
+            starred_only=starred_only,
+        )
+        total = repo.count_articles(
+            account=account or None,
+            tag=tag or None,
+            date_from=date_from,
+            date_to=date_to,
+            read_filter=rf,
+            starred_only=starred_only,
+        )
+        repo.commit()
+    return ArticleListResponse(items=items, next_cursor=next_c, total=total)
+
+
+@app.get("/api/articles/search", response_model=ArticleListResponse)
+def search_articles_api(
+    q: str = Query(..., min_length=1),
+    limit: int = Query(30, ge=1, le=100),
+    cursor: str | None = None,
+    account: str | None = None,
+    read_filter: str | None = None,
+    starred_only: bool = False,
+):
+    _require_database()
+    rf = (read_filter or "").strip().lower() or None
+    if rf not in (None, "unread", "read"):
+        raise HTTPException(status_code=400, detail="read_filter 须为 unread 或 read")
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        from src.db import fts as fts_mod
+
+        q = q.strip()
+        ids = fts_mod.search_article_ids(repo.conn, q, limit=500)
+        items, next_c = repo.list_articles(
+            limit=limit,
+            cursor=cursor,
+            account=account or None,
+            article_ids=ids,
+            read_filter=rf,
+            starred_only=starred_only,
+        )
+        total = repo.count_articles(
+            account=account or None,
+            article_ids=ids,
+            read_filter=rf,
+            starred_only=starred_only,
+        )
+        repo.commit()
+    return ArticleListResponse(items=items, next_cursor=next_c, total=total)
+
+
+class ReadingPatchBody(BaseModel):
+    is_read: bool | None = None
+    starred: bool | None = None
+
+
+class MarkAllReadBody(BaseModel):
+    article_ids: list[str]
+
+
+class ReadingImportBody(BaseModel):
+    read_ids: list[str] = []
+    starred_ids: list[str] = []
+
+
+@app.get("/api/reading/state")
+def get_reading_state_api():
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        state = repo.get_reading_state()
+        repo.commit()
+    return state
+
+
+@app.patch("/api/articles/{article_id}/reading")
+def patch_article_reading_api(article_id: str, body: ReadingPatchBody):
+    _require_database()
+    if body.is_read is None and body.starred is None:
+        raise HTTPException(status_code=400, detail="至少提供 is_read 或 starred")
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        row = repo.conn.execute(
+            "SELECT id FROM articles WHERE id=?", (article_id,)
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="文章不存在")
+        if body.is_read is not None:
+            repo.set_article_read(article_id, bool(body.is_read))
+        if body.starred is not None:
+            repo.set_article_starred(article_id, bool(body.starred))
+        repo.commit()
+    return {"ok": True, "article_id": article_id}
+
+
+@app.post("/api/reading/mark-all-read")
+def mark_all_read_api(body: MarkAllReadBody):
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        n = repo.mark_articles_read(body.article_ids)
+        repo.commit()
+    return {"ok": True, "marked": n}
+
+
+@app.post("/api/reading/import-local")
+def import_reading_local_api(body: ReadingImportBody):
+    """一次性：将浏览器 localStorage 中的已读/收藏导入数据库。"""
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        result = repo.import_reading_state(body.read_ids, body.starred_ids)
+        repo.commit()
+    return {"ok": True, **result}
+
+
+@app.get("/api/articles/index")
+def list_articles_index_api(account: str | None = None):
+    """轻量文章索引（id/account/create_time），供未读、收藏等客户端状态筛选。"""
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        items = repo.list_article_index(account=account or None)
+    return {"items": items}
+
+
+@app.get("/api/articles/by-ids", response_model=ArticleListResponse)
+def list_articles_by_ids_api(
+    ids: str = Query(..., description="逗号分隔的文章 id，最多 100 个"),
+):
+    _require_database()
+    id_list = [x.strip() for x in ids.split(",") if x.strip()]
+    if not id_list:
+        return ArticleListResponse(items=[], next_cursor=None, total=0)
+    if len(id_list) > 100:
+        raise HTTPException(status_code=400, detail="单次最多 100 个 id")
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        items, _ = repo.list_articles(limit=len(id_list), article_ids=id_list)
+        repo.commit()
+    return ArticleListResponse(items=items, next_cursor=None, total=len(items))
+
+
+@app.get("/api/articles/tags")
+def list_article_tags_api():
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        tags = repo.all_llm_tags()
+    return {"tags": tags}
+
+
+@app.get("/api/articles/{article_id}")
+def get_article_api(article_id: str):
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        item = repo.get_article_detail(article_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="文章不存在")
+    return item
+
 
 
 # ── Pydantic 数据模型 ───────────────────────────────────────────────────────────
@@ -183,47 +404,33 @@ def download_cover(article_id: str, cover_url: str, covers_dir: Path, request_he
 
 def article_word_count(article: dict, data_manager) -> int:
     """优先统计正文，缺失时回退到标题长度。"""
-    article_id = str(article.get("id") or "")
-    if article_id:
-        text_data = data_manager.message_detail_text.get(article_id)
-        if isinstance(text_data, list):
-            text = "".join(str(x) for x in text_data)
-            cleaned = re.sub(r"\s+", "", text)
-            if cleaned:
-                return len(cleaned)
-        elif isinstance(text_data, str):
-            cleaned = re.sub(r"\s+", "", text_data)
-            if cleaned:
-                return len(cleaned)
-    title = str(article.get("title") or "")
-    return len(re.sub(r"\s+", "", title))
+    from src.storage.helpers import compute_word_count
+
+    return compute_word_count(article, data_manager)
 
 
 def _fetch_article_detail_text(article_id: str, link: str) -> bool:
     """
-    根据文章链接拉取 HTML 正文（url2text），写入 data_manager.message_detail_text。
+    根据文章链接拉取 HTML 正文（url2text），写入 article_bodies 表。
 
-    存储格式与 deduplication / blog_generator 一致：正常为段落 list[str]；
-    url2text 在文章删除、请求失败时可能返回 str（如「已删除」「请求错误」），原样写入。
-
-    若该 article_id 在 message_detail_text 中已存在则跳过，避免重复抓取。
-    返回 True 表示本次写入了新数据，需要随后 write("message_detail_text")。
+    若该 article_id 已有正文则跳过。返回 True 表示本次写入了新数据。
     """
     if not link or not article_id:
         return False
-    from src.utils.data_manager import data_manager
     from src.utils.helpers import url2text
+    from src.db.repository import ArticleRepository
 
-    if article_id in data_manager.message_detail_text:
-        return False
-
-    try:
-        text = url2text(link)
-        data_manager.message_detail_text[article_id] = text
-        return True
-    except Exception as e:
-        print(f"[detail] 抓取正文失败 {article_id}: {e}")
-        return False
+    with ArticleRepository() as repo:
+        if repo.has_body(article_id):
+            return False
+        try:
+            text = url2text(link)
+            repo.set_body_text(article_id, text)
+            repo.commit()
+            return True
+        except Exception as e:
+            print(f"[detail] 抓取正文失败 {article_id}: {e}")
+            return False
 
 
 def _get_wechat():
@@ -245,26 +452,22 @@ def list_accounts():
     """
     返回所有已添加的公众号及其状态。
 
-    数据来源：
-    - name2fakeid.json  → 已添加的公众号列表
-    - message_info.json → 各公众号的文章数量和最后更新时间
+    数据来源：accounts / articles 表（SQLite）。
     """
-    name2fakeid = _read_name2fakeid()
-    message_info = _read_message_info()
+    _require_database()
+    from src.db.repository import ArticleRepository
 
+    with ArticleRepository() as repo:
+        rows = repo.list_accounts()
     result = []
-    for name, fakeid in name2fakeid.items():
-        entry = message_info.get(name, {})
-        blogs = entry.get("blogs", [])
-        # 过滤掉已被微信删除的文章
-        active_blogs = [b for b in blogs if not b.get("is_deleted", False)]
+    for row in rows:
         result.append(
             AccountStatus(
-                name=name,
-                fakeid=fakeid,
-                has_articles=len(active_blogs) > 0,
-                article_count=len(active_blogs),
-                latest_update_time=entry.get("latest_update_time", ""),
+                name=row["name"],
+                fakeid=row["fakeid"],
+                has_articles=row["article_count"] > 0,
+                article_count=row["article_count"],
+                latest_update_time=row["latest_update_time"],
             )
         )
     return result
@@ -334,7 +537,7 @@ def search_accounts(body: SearchRequest):
 @app.post("/api/accounts", response_model=AccountStatus, status_code=201)
 def add_account(body: ConfirmAddRequest):
     """
-    确认添加公众号：将用户选定的 name + fakeid 写入 name2fakeid.json。
+    确认添加公众号：将用户选定的 name + fakeid 写入 accounts 表。
 
     调用时机：前端搜索并展示候选后，用户点击"确认添加"触发。
     重复添加同名公众号会返回 409 冲突错误。
@@ -367,15 +570,18 @@ def add_account(body: ConfirmAddRequest):
 @app.delete("/api/accounts/{name}", status_code=204)
 def remove_account(name: str):
     """
-    从跟踪列表中移除公众号（只删除 name2fakeid.json 中的记录，
+    从跟踪列表中移除公众号（只删除 accounts 表中的记录，
     不删除已爬取的文章数据，如需清理可使用缓存清理功能）。
     """
     name2fakeid = _read_name2fakeid()
     if name not in name2fakeid:
         raise HTTPException(status_code=404, detail=f"公众号「{name}」不在列表中")
 
-    del name2fakeid[name]
-    _write_name2fakeid(name2fakeid)
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        repo.remove_account_from_list(name)
+        repo.commit()
     _append_log(LOG_ACCOUNT_REMOVE, f"移除公众号「{name}」", {"name": name})
 
 
@@ -390,70 +596,30 @@ class ArticleDeleteRequest(BaseModel):
 @app.post("/api/articles/remove")
 def remove_article(body: ArticleDeleteRequest):
     """
-    将文章 id 写入 data/deleted_article_ids.json，并从 message_info 中移除该条。
-    后续爬取时若微信仍返回该文，会因 id 在黑名单中而跳过。
-    同时尝试删除本地封面与详情缓存。
+    写入 deleted_articles 表并从 articles 移除；同时删除本地封面。
     """
-    from src.utils.data_manager import data_manager
-
     aid = body.article_id.strip()
     acc = body.account.strip()
     if not aid or not acc:
         raise HTTPException(status_code=400, detail="article_id 和 account 不能为空")
 
-    data_manager.reload("deleted_article_ids")
-    data_manager.reload("message_info")
+    from src.db.repository import ArticleRepository
 
-    if acc not in data_manager.message_info:
-        raise HTTPException(status_code=404, detail=f"公众号「{acc}」不存在")
-
-    blogs = data_manager.message_info[acc].get("blogs", [])
-    if not any(b.get("id") == aid for b in blogs):
-        raise HTTPException(status_code=404, detail="文章不存在或已删除")
-
-    # 黑名单
-    raw = data_manager.deleted_article_ids
-    if not isinstance(raw, dict):
-        raise HTTPException(status_code=500, detail="deleted_article_ids.json 格式异常，请检查 data 目录")
-    if "ids" not in raw or not isinstance(raw["ids"], list):
-        raw["ids"] = []
-    ids_list: list = raw["ids"]
-    if aid not in ids_list:
-        ids_list.append(aid)
-    data_manager.write("deleted_article_ids")
-
-    # 从 message_info 移除
-    data_manager.message_info[acc]["blogs"] = [b for b in blogs if b.get("id") != aid]
-    data_manager.write("message_info")
-
-    # 本地封面
+    with ArticleRepository() as repo:
+        if not repo.remove_article(aid, acc):
+            raise HTTPException(status_code=404, detail="文章不存在或已删除")
+        repo.commit()
     cover_path = COVERS_DIR / (aid.replace("/", "_") + ".jpg")
     if cover_path.exists():
         try:
             cover_path.unlink()
         except OSError:
             pass
-
-    # 详情缓存
-    detail_file = DATA_DIR / "message_detail_text.json"
-    if detail_file.exists():
-        try:
-            with open(detail_file, encoding="utf-8") as f:
-                detail_texts = json.load(f)
-            if aid in detail_texts:
-                del detail_texts[aid]
-                with open(detail_file, "w", encoding="utf-8") as f:
-                    json.dump(detail_texts, f, ensure_ascii=False, indent=4)
-            data_manager.reload("message_detail_text")
-        except (json.JSONDecodeError, OSError):
-            pass
-
     _append_log(
         LOG_ARTICLE_DELETE,
         f"删除文章「{aid}」（{acc}）",
         {"article_id": aid, "account": acc},
     )
-
     return {"ok": True, "article_id": aid}
 
 
@@ -562,6 +728,180 @@ def _check_auth_valid() -> tuple[bool, str]:
         return True, f"检测时出现异常（将尝试继续爬取）: {e}"
 
 
+def _run_crawl_sqlite() -> None:
+    """SQLite 存储下的爬取主流程（不写 message_info.json）。"""
+    global _crawl_state
+    from src.crawler.wechat_request import WechatRequest
+    from src.db.repository import ArticleRepository
+    from src.llm.article_tagging import tag_article
+    from src.llm.llm_config import (
+        llm_tagging_enabled,
+        read_crawl_llm_multithread_enabled,
+        read_crawl_llm_multithread_workers,
+    )
+    from src.utils.data_manager import data_manager
+    from src.utils.helpers import time_now
+
+    data_manager.reload("id_info")
+    data_manager.reload("issues_message")
+
+    auth_ok, auth_reason = _check_auth_valid()
+    if not auth_ok:
+        _crawl_state["auth_error"] = True
+        _crawl_state["errors"].append(f"凭证失效，已终止爬取：{auth_reason}")
+        _mark_auth_failed(auth_reason)
+        _append_log(LOG_CRAWL_ERROR, f"凭证失效，爬取终止：{auth_reason}", {"reason": auth_reason})
+        return
+
+    with ArticleRepository() as repo:
+        name2fakeid = repo.get_name2fakeid()
+        _crawl_state["total"] = len(name2fakeid)
+        _append_log(
+            LOG_CRAWL_START,
+            f"开始爬取，共 {len(name2fakeid)} 个公众号",
+            {"accounts": list(name2fakeid.keys())},
+        )
+
+        wechat = WechatRequest()
+        new_total = 0
+        llm_enabled_for_crawl = llm_tagging_enabled()
+        llm_multithread_for_crawl = read_crawl_llm_multithread_enabled()
+        llm_multithread_workers_cap = read_crawl_llm_multithread_workers()
+
+        for oa_name, fakeid in name2fakeid.items():
+            if _crawl_state.get("cancel_requested"):
+                _crawl_state["cancelled"] = True
+                _crawl_state["errors"].append("用户手动取消爬取")
+                _append_log(
+                    LOG_CRAWL_FINISH,
+                    "爬取被用户手动取消",
+                    {"done": _crawl_state.get("done", 0), "total": _crawl_state.get("total", 0)},
+                )
+                break
+            _crawl_state["current"] = oa_name
+            try:
+                repo.upsert_account(oa_name, fakeid)
+                existing_blogs = repo.get_blogs_for_account(oa_name)
+                new_articles = wechat.fakeid2message_update(fakeid, existing_blogs)
+
+                if new_articles:
+                    new_total += len(new_articles)
+                    for article in new_articles:
+                        repo.upsert_article_from_blog(
+                            oa_name, article, update_fts=False
+                        )
+                        download_cover(
+                            article["id"],
+                            article.get("cover", ""),
+                            COVERS_DIR,
+                            _DOWNLOAD_HEADERS,
+                        )
+                        repo.update_cover_path(article["id"])
+                        _fetch_article_detail_text(
+                            article["id"], article.get("link", "")
+                        )
+                        wc = article_word_count(article, data_manager)
+                        repo.set_word_count(article["id"], wc)
+                        article["word_count"] = wc
+
+                if llm_enabled_for_crawl:
+                    try:
+                        all_blogs = repo.get_blogs_for_account(oa_name)
+                        need_analyze = [
+                            a
+                            for a in all_blogs
+                            if not str(a.get("summary") or "").strip()
+                        ]
+                        if llm_multithread_for_crawl and len(need_analyze) > 1:
+                            max_workers = min(
+                                llm_multithread_workers_cap, len(need_analyze)
+                            )
+                            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                                future_to_article = {
+                                    executor.submit(
+                                        tag_article, article, data_manager
+                                    ): article
+                                    for article in need_analyze
+                                }
+                                for future in as_completed(future_to_article):
+                                    if _crawl_state.get("cancel_requested"):
+                                        _crawl_state["cancelled"] = True
+                                        break
+                                    article = future_to_article[future]
+                                    try:
+                                        analysis = future.result()
+                                        tags = (
+                                            analysis.get("tags")
+                                            if isinstance(analysis, dict)
+                                            else []
+                                        )
+                                        summary = (
+                                            analysis.get("summary")
+                                            if isinstance(analysis, dict)
+                                            else ""
+                                        )
+                                        if tags or summary:
+                                            repo.update_llm_fields(
+                                                article["id"],
+                                                str(summary or ""),
+                                                tags or [],
+                                            )
+                                            article["summary"] = summary
+                                            article["tags"] = tags
+                                    except Exception as e:
+                                        print(
+                                            f"[tag] 单篇打标失败 {article.get('id')}: {e}"
+                                        )
+                        else:
+                            for article in need_analyze:
+                                if _crawl_state.get("cancel_requested"):
+                                    _crawl_state["cancelled"] = True
+                                    break
+                                try:
+                                    analysis = tag_article(article, data_manager)
+                                    tags = (
+                                        analysis.get("tags")
+                                        if isinstance(analysis, dict)
+                                        else []
+                                    )
+                                    summary = (
+                                        analysis.get("summary")
+                                        if isinstance(analysis, dict)
+                                        else ""
+                                    )
+                                    if tags or summary:
+                                        repo.update_llm_fields(
+                                            article["id"],
+                                            str(summary or ""),
+                                            tags or [],
+                                        )
+                                except Exception as e:
+                                    print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
+                    except Exception as e:
+                        print(f"[tag] 打标模块异常: {e}")
+
+                repo.set_account_latest_crawl(oa_name, time_now())
+                repo.commit()
+                _mark_auth_ok()
+            except Exception as e:
+                err_str = str(e)
+                _crawl_state["errors"].append(f"{oa_name}: {err_str}")
+                _append_log(
+                    LOG_CRAWL_ERROR,
+                    f"爬取「{oa_name}」失败：{e}",
+                    {"account": oa_name, "error": err_str},
+                )
+                if any(
+                    kw in err_str.lower()
+                    for kw in ("invalid session", "invalid csrf", "csrf token", "session")
+                ):
+                    _mark_auth_failed(err_str)
+            finally:
+                _crawl_state["done"] += 1
+                _crawl_state["new_articles"] = new_total
+                time.sleep(1.2)
+
+
 def _run_crawl() -> None:
     """
     后台爬取线程的主函数，流程如下：
@@ -570,13 +910,12 @@ def _run_crawl() -> None:
     2. 从磁盘重新加载最新凭证（data_manager.reload），支持手动更新 id_info.json
     3. 调用 _check_auth_valid() 做预检：凭证失效时立刻终止，不逐个账号重试
     4. 遍历所有公众号，调用 WechatRequest.fakeid2message_update() 获取新文章
-    5. 对每篇新文章下载封面图、拉正文；可选 LLM 生成摘要+标签写入 message_info.json
+    5. 对每篇新文章下载封面图、拉正文；可选 LLM 生成摘要+标签写入 SQLite
     6. 每处理完一个公众号（成功或失败），done += 1
     7. 全部完成后写入结束日志，设置 running=False
     """
     global _crawl_state
     try:
-        # ── 第一步：立即更新 total，让前端尽快看到正确的进度分母 ──
         quick_n2f = _read_name2fakeid()
         started_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         _crawl_state.update({
@@ -593,155 +932,7 @@ def _run_crawl() -> None:
             "cancelled": False,
         })
 
-        from src.crawler.wechat_request import WechatRequest
-        from src.llm.article_tagging import tag_article
-        from src.llm.llm_config import (
-            llm_tagging_enabled,
-            read_crawl_llm_multithread_enabled,
-            read_crawl_llm_multithread_workers,
-        )
-        from src.utils.data_manager import data_manager
-        from src.utils.helpers import time_now
-
-        # ── 第二步：从磁盘重新加载，确保内存数据是最新的 ──
-        # 特别是 id_info，用户可能在服务运行时手动修改了 token/cookie
-        data_manager.reload("id_info")
-        data_manager.reload("name2fakeid")
-        data_manager.reload("message_info")
-        data_manager.reload("issues_message")
-        data_manager.reload("deleted_article_ids")
-        data_manager.reload("message_detail_text")
-
-        # ── 第三步：凭证预检 ──────────────────────────────────────────
-        # 如果凭证已失效，提前终止，避免每个账号都等待超时再报错
-        auth_ok, auth_reason = _check_auth_valid()
-        if not auth_ok:
-            _crawl_state["auth_error"] = True
-            _crawl_state["errors"].append(f"凭证失效，已终止爬取：{auth_reason}")
-            _mark_auth_failed(auth_reason)
-            _append_log(LOG_CRAWL_ERROR, f"凭证失效，爬取终止：{auth_reason}", {"reason": auth_reason})
-            return  # 直接结束，不进入主循环
-
-        name2fakeid: dict[str, str] = dict(data_manager.name2fakeid)
-        # reload 后账号数可能与 quick_n2f 不同，更新 total 保持一致
-        _crawl_state["total"] = len(name2fakeid)
-
-        _append_log(LOG_CRAWL_START, f"开始爬取，共 {len(name2fakeid)} 个公众号",
-                    {"accounts": list(name2fakeid.keys())})
-
-        wechat = WechatRequest()
-        new_total = 0  # 本次爬取新增文章的累计数
-
-        # 爬取时是否启用模型总结+打标（配置页开关）
-        llm_enabled_for_crawl = llm_tagging_enabled()
-        # 爬取补总结/打标是否启用多线程（全局开关）
-        llm_multithread_for_crawl = read_crawl_llm_multithread_enabled()
-        llm_multithread_workers_cap = read_crawl_llm_multithread_workers()
-
-        # ── 第四步：逐个公众号爬取 ──────────────────────────────────────
-        for oa_name, fakeid in name2fakeid.items():
-            if _crawl_state.get("cancel_requested"):
-                _crawl_state["cancelled"] = True
-                _crawl_state["errors"].append("用户手动取消爬取")
-                _append_log(LOG_CRAWL_FINISH, "爬取被用户手动取消", {"done": _crawl_state.get("done", 0), "total": _crawl_state.get("total", 0)})
-                break
-            _crawl_state["current"] = oa_name  # 更新"正在处理"的账号名，供前端展示
-            try:
-                # 首次爬取该公众号时，初始化其记录结构
-                if oa_name not in data_manager.message_info:
-                    data_manager.message_info[oa_name] = {
-                        "latest_update_time": "2000-01-01 00:00",
-                        "blogs": [],
-                    }
-
-                existing_blogs: list = data_manager.message_info[oa_name]["blogs"]
-                # fakeid2message_update 内部通过 article_id 去重，只返回新增文章
-                new_articles = wechat.fakeid2message_update(fakeid, existing_blogs)
-
-                if new_articles:
-                    data_manager.message_info[oa_name]["blogs"].extend(new_articles)
-                    new_total += len(new_articles)
-                    detail_dirty = False
-                    # 新文章：下载封面 + 拉取正文写入 message_detail_text.json
-                    for article in new_articles:
-                        download_cover(article["id"], article.get("cover", ""), COVERS_DIR, _DOWNLOAD_HEADERS)
-                        if _fetch_article_detail_text(article["id"], article.get("link", "")):
-                            detail_dirty = True
-                        article["word_count"] = article_word_count(article, data_manager)
-                    if detail_dirty:
-                        data_manager.write("message_detail_text")
-
-                # 模型分析（摘要+标签）：
-                # - 新文章会分析
-                # - 已存在但缺少 summary 的文章，也会在后续爬取时补分析
-                # 注意：这里不依赖 new_articles，避免“无新文时跳过补总结”
-                if llm_enabled_for_crawl:
-                    try:
-                        all_blogs = data_manager.message_info[oa_name]["blogs"]
-                        need_analyze = [a for a in all_blogs if not str(a.get("summary") or "").strip()]
-                        if llm_multithread_for_crawl and len(need_analyze) > 1:
-                            max_workers = min(llm_multithread_workers_cap, len(need_analyze))
-                            with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                                future_to_article = {
-                                    executor.submit(tag_article, article, data_manager): article
-                                    for article in need_analyze
-                                }
-                                for future in as_completed(future_to_article):
-                                    if _crawl_state.get("cancel_requested"):
-                                        _crawl_state["cancelled"] = True
-                                        for f in future_to_article:
-                                            if not f.done():
-                                                f.cancel()
-                                        break
-                                    article = future_to_article[future]
-                                    try:
-                                        analysis = future.result()
-                                        tags = analysis.get("tags") if isinstance(analysis, dict) else []
-                                        summary = analysis.get("summary") if isinstance(analysis, dict) else ""
-                                        if tags:
-                                            article["tags"] = tags
-                                        if summary:
-                                            article["summary"] = summary
-                                    except Exception as e:
-                                        print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
-                        else:
-                            for article in need_analyze:
-                                if _crawl_state.get("cancel_requested"):
-                                    _crawl_state["cancelled"] = True
-                                    break
-                                try:
-                                    analysis = tag_article(article, data_manager)
-                                    tags = analysis.get("tags") if isinstance(analysis, dict) else []
-                                    summary = analysis.get("summary") if isinstance(analysis, dict) else ""
-                                    if tags:
-                                        article["tags"] = tags
-                                    if summary:
-                                        article["summary"] = summary
-                                except Exception as e:
-                                    print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
-                    except Exception as e:
-                        print(f"[tag] 打标模块异常: {e}")
-
-                # 更新最后爬取时间
-                data_manager.message_info[oa_name]["latest_update_time"] = time_now()
-                data_manager.write("message_info")
-
-                # 爬取成功 → 凭证有效，更新状态
-                _mark_auth_ok()
-
-            except Exception as e:
-                err_str = str(e)
-                err_msg = f"{oa_name}: {err_str}"
-                _crawl_state["errors"].append(err_msg)
-                _append_log(LOG_CRAWL_ERROR, f"爬取「{oa_name}」失败：{e}",
-                            {"account": oa_name, "error": err_str})
-                # 判断是否是凭证失效导致的错误（微信 API 返回的特定错误字符串）
-                if any(kw in err_str.lower() for kw in ("invalid session", "invalid csrf", "csrf token", "session")):
-                    _mark_auth_failed(err_str)
-            finally:
-                # 无论成功还是失败，都算处理完一个，done + 1
-                _crawl_state["done"] += 1
-                _crawl_state["new_articles"] = new_total
+        _run_crawl_sqlite()
 
     except Exception as e:
         # 初始化阶段（循环外）出现的异常
@@ -960,13 +1151,10 @@ def _collect_removable_ids(keep_days: int) -> tuple[str, set[str]]:
     - set_of_removable_ids：所有早于截止日期的文章 ID 集合
     """
     cutoff = (datetime.now() - timedelta(days=keep_days)).strftime("%Y-%m-%d %H:%M")
-    message_info = _read_message_info()
-    removable: set[str] = set()
-    for account in message_info.values():
-        for blog in account.get("blogs", []):
-            if blog.get("create_time", "9999") < cutoff:
-                removable.add(blog["id"])
-    return cutoff, removable
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        return cutoff, repo.ids_older_than(cutoff)
 
 
 @app.get("/api/cache/preview", response_model=CachePreview)
@@ -979,24 +1167,18 @@ def cache_preview(keep_days: int = 90):
         raise HTTPException(status_code=400, detail="keep_days 必须 >= 1")
 
     cutoff, removable_ids = _collect_removable_ids(keep_days)
-    message_info = _read_message_info()
-    total_articles = sum(len(v.get("blogs", [])) for v in message_info.values())
+    from src.db.repository import ArticleRepository
 
-    # 统计可删除的封面图（按文件名匹配）
+    with ArticleRepository() as repo:
+        total_articles = repo.count_articles()
+    removable_detail_texts = len(removable_ids)
+
     removable_covers = 0
     if COVERS_DIR.exists():
         cover_files = {f.stem: f for f in COVERS_DIR.glob("*.jpg")}
         for rid in removable_ids:
             if rid.replace("/", "_") in cover_files:
                 removable_covers += 1
-
-    # 统计可删除的详情缓存（message_detail_text.json 中的键）
-    detail_text_file = DATA_DIR / "message_detail_text.json"
-    removable_detail_texts = 0
-    if detail_text_file.exists():
-        with open(detail_text_file, encoding="utf-8") as f:
-            detail_texts: dict = json.load(f)
-        removable_detail_texts = sum(1 for rid in removable_ids if rid in detail_texts)
 
     return CachePreview(
         keep_days=keep_days,
@@ -1011,11 +1193,7 @@ def cache_preview(keep_days: int = 90):
 @app.post("/api/cache/clear", response_model=CacheClearResult)
 def clear_cache(body: CacheClearRequest):
     """
-    执行缓存清理，删除早于 keep_days 天的数据：
-      1. 从 message_info.json 删除旧文章记录
-      2. 从 data/covers/ 删除对应封面图文件
-      3. 从 message_detail_text.json 删除对应详情缓存
-      4. 刷新 data_manager 内存，避免旧数据残留
+    执行缓存清理，删除早于 keep_days 天的文章（SQLite）及对应封面图。
 
     爬取任务运行期间禁止清理，以避免数据写入冲突。
     """
@@ -1028,14 +1206,8 @@ def clear_cache(body: CacheClearRequest):
     if not removable_ids:
         return CacheClearResult(removed_articles=0, removed_covers=0, removed_detail_texts=0)
 
-    # 1. 从 message_info.json 移除旧文章
-    message_info = _read_message_info()
-    for account in message_info.values():
-        account["blogs"] = [b for b in account.get("blogs", []) if b["id"] not in removable_ids]
-    with open(MESSAGE_INFO_FILE, "w", encoding="utf-8") as f:
-        json.dump(message_info, f, ensure_ascii=False, indent=4)
+    from src.db.repository import ArticleRepository
 
-    # 2. 删除封面图文件
     removed_covers = 0
     if COVERS_DIR.exists():
         for rid in removable_ids:
@@ -1043,45 +1215,24 @@ def clear_cache(body: CacheClearRequest):
             if cover_path.exists():
                 cover_path.unlink()
                 removed_covers += 1
-
-    # 3. 从 message_detail_text.json 删除详情缓存
-    removed_detail_texts = 0
-    detail_text_file = DATA_DIR / "message_detail_text.json"
-    if detail_text_file.exists():
-        with open(detail_text_file, encoding="utf-8") as f:
-            detail_texts: dict = json.load(f)
-        before = len(detail_texts)
-        detail_texts = {k: v for k, v in detail_texts.items() if k not in removable_ids}
-        removed_detail_texts = before - len(detail_texts)
-        with open(detail_text_file, "w", encoding="utf-8") as f:
-            json.dump(detail_texts, f, ensure_ascii=False, indent=4)
-
-    # 4. 同步刷新 data_manager 内存，避免旧数据在本次进程中继续存在
-    try:
-        from src.utils.data_manager import data_manager
-        data_manager.reload("message_info")
-        data_manager.reload("message_detail_text")
-    except Exception:
-        pass
-
+    with ArticleRepository() as repo:
+        removed_articles = repo.delete_articles_by_ids(removable_ids)
+        repo.commit()
     _append_log(
         LOG_CACHE_CLEAR,
-        f"清理缓存：删除 {len(removable_ids)} 篇文章（{body.keep_days} 天前），"
-        f"封面图 {removed_covers} 张，详情缓存 {removed_detail_texts} 条",
+        f"清理缓存：删除 {removed_articles} 篇文章（{body.keep_days} 天前），封面图 {removed_covers} 张",
         {
             "keep_days": body.keep_days,
-            "cutoff_date": (datetime.now() - timedelta(days=body.keep_days)).strftime("%Y-%m-%d"),
-            "removed_articles": len(removable_ids),
+            "removed_articles": removed_articles,
             "removed_covers": removed_covers,
-            "removed_detail_texts": removed_detail_texts,
         },
     )
-
     return CacheClearResult(
-        removed_articles=len(removable_ids),
+        removed_articles=removed_articles,
         removed_covers=removed_covers,
-        removed_detail_texts=removed_detail_texts,
+        removed_detail_texts=removed_articles,
     )
+
 
 
 # ── LLM 打标配置 API（读写 data/llm_config.json）──────────────────────────────
@@ -1438,172 +1589,139 @@ def check_auth_now():
     return _build_auth_status()
 
 
-# ── 扫码登录 ────────────────────────────────────────────────────────────────────
-# 当凭证过期时，用户可以通过前端触发扫码登录流程：
-#   1. 后端用无头 Chrome 打开微信公众平台登录页
-#   2. 每 2 秒截图保存到 _login_state["qrcode_img"]
-#   3. 前端轮询 /api/auth/qrcode 获取截图并展示
-#   4. 用户扫码后，后端检测 URL 中出现 token，提取并保存凭证
-#   5. 前端轮询 /api/auth/login/status 检测完成，关闭弹窗
+# ── 扫码登录（对齐 wechat-article-exporter 四步流程）────────────────────────────
+# ① POST /api/auth/login/session     → startlogin + 首屏二维码
+# ② GET  /api/auth/login/qrcode      → 二维码过期时刷新（status 2/3）
+# ③ GET  /api/auth/login/scan        → ask 单次轮询（前端约 2s 一次）
+# ④ POST /api/auth/login/complete    → bizlogin，写入 id_info.json
+#
+# 同一会话共用服务端 MpScanLogin.session（uuid Cookie 由 requests 维护）。
 
-_login_state: dict = {
-    "running": False,    # 是否正在等待扫码
-    "done": False,       # 本次登录流程是否已结束（成功或失败）
-    "error": "",         # 失败时的错误信息
-    "qrcode_img": "",    # 最新二维码截图（data:image/png;base64,...）
-    "qrcode_at": "",     # 截图时间（"HH:MM:SS"）
-    "started_at": "",    # 登录流程开始时间
-    "finished_at": "",   # 登录流程结束时间
-}
-_login_lock = threading.Lock()  # 保护 _login_state 的多线程读写
+_active_login = None
+_login_lock = threading.Lock()
 
 
-def _run_login() -> None:
-    """
-    后台登录线程：
-      - 用无头 Chrome 打开微信登录页面（不弹出可见窗口）
-      - 循环截图，让前端可以展示二维码供用户扫描
-      - 检测到 URL 含 token 后，提取 token + cookie 写入 id_info.json
-      - 3 分钟内未扫码则超时退出
-    """
-    import time
+def _require_login_session():
+    with _login_lock:
+        if _active_login is None:
+            raise HTTPException(status_code=404, detail="登录会话不存在或已结束，请重新扫码")
+        return _active_login
 
-    bro = None
+
+def _clear_login_session() -> None:
+    global _active_login
+    with _login_lock:
+        _active_login = None
+
+
+def _qrcode_payload(login) -> dict:
+    img = login.fetch_qrcode_data_url()
+    return {
+        "img": img,
+        "refreshed_at": datetime.now().strftime("%H:%M:%S"),
+    }
+
+
+class LoginSessionResponse(BaseModel):
+    ok: bool = True
+    img: str
+    refreshed_at: str
+    scan_status: int = 0
+    scan_message: str = ""
+
+
+class ScanPollResponse(BaseModel):
+    ret: int
+    err_msg: str = ""
+    status: int
+    acct_size: int = 0
+    message: str
+
+
+class LoginCompleteResponse(BaseModel):
+    ok: bool = True
+    token_hint: str = ""
+
+
+@app.post("/api/auth/login/session", response_model=LoginSessionResponse)
+def create_login_session():
+    """① 建立扫码会话并返回首张二维码。"""
+    global _active_login
+    from src.auth.mp_scan_login import MpScanLogin, scan_status_message
+
+    with _login_lock:
+        _active_login = MpScanLogin()
+        login = _active_login
     try:
-        from DrissionPage import ChromiumPage, ChromiumOptions
-        from src.utils.data_manager import data_manager
+        login.start_session()
+        payload = _qrcode_payload(login)
+        return LoginSessionResponse(
+            img=payload["img"],
+            refreshed_at=payload["refreshed_at"],
+            scan_status=0,
+            scan_message=scan_status_message(0),
+        )
+    except Exception as e:
+        _clear_login_session()
+        raise HTTPException(status_code=502, detail=str(e)) from e
 
-        # headless=True：不弹出可见窗口，在后台渲染页面
-        # auto_port()：自动分配调试端口，避免与已有 Chrome 冲突
-        co = ChromiumOptions().auto_port().headless(True)
-        bro = ChromiumPage(co)
-        bro.set.window.size(1280, 800)  # 设置虚拟窗口大小，影响截图分辨率
-        bro.get("https://mp.weixin.qq.com/")
 
-        # 首屏会先出现登录骨架/文案，二维码 img 晚几秒才出现；若此时截全页会误导用户。
-        # 先等待二维码节点出现，再进入轮询；只推送「二维码元素」截图，不再用全页图当二维码。
-        qr_wait_deadline = time.time() + 35
-        qr_elem = None
-        while time.time() < qr_wait_deadline and "token" not in bro.url:
-            try:
-                qr_elem = bro.ele("css:img[src*='qrcode']", timeout=2)
-                if qr_elem:
-                    break
-            except Exception:
-                pass
-            time.sleep(0.35)
-        if "token" not in bro.url and not qr_elem:
-            raise Exception("页面未在预期时间内加载出登录二维码，请检查网络或稍后重试")
+@app.get("/api/auth/login/qrcode")
+def refresh_login_qrcode():
+    """② 刷新二维码（status 为 2/3 时由前端调用）。"""
+    login = _require_login_session()
+    try:
+        return _qrcode_payload(login)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
 
-        # 二维码一出现就推送首帧，避免再等主循环一轮才写入 _login_state
-        if qr_elem and "token" not in bro.url:
-            try:
-                _b64 = qr_elem.get_screenshot(as_base64=True)
-                if _b64:
-                    with _login_lock:
-                        _login_state["qrcode_img"] = f"data:image/png;base64,{_b64}"
-                        _login_state["qrcode_at"] = datetime.now().strftime("%H:%M:%S")
-            except Exception:
-                pass
 
-        max_wait = 180  # 最多等待 3 分钟
-        start = time.time()
+@app.get("/api/auth/login/scan", response_model=ScanPollResponse)
+def poll_login_scan():
+    """③ 单次 ask 轮询，返回 status 与可读文案。"""
+    login = _require_login_session()
+    try:
+        result = login.poll_scan()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
 
-        while "token" not in bro.url:
-            if time.time() - start > max_wait:
-                raise Exception("等待扫码超时（3 分钟），请重试")
+    if result.ret != 0 and result.status < 0:
+        raise HTTPException(
+            status_code=502,
+            detail=result.message or result.err_msg or "扫码状态查询失败",
+        )
 
-            img_b64 = ""
-            try:
-                qr_elem = bro.ele("css:img[src*='qrcode']", timeout=3)
-                if qr_elem:
-                    img_b64 = qr_elem.get_screenshot(as_base64=True)
-            except Exception:
-                pass
+    return ScanPollResponse(
+        ret=result.ret,
+        err_msg=result.err_msg,
+        status=result.status,
+        acct_size=result.acct_size,
+        message=result.message,
+    )
 
-            if img_b64:
-                with _login_lock:
-                    _login_state["qrcode_img"] = f"data:image/png;base64,{img_b64}"
-                    _login_state["qrcode_at"] = datetime.now().strftime("%H:%M:%S")
 
-            time.sleep(2)  # 每 2 秒刷新一次截图（二维码会过期刷新）
+@app.post("/api/auth/login/complete", response_model=LoginCompleteResponse)
+def complete_login_session():
+    """④ 手机确认后完成登录并持久化凭证。"""
+    from src.utils.data_manager import data_manager
 
-        # ── 扫码成功，从 URL 提取 token ──
-        match = re.search(r"token=(\d+)", bro.url)
-        if not match:
-            raise ValueError("无法从 URL 中解析 token")
-        token = match.group(1)
-
-        # 将所有 cookie 拼接为字符串（"name=value; name2=value2; ..."）
-        cookies = bro.cookies()
-        cookie_str = "; ".join(f"{c['name']}={c['value']}" for c in cookies)
-
-        # 写入 id_info.json，同时更新内存中的 data_manager
+    login = _require_login_session()
+    try:
+        token, cookie_str = login.complete_login()
         data_manager.id_info["token"] = token
         data_manager.id_info["cookie"] = cookie_str
         data_manager.write("id_info")
-
         _mark_auth_ok()
-        with _login_lock:
-            _login_state.update(running=False, done=True, error="",
-                                qrcode_img="", qrcode_at="",
-                                finished_at=datetime.now().strftime("%H:%M:%S"))
+        hint = token[:8] + "…" if len(token) > 8 else token
+        return LoginCompleteResponse(ok=True, token_hint=hint)
     except Exception as e:
-        with _login_lock:
-            _login_state.update(running=False, done=True, error=str(e),
-                                qrcode_img="", qrcode_at="",
-                                finished_at=datetime.now().strftime("%H:%M:%S"))
+        raise HTTPException(status_code=502, detail=str(e)) from e
     finally:
-        # 无论成功还是失败，都关闭浏览器，释放资源
-        try:
-            if bro:
-                bro.quit()
-        except Exception:
-            pass
+        _clear_login_session()
 
 
-class LoginStatus(BaseModel):
-    """扫码登录的进度状态。"""
-    running: bool
-    done: bool
-    error: str
-    started_at: str
-    finished_at: str
-
-
-@app.post("/api/auth/login")
-def start_login():
-    """
-    启动扫码登录流程（后台线程），立即返回。
-    同一时间只允许一个登录流程运行。
-    """
-    with _login_lock:
-        if _login_state["running"]:
-            return {"detail": "已有登录流程正在进行，请扫描当前二维码"}
-        _login_state.update(running=True, done=False, error="",
-                            qrcode_img="", qrcode_at="",
-                            started_at=datetime.now().strftime("%H:%M:%S"),
-                            finished_at="")
-    threading.Thread(target=_run_login, daemon=True).start()
-    return {"detail": "正在加载登录页面，请稍候..."}
-
-
-@app.get("/api/auth/login/status", response_model=LoginStatus)
-def get_login_status():
-    """查询当前扫码登录流程的状态，前端每 2 秒轮询一次。"""
-    with _login_lock:
-        return LoginStatus(**{k: _login_state[k] for k in LoginStatus.model_fields})
-
-
-@app.get("/api/auth/qrcode")
-def get_qrcode():
-    """
-    返回最新的微信登录二维码截图（base64 编码的 PNG）。
-    前端每 2 秒调用一次，刷新展示的二维码图片（二维码有有效期，会自动更新）。
-    """
-    with _login_lock:
-        img = _login_state.get("qrcode_img", "")
-        at = _login_state.get("qrcode_at", "")
-    if not img:
-        raise HTTPException(status_code=404, detail="暂无二维码，请先点击扫码登录")
-    return {"img": img, "refreshed_at": at}
+@app.post("/api/auth/login/cancel")
+def cancel_login_session():
+    """放弃当前扫码会话。"""
+    _clear_login_session()
+    return {"ok": True}

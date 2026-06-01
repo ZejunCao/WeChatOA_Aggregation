@@ -170,9 +170,14 @@ class WechatRequest:
         for m in message_exist:
             msgid_exist.add(m['id'])
 
-        # 用户在前端主动删除的文章 id，爬取时永久跳过（见 data/deleted_article_ids.json）
-        _raw_del = data_manager.deleted_article_ids
-        skipped_by_user = set(_raw_del.get('ids', [])) if isinstance(_raw_del, dict) else set()
+        # 用户在前端主动删除的文章 id，爬取时永久跳过
+        from src.db.repository import ArticleRepository
+
+        with ArticleRepository() as repo:
+            rows = repo.conn.execute(
+                "SELECT article_id FROM deleted_articles"
+            ).fetchall()
+            skipped_by_user = {r["article_id"] for r in rows}
 
         # 已知被删除的文章 id 集合（避免重复记录）
         is_deleted_set = set(data_manager.issues_message['is_delete'])
@@ -253,7 +258,7 @@ class WechatRequest:
         注意事项：
         - 此方法会阻塞，直到用户完成扫码或手动关闭浏览器
         - 在 api.py 的后台爬取流程中不会调用此方法（避免在服务进程中打开浏览器）
-        - api.py 的 _run_login() 使用 HTTP 扫码接口（见 src.auth.mp_scan_login）
+        - api.py 扫码登录使用 HTTP 接口（见 src.auth.mp_scan_login）
         """
         from DrissionPage import ChromiumPage, ChromiumOptions
 

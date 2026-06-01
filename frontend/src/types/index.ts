@@ -18,6 +18,10 @@ export interface Article {
   tags?: string[]      // LLM 生成的标签列表
   summary?: string     // LLM 生成的文章摘要（比 digest 更精炼）
   word_count?: number  // 文章字数（中文按字、英文按词）
+
+  /** SQLite：用户阅读/收藏状态（由 API 返回） */
+  is_read?: boolean
+  starred?: boolean
 }
 
 // ── 单个公众号的文章集合（message_info.json 中每个 key 对应的 value） ────────
