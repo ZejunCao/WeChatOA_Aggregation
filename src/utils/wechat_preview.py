@@ -21,6 +21,143 @@ from src.utils.helpers import message_is_delete
 from src.utils.wechat_body import is_allowed_wechat_image_url, prepare_html_for_preview
 
 _MP_ORIGIN = "https://mp.weixin.qq.com/"
+_PREVIEW_FIRST_SCREEN_IMG_COUNT = 6
+
+
+def _preview_img_aspect_ratio(img: etree._Element) -> str | None:
+    """从微信 img 的 data-w / data-ratio 或 style 推断宽高比。"""
+    ratio_s = (img.get("data-ratio") or "").strip()
+    w_s = (img.get("data-w") or img.get("width") or "").strip()
+    h_s = (img.get("data-height") or img.get("height") or "").strip()
+    try:
+        if w_s and h_s:
+            wi, hi = int(float(w_s)), int(float(h_s))
+            if wi > 0 and hi > 0:
+                return f"{wi}/{hi}"
+        if w_s and ratio_s:
+            wi = int(float(w_s))
+            r = float(ratio_s)
+            hi = max(1, round(wi * r))
+            if wi > 0 and hi > 0:
+                return f"{wi}/{hi}"
+    except (ValueError, TypeError):
+        pass
+    style = img.get("style") or ""
+    wm = re.search(r"width:\s*(\d+(?:\.\d+)?)px", style)
+    hm = re.search(r"height:\s*(\d+(?:\.\d+)?)px", style)
+    if wm and hm:
+        try:
+            wi, hi = int(float(wm.group(1))), int(float(hm.group(1)))
+            if wi > 0 and hi > 0:
+                return f"{wi}/{hi}"
+        except ValueError:
+            pass
+    return None
+
+
+def _configure_preview_image(img: etree._Element, idx: int) -> None:
+    src = (img.get("data-src") or img.get("src") or "").strip()
+    if src:
+        if src.startswith("//"):
+            src = "https:" + src
+        elif src.startswith("/"):
+            src = urljoin(_MP_ORIGIN, src)
+        from urllib.parse import quote
+
+        if is_allowed_wechat_image_url(src):
+            img.set("src", f"/api/wechat-image?url={quote(src, safe='')}")
+        else:
+            img.set("src", src)
+
+    ar = _preview_img_aspect_ratio(img)
+    styles: list[str] = []
+    existing_style = (img.get("style") or "").strip()
+    if existing_style:
+        styles.append(existing_style)
+    if ar:
+        styles.append(f"aspect-ratio:{ar}")
+    styles.extend(
+        [
+            "width:100%",
+            "max-width:100%",
+            "height:auto",
+            "background:#e8e4de",
+            "object-fit:contain",
+        ]
+    )
+    img.set("style", ";".join(styles))
+
+    classes = ["wx-preview-img"]
+    prev_cls = (img.get("class") or "").strip()
+    if prev_cls:
+        classes.insert(0, prev_cls)
+    img.set("class", " ".join(classes))
+    img.set("data-wx-img-state", "loading")
+
+    if idx < _PREVIEW_FIRST_SCREEN_IMG_COUNT:
+        img.set("loading", "eager")
+        if idx < 2:
+            img.set("fetchpriority", "high")
+    else:
+        img.set("loading", "lazy")
+    img.set("decoding", "async")
+
+    for attr in list(img.attrib):
+        if attr.startswith("data-") and attr not in ("data-wx-img-state",):
+            del img.attrib[attr]
+
+
+def _resolve_preview_link_href(href: str, base_url: str = _MP_ORIGIN) -> str | None:
+    """解析为可在浏览器新标签打开的绝对 URL；页内 # 锚点返回 None。"""
+    href = (href or "").strip()
+    if not href:
+        return None
+    lower = href.lower()
+    if lower.startswith(("javascript:", "mailto:", "tel:", "data:")):
+        return None
+    if href.startswith("#"):
+        return None
+    if href.startswith("//"):
+        return "https:" + href
+    if lower.startswith("http://") or lower.startswith("https://"):
+        return href
+    return urljoin(base_url, href)
+
+
+# 标记预览 HTML 已处理外链（用于缓存失效）
+_PREVIEW_LINK_MARKER = "preview-link-v1"
+
+
+def _configure_preview_links(root: etree._Element, base_url: str = _MP_ORIGIN) -> None:
+    """正文链接一律新窗口打开，避免在预览 iframe 内跳转失败。"""
+    for anchor in root.xpath(".//a[@href]"):
+        raw = (anchor.get("href") or "").strip()
+        resolved = _resolve_preview_link_href(raw, base_url)
+        if not resolved:
+            continue
+        anchor.set("href", resolved)
+        anchor.set("target", "_blank")
+        anchor.set("rel", "noopener noreferrer")
+
+
+def _configure_preview_links_html(html: str, base_url: str = _MP_ORIGIN) -> str:
+    if not html or not html.strip():
+        return html
+    wrapper = etree.HTML(
+        f'<div id="wx-links-root">{html}</div>',
+        parser=etree.HTMLParser(encoding="utf-8"),
+    )
+    if wrapper is None:
+        return html
+    nodes = wrapper.xpath('//div[@id="wx-links-root"]')
+    if not nodes:
+        return html
+    node = nodes[0]
+    _configure_preview_links(node, base_url)
+    return "".join(
+        etree.tostring(c, encoding="unicode", method="html") for c in node
+    )
+
 
 # 微信 tencent_portfolio_light.css 中代码块核心样式（外链 CSS 未加载时兜底）
 _CODE_SNIPPET_CSS = """
@@ -112,6 +249,27 @@ _ARTICLE_TABLE_CSS = """
 """
 
 # 阅读区背景：固定浅色（不受系统深色模式影响，避免代码块/表格与背景同色）
+_PREVIEW_IMG_CSS = """
+/* preview-img-v1 */
+.wx-preview-img{
+  display:block;
+  max-width:100%!important;
+  height:auto!important;
+  margin:12px auto;
+  background:#e8e4de;
+  border-radius:4px;
+  object-fit:contain;
+}
+.wx-preview-img[data-wx-img-state="loading"]{
+  min-height:48px;
+  animation:wx-preview-img-pulse 1.2s ease-in-out infinite;
+}
+@keyframes wx-preview-img-pulse{
+  0%,100%{opacity:1}
+  50%{opacity:.72}
+}
+"""
+
 _PREVIEW_SURFACE_CSS = """
 /* preview-surface-v3 */
 :root{color-scheme:light}
@@ -320,6 +478,15 @@ def _extract_page_meta(raw_html: str) -> dict[str, str]:
         elif country_id and country_name:
             meta["ip_wording"] = country_name
 
+    for pattern in (
+        r'<meta\s+[^>]*property=["\']og:url["\'][^>]*content=["\']([^"\']+)',
+        r'<link\s+[^>]*rel=["\']canonical["\'][^>]*href=["\']([^"\']+)',
+    ):
+        m = re.search(pattern, raw_html, re.I)
+        if m:
+            meta["canonical_url"] = m.group(1).strip()
+            break
+
     return meta
 
 
@@ -511,6 +678,9 @@ def build_preview_document(
                 etree.tostring(c, encoding="unicode", method="html") for c in rich[0]
             )
         )
+        inner = _configure_preview_links_html(
+            inner, page_meta.get("canonical_url") or _MP_ORIGIN
+        )
         return _wrap_preview_fragment(
             inner, title, "", ai_summary=ai_summary, ai_tags=ai_tags
         )
@@ -541,24 +711,11 @@ def build_preview_document(
         if parent is not None:
             parent.remove(bad)
 
-    for img in article.xpath(".//img"):
-        src = (img.get("data-src") or img.get("src") or "").strip()
-        if src:
-            if src.startswith("//"):
-                src = "https:" + src
-            elif src.startswith("/"):
-                src = urljoin(_MP_ORIGIN, src)
-            from urllib.parse import quote
+    for idx, img in enumerate(article.xpath(".//img")):
+        _configure_preview_image(img, idx)
 
-            if is_allowed_wechat_image_url(src):
-                img.set("src", f"/api/wechat-image?url={quote(src, safe='')}")
-            else:
-                img.set("src", src)
-        img.set("loading", "lazy")
-        img.set("decoding", "async")
-        for attr in list(img.attrib):
-            if attr.startswith("data-"):
-                del img.attrib[attr]
+    page_url = page_meta.get("canonical_url") or _MP_ORIGIN
+    _configure_preview_links(article, page_url)
 
     body_cls_list = tree.xpath("//body/@class")
     body_cls = body_cls_list[0] if body_cls_list else ""
@@ -578,6 +735,7 @@ def build_preview_document(
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <!-- {_PREVIEW_LINK_MARKER} -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
@@ -588,6 +746,7 @@ def build_preview_document(
     #js_article_bottom_bar, .__page_content__ {{ max-width: 667px; margin: 0 auto; }}
     img {{ max-width: 100% !important; height: auto !important; }}
     {_PREVIEW_SURFACE_CSS}
+    {_PREVIEW_IMG_CSS}
     {_PREVIEW_AI_CSS}
     {_CODE_SNIPPET_CSS}
     {_ARTICLE_HEADER_CSS}
@@ -616,6 +775,7 @@ def _wrap_preview_fragment(
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <!-- {_PREVIEW_LINK_MARKER} -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <meta name="color-scheme" content="light">
@@ -650,4 +810,14 @@ def is_full_preview_document(html: str | None) -> bool:
     has_table = "preview-table-v1" in html
     has_surface = "preview-surface-v3" in html
     has_ai = "preview-ai-v1" in html
-    return has_theme and has_header and has_table and has_surface and has_ai
+    has_img = "preview-img-v1" in html
+    has_link = "preview-link-v1" in html
+    return (
+        has_theme
+        and has_header
+        and has_table
+        and has_surface
+        and has_ai
+        and has_img
+        and has_link
+    )

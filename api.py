@@ -437,7 +437,11 @@ def proxy_wechat_image(url: str = Query(..., min_length=8)):
         resp = requests.get(url, headers=h, timeout=20)
         resp.raise_for_status()
         media = resp.headers.get("content-type") or "image/jpeg"
-        return Response(content=resp.content, media_type=media)
+        return Response(
+            content=resp.content,
+            media_type=media,
+            headers={"Cache-Control": "public, max-age=604800, immutable"},
+        )
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"图片加载失败：{e}") from e
 

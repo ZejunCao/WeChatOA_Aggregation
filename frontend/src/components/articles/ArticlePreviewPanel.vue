@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import DOMPurify from 'dompurify'
 import {
   X,
@@ -21,6 +21,18 @@ const readingStore = useReadingStore()
 type CopyState = 'idle' | 'ok' | 'fail'
 const copyState = ref<CopyState>('idle')
 let copyResetTimer: ReturnType<typeof setTimeout> | undefined
+
+const iframeRef = ref<HTMLIFrameElement | null>(null)
+/** HTML 已注入 iframe，首屏配图加载完成（或超时）后再展示 */
+const mediaReady = ref(false)
+let mediaReadyTimer: ReturnType<typeof setTimeout> | undefined
+let mediaWaitGen = 0
+let unlinkPreviewClickHandler: (() => void) | undefined
+
+const PREVIEW_LINK_BASE = 'https://mp.weixin.qq.com/'
+
+const FIRST_SCREEN_IMG_COUNT = 6
+const MEDIA_READY_TIMEOUT_MS = 2800
 
 const safePreviewHtml = computed(() => {
   const raw = store.previewHtml
@@ -69,6 +81,114 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
+function clearMediaReadyTimer() {
+  if (mediaReadyTimer) {
+    clearTimeout(mediaReadyTimer)
+    mediaReadyTimer = undefined
+  }
+}
+
+function finishMediaReady() {
+  clearMediaReadyTimer()
+  mediaReady.value = true
+}
+
+function waitForFirstScreenImages() {
+  const gen = ++mediaWaitGen
+  mediaReady.value = false
+  clearMediaReadyTimer()
+  mediaReadyTimer = setTimeout(() => {
+    if (gen === mediaWaitGen) finishMediaReady()
+  }, MEDIA_READY_TIMEOUT_MS)
+
+  void nextTick(() => {
+    if (gen !== mediaWaitGen) return
+    const doc = iframeRef.value?.contentDocument
+    if (!doc) {
+      finishMediaReady()
+      return
+    }
+    const imgs = Array.from(
+      doc.querySelectorAll<HTMLImageElement>(
+        '#js_content img, #js_article img, .wx-preview-img',
+      ),
+    ).filter((el) => el.getAttribute('src'))
+    const targets = imgs.slice(0, FIRST_SCREEN_IMG_COUNT)
+    if (!targets.length) {
+      finishMediaReady()
+      return
+    }
+    const markLoaded = (img: HTMLImageElement) => {
+      img.setAttribute('data-wx-img-state', 'loaded')
+    }
+    void Promise.all(
+      targets.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            if (img.complete && img.naturalWidth > 0) {
+              markLoaded(img)
+              resolve()
+              return
+            }
+            const done = () => {
+              if (img.naturalWidth > 0) markLoaded(img)
+              resolve()
+            }
+            img.addEventListener('load', done, { once: true })
+            img.addEventListener('error', done, { once: true })
+          }),
+      ),
+    ).then(() => {
+      if (gen === mediaWaitGen) finishMediaReady()
+    })
+  })
+}
+
+function openPreviewLinkInNewWindow(rawHref: string) {
+  const href = rawHref.trim()
+  if (!href || href.startsWith('#')) return
+  const lower = href.toLowerCase()
+  if (lower.startsWith('javascript:') || lower.startsWith('mailto:') || lower.startsWith('tel:')) {
+    return
+  }
+  let url: string
+  try {
+    url = new URL(href, PREVIEW_LINK_BASE).href
+  } catch {
+    return
+  }
+  const win = window.open(url, '_blank', 'noopener,noreferrer')
+  win?.focus()
+}
+
+function bindPreviewLinkClicks() {
+  unlinkPreviewClickHandler?.()
+  unlinkPreviewClickHandler = undefined
+  const doc = iframeRef.value?.contentDocument
+  if (!doc) return
+
+  const onDocClick = (e: MouseEvent) => {
+    const anchor = (e.target as Element | null)?.closest?.('a')
+    if (!anchor) return
+    const href = anchor.getAttribute('href')
+    if (!href || href.startsWith('#')) return
+    e.preventDefault()
+    e.stopPropagation()
+    openPreviewLinkInNewWindow(href)
+  }
+
+  doc.addEventListener('click', onDocClick, true)
+  unlinkPreviewClickHandler = () => {
+    doc.removeEventListener('click', onDocClick, true)
+  }
+}
+
+function onIframeLoad() {
+  if (!store.previewHtml || store.loading) return
+  bindPreviewLinkClicks()
+  waitForFirstScreenImages()
+}
+
 watch(
   () => store.open,
   (isOpen) => {
@@ -76,6 +196,11 @@ watch(
     if (!isOpen) {
       copyState.value = 'idle'
       if (copyResetTimer) clearTimeout(copyResetTimer)
+      mediaReady.value = false
+      clearMediaReadyTimer()
+      mediaWaitGen++
+      unlinkPreviewClickHandler?.()
+      unlinkPreviewClickHandler = undefined
     }
   },
 )
@@ -84,6 +209,18 @@ watch(
   () => store.display?.id,
   () => {
     copyState.value = 'idle'
+    mediaReady.value = false
+    mediaWaitGen++
+  },
+)
+
+watch(
+  () => [store.loading, store.previewHtml] as const,
+  ([loading, html]) => {
+    if (loading || !html) {
+      mediaReady.value = false
+      mediaWaitGen++
+    }
   },
 )
 
@@ -92,6 +229,8 @@ onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown)
   document.body.style.overflow = ''
   if (copyResetTimer) clearTimeout(copyResetTimer)
+  clearMediaReadyTimer()
+  unlinkPreviewClickHandler?.()
 })
 </script>
 
@@ -206,13 +345,24 @@ onUnmounted(() => {
             </button>
           </div>
 
+          <div
+            v-if="!store.loading && !store.error && safePreviewHtml && !mediaReady"
+            class="article-preview-iframe-loading"
+          >
+            <Loader2 class="h-6 w-6 animate-spin text-[var(--color-muted-foreground)]" />
+            <span class="text-sm text-[var(--color-muted-foreground)]">正在加载首屏配图…</span>
+          </div>
+
           <iframe
-            v-else-if="safePreviewHtml"
+            v-if="!store.loading && !store.error && safePreviewHtml"
+            ref="iframeRef"
             :key="store.display.id"
             class="article-preview-iframe"
+            :class="{ 'is-media-ready': mediaReady }"
             title="微信公众号原文预览"
             sandbox="allow-same-origin allow-popups"
             :srcdoc="safePreviewHtml"
+            @load="onIframeLoad"
           />
 
           <button

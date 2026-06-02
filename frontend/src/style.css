@@ -1604,6 +1604,12 @@ body.is-account-dragging * {
   flex: 1;
   width: 100%;
   min-height: 0;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.article-preview-iframe.is-media-ready {
+  opacity: 1;
   border: none;
   background: transparent;
 }
@@ -1655,135 +1661,6 @@ body.is-account-dragging * {
 
 .dark .article-preview-open-original {
   color: oklch(72% 0.12 262);
-}
-
-.article-preview-scroll {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: var(--color-card);
-}
-
-.article-preview-cover-wrap {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: var(--color-muted);
-  overflow: hidden;
-}
-
-.article-preview-cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.article-preview-content {
-  padding: 1.25rem 1.35rem 2rem;
-}
-
-.article-preview-meta {
-  font-size: 0.75rem;
-  color: var(--color-muted-foreground);
-  margin-bottom: 0.65rem;
-}
-
-.article-preview-title {
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: -0.02em;
-  color: var(--color-foreground);
-  margin-bottom: 1rem;
-}
-
-.article-preview-summary-block {
-  margin-bottom: 1.25rem;
-  padding: 0.85rem 1rem;
-  border-radius: 0.85rem;
-  border: 1px solid color-mix(in srgb, #8b5cf6 28%, var(--color-border));
-  background: color-mix(in srgb, #ede9fe 65%, var(--color-card));
-}
-
-.dark .article-preview-summary-block {
-  border-color: color-mix(in srgb, #a78bfa 35%, var(--color-border));
-  background: color-mix(in srgb, #2e1064 40%, var(--color-card));
-}
-
-/* 微信 rich_media_content 排版（保留 inline style） */
-.article-preview-rich {
-  margin-top: 0.5rem;
-  font-size: 17px;
-  line-height: 1.75;
-  color: #333;
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-}
-
-.dark .article-preview-rich {
-  color: #e8e6ed;
-}
-
-.article-preview-rich section,
-.article-preview-rich p {
-  margin: 0.75em 0;
-}
-
-.article-preview-rich img {
-  display: block;
-  max-width: 100% !important;
-  height: auto !important;
-  margin: 0.75em auto;
-  border-radius: 4px;
-}
-
-.article-preview-rich strong {
-  font-weight: 600;
-}
-
-.article-preview-rich a {
-  color: #576b95;
-  text-decoration: underline;
-}
-
-.article-preview-body {
-  margin-top: 0.5rem;
-}
-
-.article-preview-para {
-  font-size: 0.9375rem;
-  line-height: 1.75;
-  color: var(--color-foreground);
-  margin-bottom: 1em;
-  text-align: justify;
-}
-
-.article-preview-para:last-child {
-  margin-bottom: 0;
-}
-
-.article-preview-empty-body {
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: var(--color-muted-foreground);
-  padding: 1rem 0;
-}
-
-.article-preview-inline-link {
-  color: var(--feed-accent, var(--color-primary));
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
-}
-
-.article-preview-footer {
-  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--color-border);
-  background: var(--color-card);
 }
 
 .article-preview-primary-btn {
