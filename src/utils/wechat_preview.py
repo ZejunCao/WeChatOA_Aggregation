@@ -410,6 +410,10 @@ def fetch_article_page_html(url: str, num: int = 0) -> str | None:
     if not tree.xpath('//*[@id="js_article"]') and not tree.xpath(
         '//*[contains(@class, "rich_media_content")]'
     ):
+        from src.utils.wechat_picture import is_picture_message_html
+
+        if is_picture_message_html(html):
+            return html
         data_url = tree.xpath('//div[@class="original_panel_tool"]/span/@data-url')
         if data_url:
             return fetch_article_page_html(data_url[0], num=num + 1)
@@ -656,10 +660,30 @@ def build_preview_document(
     ai_tags: list[str] | None = None,
     fallback_pub_time: str = "",
     fallback_pub_unix: int | None = None,
+    fallback_digest: str = "",
+    item_show_type: int = 0,
 ) -> str:
     """
     从微信原文页构建可 srcdoc 嵌入的完整 HTML（参考 exporter normalizeHtml）。
     """
+    from src.utils.wechat_picture import (
+        build_picture_preview_document,
+        is_picture_message_html,
+    )
+
+    if item_show_type in (8, 10) or is_picture_message_html(raw_html):
+        picture_html = build_picture_preview_document(
+            raw_html,
+            title=title,
+            ai_summary=ai_summary,
+            ai_tags=ai_tags,
+            fallback_pub_time=fallback_pub_time,
+            fallback_pub_unix=fallback_pub_unix,
+            digest=fallback_digest,
+        )
+        if picture_html.strip():
+            return picture_html
+
     tree = etree.HTML(raw_html, parser=etree.HTMLParser(encoding="utf-8"))
     if tree is None:
         return ""
@@ -801,6 +825,10 @@ def _wrap_preview_fragment(
 def is_full_preview_document(html: str | None) -> bool:
     if not html or not html.strip():
         return False
+    from src.utils.wechat_picture import is_picture_preview_document
+
+    if is_picture_preview_document(html):
+        return True
     s = html.lstrip().lower()
     if not (s.startswith("<!doctype") or s.startswith("<html")):
         return False

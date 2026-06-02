@@ -12,7 +12,7 @@ export interface Article {
   cover: string        // 封面图原始 URL（微信 CDN，可能有防盗链）
   create_time: string  // 发布时间，格式 "YYYY-MM-DD HH:MM"
   is_deleted: boolean  // 是否已被公众号删除
-  item_show_type: number  // 文章展示类型（0=普通图文，5=视频 等，非 0 一般跳过）
+  item_show_type: number  // 0=普通图文；5=视频；8/10=图片消息（小绿书）
 
   // 预留 LLM 字段，目前为空，后续接入大模型打标签/摘要时填充
   tags?: string[]      // LLM 生成的标签列表
@@ -86,6 +86,13 @@ export interface AuthStatus {
   error: string             // 失败原因（正常时为空）
   token_hint: string        // token 前 8 位，供确认身份
   id_info_mtime: string     // id_info.json 最后修改时间
+  credential_saved_at?: string
+  credential_expires_at?: string
+  credential_days_remaining?: number | null
+  credential_expired?: boolean
+  credential_expires_soon?: boolean
+  credential_ttl_days?: number
+  credential_expiry_label?: string
 }
 
 // GET /api/cache/preview 的响应（清理前预览）

@@ -415,8 +415,16 @@ const authLevel = computed<'ok' | 'warn' | 'error' | 'unknown'>(() => {
   const s = authStatus.value
   if (!s) return 'unknown'
   if (!s.has_credentials) return 'error'
+  if (s.credential_expired) return 'warn'
   if (!s.valid && s.checked_at) return 'warn'
+  if (s.credential_expires_soon) return 'warn'
   return 'ok'
+})
+
+const authExpiryHint = computed(() => {
+  const s = authStatus.value
+  if (!s?.has_credentials) return ''
+  return s.credential_expiry_label || ''
 })
 
 // ── 模型配置（data/llm_config.json）──────────────────────────────────────────
@@ -1211,6 +1219,13 @@ async function completeWechatLogin() {
     loginPending.value = false
     showLoginModal.value = false
     await loadAuthStatus()
+    const msg =
+      (data as { message?: string }).message ||
+      (data as { credential_expiry_label?: string }).credential_expiry_label ||
+      ''
+    if (msg) {
+      window.alert(msg)
+    }
   } catch {
     loginError.value = '无法连接到后端服务'
   } finally {
@@ -1505,7 +1520,18 @@ async function doCacheClear() {
               更新 <code class="rounded bg-[var(--color-muted)] px-1 py-px font-mono text-[10px]">data/id_info.json</code> 或扫码登录
             </template>
             <template v-else-if="authLevel === 'warn'">
-              {{ authStatus?.error || 'invalid session' }}
+              <template v-if="authStatus?.credential_expired && authExpiryHint">
+                凭证已过期（{{ authExpiryHint }}），请重新扫码登录
+              </template>
+              <template v-else-if="authExpiryHint && !authStatus?.valid">
+                {{ authStatus?.error || 'invalid session' }}（{{ authExpiryHint }}）
+              </template>
+              <template v-else-if="authExpiryHint">
+                {{ authExpiryHint }}，建议尽快重新扫码
+              </template>
+              <template v-else>
+                {{ authStatus?.error || 'invalid session' }}
+              </template>
             </template>
           </p>
         </div>
@@ -1563,13 +1589,17 @@ async function doCacheClear() {
           v-if="authStatus"
           class="flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-foreground)]"
           :title="authLevel === 'ok'
-            ? `凭证有效，token: ${authStatus.token_hint}，文件更新于 ${authStatus.id_info_mtime}`
-            : authStatus.error || '凭证状态异常'"
+            ? `凭证有效，token: ${authStatus.token_hint}，${authExpiryHint || ''}，文件更新于 ${authStatus.id_info_mtime}`
+            : [authStatus.error, authExpiryHint].filter(Boolean).join(' · ') || '凭证状态异常'"
         >
           <ShieldCheck v-if="authLevel === 'ok'" class="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
           <ShieldAlert v-else-if="authLevel === 'warn'" class="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
           <ShieldOff v-else class="h-3.5 w-3.5 text-[var(--color-destructive)]" />
-          <span>{{ authLevel === 'ok' ? '凭证有效' : authLevel === 'warn' ? '可能过期' : '未配置' }}</span>
+          <span v-if="authLevel === 'ok'">
+            凭证有效<span v-if="authExpiryHint" class="text-[var(--color-muted-foreground)]"> · {{ authExpiryHint }}</span>
+          </span>
+          <span v-else-if="authLevel === 'warn'">{{ authExpiryHint || '可能过期' }}</span>
+          <span v-else>未配置</span>
         </div>
 
         <!-- Cache clear button -->

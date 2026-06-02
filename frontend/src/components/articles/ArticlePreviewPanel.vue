@@ -34,11 +34,25 @@ const PREVIEW_LINK_BASE = 'https://mp.weixin.qq.com/'
 const FIRST_SCREEN_IMG_COUNT = 6
 const MEDIA_READY_TIMEOUT_MS = 2800
 
+const isPicturePreview = computed(() =>
+  (store.previewHtml || '').includes('preview-picture-v1'),
+)
+
+/** 图片消息预览含自有轮播脚本，需保留 script 且 iframe 允许执行 */
 const safePreviewHtml = computed(() => {
   const raw = store.previewHtml
   if (!raw) return ''
+  if (isPicturePreview.value) {
+    return raw
+  }
   return DOMPurify.sanitize(raw, { WHOLE_DOCUMENT: true })
 })
+
+const previewIframeSandbox = computed(() =>
+  isPicturePreview.value
+    ? 'allow-same-origin allow-popups allow-scripts'
+    : 'allow-same-origin allow-popups',
+)
 
 const showNav = computed(
   () => store.navigationTotal > 1 && store.navigationIndex >= 0,
@@ -110,7 +124,7 @@ function waitForFirstScreenImages() {
     }
     const imgs = Array.from(
       doc.querySelectorAll<HTMLImageElement>(
-        '#js_content img, #js_article img, .wx-preview-img',
+        '#js_content img, #js_article img, .wx-preview-img, .wx-picture-slide img',
       ),
     ).filter((el) => el.getAttribute('src'))
     const targets = imgs.slice(0, FIRST_SCREEN_IMG_COUNT)
@@ -185,7 +199,13 @@ function bindPreviewLinkClicks() {
 
 function onIframeLoad() {
   if (!store.previewHtml || store.loading) return
+  const doc = iframeRef.value?.contentDocument
+  const isPicture = doc?.body?.getAttribute('data-wx-preview-kind') === 'picture'
   bindPreviewLinkClicks()
+  if (isPicture) {
+    finishMediaReady()
+    return
+  }
   waitForFirstScreenImages()
 }
 
@@ -360,7 +380,7 @@ onUnmounted(() => {
             class="article-preview-iframe"
             :class="{ 'is-media-ready': mediaReady }"
             title="微信公众号原文预览"
-            sandbox="allow-same-origin allow-popups"
+            :sandbox="previewIframeSandbox"
             :srcdoc="safePreviewHtml"
             @load="onIframeLoad"
           />

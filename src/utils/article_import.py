@@ -6,13 +6,19 @@ from __future__ import annotations
 import re
 from datetime import datetime
 from typing import Any
-from urllib.parse import parse_qs, unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlencode, urlparse, urlunparse
 
 import requests
 from lxml import etree
 
 from src.utils.helpers import message_is_delete, time_now
 from src.utils.wechat_body import fetch_article_body
+from src.utils.wechat_picture import (
+    extract_picture_urls,
+    is_picture_message_html,
+    normalize_wechat_meta_digest,
+    parse_item_show_type,
+)
 from src.utils.wechat_preview import _request_headers
 
 _MP_HOST = "mp.weixin.qq.com"
@@ -22,19 +28,97 @@ class ArticleImportError(ValueError):
     """链接导入失败（可展示给用户）。"""
 
 
+_SKIP_QUERY_PREFIXES = ("utm_", "from_", "scene", "clicktime", "ascene")
+_SKIP_QUERY_KEYS = frozenset(
+    {
+        "scene",
+        "clicktime",
+        "ascene",
+        "devicetype",
+        "version",
+        "lang",
+        "pass_ticket",
+        "wx_header",
+    }
+)
+
+
 def normalize_mp_article_url(url: str) -> str:
+    """校验并补全协议/域名，用于发起请求。"""
     raw = (url or "").strip()
     if not raw:
         raise ArticleImportError("链接不能为空")
     if not re.match(r"^https?://", raw, re.I):
         raw = f"https://{raw}"
     parsed = urlparse(raw)
-    if parsed.hostname not in (_MP_HOST, f"www.{_MP_HOST}"):
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    if host != _MP_HOST:
         raise ArticleImportError("请输入有效的微信公众号文章链接（mp.weixin.qq.com）")
     path = parsed.path or ""
     if "/s/" not in path and "appmsg" not in path:
         raise ArticleImportError("该链接不是公众号文章页")
-    return raw
+    return raw.split("#")[0]
+
+
+def extract_mp_article_slug(url: str) -> str:
+    """提取 /s/{slug} 中的 slug，用于模糊去重。"""
+    try:
+        parsed = urlparse(normalize_mp_article_url(url))
+    except ArticleImportError:
+        return ""
+    m = re.match(r"^/s/([A-Za-z0-9_-]+)/?$", parsed.path or "")
+    return m.group(1) if m else ""
+
+
+def canonical_article_link(url: str) -> str:
+    """
+    归一化文章链接，便于入库与去重（https、去 fragment、短链去 query 等）。
+    """
+    raw = normalize_mp_article_url(url)
+    parsed = urlparse(raw)
+    path = parsed.path or ""
+
+    m = re.match(r"^/s/([A-Za-z0-9_-]+)/?$", path)
+    if m:
+        return f"https://{_MP_HOST}/s/{m.group(1)}"
+
+    qs = parse_qs(parsed.query, keep_blank_values=False)
+    kept: list[tuple[str, str]] = []
+    for key in sorted(qs.keys()):
+        kl = key.lower()
+        if kl in _SKIP_QUERY_KEYS or any(kl.startswith(p) for p in _SKIP_QUERY_PREFIXES):
+            continue
+        vals = qs[key]
+        if vals and str(vals[0]).strip():
+            kept.append((key, str(vals[0]).strip()))
+
+    query = urlencode(kept, doseq=False) if kept else ""
+    return urlunparse(("https", _MP_HOST, path, "", query, ""))
+
+
+def link_lookup_variants(url: str) -> list[str]:
+    """生成用于数据库匹配的链接候选（顺序：原文 → 归一化）。"""
+    out: list[str] = []
+    seen: set[str] = set()
+
+    def add(u: str) -> None:
+        u = (u or "").strip()
+        if u and u not in seen:
+            seen.add(u)
+            out.append(u)
+
+    raw = (url or "").strip()
+    if raw:
+        add(raw.split("#")[0])
+    try:
+        add(normalize_mp_article_url(url))
+    except ArticleImportError:
+        pass
+    try:
+        add(canonical_article_link(url))
+    except ArticleImportError:
+        pass
+    return out
 
 
 def _fetch_article_html(url: str) -> tuple[str, str]:
@@ -65,12 +149,21 @@ def _parse_ids_and_time(html: str, final_url: str) -> tuple[str, str, str]:
         or (qs.get("appmsgid") or [""])[0]
         or _re_first(r'var\s+mid\s*=\s*["\'](\d+)["\']', html)
         or _re_first(r'var\s+appmsgid\s*=\s*["\'](\d+)["\']', html)
+        or _re_first(r'\bmid\s*:\s*["\']?(\d+)', html)
     )
-    idx = (qs.get("idx") or [""])[0] or _re_first(r'var\s+idx\s*=\s*["\'](\d+)["\']', html) or "1"
+    idx = (
+        (qs.get("idx") or [""])[0]
+        or _re_first(r'var\s+idx\s*=\s*["\'](\d+)["\']', html)
+        or _re_first(r'\bidx\s*:\s*["\']?(\d+)', html)
+        or "1"
+    )
     if not mid:
         raise ArticleImportError("无法从页面解析文章编号，请确认链接有效")
 
-    aid = _re_first(r'var\s+aid\s*=\s*["\']([^"\']+)["\']', html)
+    aid = (
+        _re_first(r'var\s+aid\s*=\s*["\']([^"\']+)["\']', html)
+        or _re_first(r'\baid\s*:\s*["\']?([^,"\']+)', html)
+    )
     if not aid:
         aid = f"{mid}_{idx}"
 
@@ -78,6 +171,7 @@ def _parse_ids_and_time(html: str, final_url: str) -> tuple[str, str, str]:
         _re_first(r'var\s+ct\s*=\s*["\'](\d+)["\']', html)
         or _re_first(r"var\s+create_time\s*=\s*['\"](\d+)['\"]", html)
         or _re_first(r"var\s+oriCreateTime\s*=\s*['\"](\d+)['\"]", html)
+        or _re_first(r'\bcreate_time\s*:\s*["\']?(\d{10})', html)
     )
     if ct_raw:
         try:
@@ -123,6 +217,8 @@ def _parse_metadata(html: str, final_url: str) -> dict[str, str]:
     if not digest:
         digest = _re_first(r'var\s+msg_desc\s*=\s*htmlDecode\("([^"]*)"\)', html)
     digest = unquote(digest).strip()
+    if digest:
+        digest = normalize_wechat_meta_digest(digest)
 
     cover = _re_first(r'var\s+msg_cdn_url\s*=\s*"([^"]+)"', html)
     if not cover:
@@ -149,18 +245,31 @@ def build_blog_from_url(url: str) -> dict[str, Any]:
     """
     normalized = normalize_mp_article_url(url)
     final_url, html = _fetch_article_html(normalized)
+    final_url = canonical_article_link(final_url)
     meta = _parse_metadata(html, final_url)
     article_id, _aid, create_time = _parse_ids_and_time(html, final_url)
+    show_type = parse_item_show_type(html)
+    is_picture = is_picture_message_html(html)
 
-    text, _body_html = fetch_article_body(final_url)
-    if text == "已删除":
-        raise ArticleImportError("该文章已被发布者删除")
-    if text == "请求错误":
-        raise ArticleImportError("抓取正文失败，请检查网络或 data/id_info.json 凭证")
-
-    if not meta["digest"] and isinstance(text, list):
-        joined = "\n".join(str(x) for x in text if str(x).strip())
-        meta["digest"] = joined[:160].replace("\n", " ")
+    text: Any = []
+    if is_picture:
+        pics = extract_picture_urls(html)
+        if not pics:
+            raise ArticleImportError("未能解析图片消息内容，请确认链接有效")
+        if not meta["cover"]:
+            meta["cover"] = pics[0]
+        if not meta["digest"]:
+            meta["digest"] = meta["title"]
+        text = [meta["title"], meta["digest"]]
+    else:
+        text, _body_html = fetch_article_body(final_url)
+        if text == "已删除":
+            raise ArticleImportError("该文章已被发布者删除")
+        if text == "请求错误":
+            raise ArticleImportError("抓取正文失败，请检查网络或 data/id_info.json 凭证")
+        if not meta["digest"] and isinstance(text, list):
+            joined = "\n".join(str(x) for x in text if str(x).strip())
+            meta["digest"] = joined[:160].replace("\n", " ")
 
     blog = {
         "id": article_id,
@@ -170,9 +279,10 @@ def build_blog_from_url(url: str) -> dict[str, Any]:
         "cover": meta["cover"],
         "create_time": create_time,
         "is_deleted": False,
-        "item_show_type": 0,
+        "item_show_type": show_type,
         "_import_biz": meta["biz"],
         "_import_account": meta["account"],
+        "_import_body_text": text,
     }
     return blog
 

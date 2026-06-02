@@ -580,13 +580,33 @@ class ArticleRepository:
         )
 
     def find_article_by_link(self, link: str) -> dict[str, Any] | None:
-        row = self.conn.execute(
-            "SELECT id, account_name, title, link FROM articles WHERE link=? AND is_user_deleted=0",
-            (link.strip(),),
-        ).fetchone()
-        if not row:
-            return None
-        return dict(row)
+        from src.utils.article_import import extract_mp_article_slug, link_lookup_variants
+
+        for variant in link_lookup_variants(link):
+            row = self.conn.execute(
+                """
+                SELECT id, account_name, title, link FROM articles
+                WHERE link=? AND is_user_deleted=0
+                """,
+                (variant,),
+            ).fetchone()
+            if row:
+                return dict(row)
+
+        slug = extract_mp_article_slug(link)
+        if slug:
+            row = self.conn.execute(
+                """
+                SELECT id, account_name, title, link FROM articles
+                WHERE is_user_deleted=0 AND link LIKE ?
+                ORDER BY create_time DESC
+                LIMIT 1
+                """,
+                (f"%/s/{slug}%",),
+            ).fetchone()
+            if row:
+                return dict(row)
+        return None
 
     def mark_article_as_imported(self, article_id: str) -> None:
         """链接导入命中已存在文章时，仅加入「导入」列表，不改变 origin。"""
