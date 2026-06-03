@@ -6,6 +6,7 @@
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import FeedView from '@/views/FeedView.vue'
+import NotesView from '@/views/NotesView.vue'
 import ConfigView from '@/views/ConfigView.vue'
 import LogView from '@/views/LogView.vue'
 
@@ -23,6 +24,11 @@ const router = createRouter({
       path: '/config',   // 公众号管理页：添加/删除/爬取/清理
       name: 'config',
       component: ConfigView,
+    },
+    {
+      path: '/notes',
+      name: 'notes',
+      component: NotesView,
     },
     {
       path: '/logs',     // 操作日志页：查看历史爬取、清理记录

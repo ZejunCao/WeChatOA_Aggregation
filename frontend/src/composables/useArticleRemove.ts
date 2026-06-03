@@ -21,13 +21,14 @@ export function useArticleRemove(
 
     if (inImportTab) {
       const importOnly = article.source === 'import'
+      const danger = article.has_note ? '\n⚠ 该文包含笔记，删除后笔记会一并移除。' : ''
       const msg = importOnly
-        ? `移出「${article.title}」？\n该文为链接导入，移出后将从库中删除。`
+        ? `移出「${article.title}」？\n该文为链接导入，移出后将从库中删除。${danger}`
         : `从导入列表移出「${article.title}」？\n文章仍保留在「全部」中。`
       if (!confirm(msg)) return
     } else if (
       !confirm(
-        `从列表中删除「${article.title}」？\n将从本地数据移除，且以后爬取也不会再入库。`,
+        `从列表中删除「${article.title}」？\n将从本地数据移除，且以后爬取也不会再入库。${article.has_note ? '\n⚠ 该文包含笔记，删除后笔记会一并移除。' : ''}`,
       )
     ) {
       return
@@ -44,6 +45,7 @@ export function useArticleRemove(
         body: JSON.stringify({
           article_id: article.id,
           account: article.account,
+          force: !!article.has_note,
         }),
       })
       const data = (await res.json().catch(() => ({}))) as {

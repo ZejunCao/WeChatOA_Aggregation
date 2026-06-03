@@ -339,6 +339,7 @@ html[data-feed-theme="demo-glass"] .article-glass-badge-ai {
   background: rgba(168, 85, 247, 0.8);
 }
 
+html[data-feed-theme="demo-glass"] .article-glass-heading,
 html[data-feed-theme="demo-glass"] .article-glass-title {
   font-size: 14px;
   font-weight: 600;
@@ -346,6 +347,7 @@ html[data-feed-theme="demo-glass"] .article-glass-title {
   color: var(--text-1);
 }
 
+html[data-feed-theme="demo-glass"] .article-glass-card.is-read .article-glass-heading,
 html[data-feed-theme="demo-glass"] .article-glass-card.is-read .article-glass-title {
   color: var(--text-2);
   font-weight: 500;
@@ -448,10 +450,12 @@ html[data-feed-theme="demo-glass"] .article-glass-row:hover {
   box-shadow: 0 4px 16px rgba(236, 72, 153, 0.08);
 }
 
+html[data-feed-theme="demo-glass"] .article-glass-row-heading,
 html[data-feed-theme="demo-glass"] .article-glass-row-title {
   color: var(--text-1);
 }
 
+html[data-feed-theme="demo-glass"] .article-glass-row.is-read .article-glass-row-heading,
 html[data-feed-theme="demo-glass"] .article-glass-row.is-read .article-glass-row-title {
   color: var(--text-2);
 }

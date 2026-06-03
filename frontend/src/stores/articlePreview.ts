@@ -26,6 +26,9 @@ export const useArticlePreviewStore = defineStore('articlePreview', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const navigationIds = ref<string[]>([])
+  // 打开预览时是否自动展开笔记面板（来自「笔记」页点击）。
+  // 用递增计数而非布尔，确保面板每次打开都能重新触发 watch。
+  const expandNoteRequest = ref(0)
 
   const display = computed(() => article.value)
 
@@ -46,12 +49,13 @@ export const useArticlePreviewStore = defineStore('articlePreview', () => {
     navigationIds.value = ids
   }
 
-  async function openPreview(item: FeedArticle) {
+  async function openPreview(item: FeedArticle, opts?: { expandNote?: boolean }) {
     article.value = item
     previewHtml.value = ''
     error.value = null
     loading.value = true
     open.value = true
+    if (opts?.expandNote) expandNoteRequest.value++
     void useReadingStore().markRead(item.id)
 
     try {
@@ -133,6 +137,7 @@ export const useArticlePreviewStore = defineStore('articlePreview', () => {
     canGoNext,
     navigationIndex,
     navigationTotal: computed(() => navigationIds.value.length),
+    expandNoteRequest,
     setNavigationIds,
     openPreview,
     close,

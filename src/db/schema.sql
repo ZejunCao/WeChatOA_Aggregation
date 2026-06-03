@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS articles (
   updated_at        TEXT,
   source            TEXT NOT NULL DEFAULT 'crawl',
   import_listed     INTEGER NOT NULL DEFAULT 0,
+  import_order      INTEGER NOT NULL DEFAULT 0,
   CHECK (is_wx_deleted IN (0, 1)),
   CHECK (is_user_deleted IN (0, 1)),
   CHECK (source IN ('crawl', 'import')),
@@ -42,6 +43,10 @@ CREATE TABLE IF NOT EXISTS articles (
 
 CREATE INDEX IF NOT EXISTS idx_articles_import_listed_time
   ON articles (import_listed, create_time DESC, id DESC)
+  WHERE import_listed = 1;
+
+CREATE INDEX IF NOT EXISTS idx_articles_import_listed_order
+  ON articles (import_listed, import_order DESC, id DESC)
   WHERE import_listed = 1;
 
 CREATE INDEX IF NOT EXISTS idx_articles_account_time
@@ -90,6 +95,16 @@ CREATE TABLE IF NOT EXISTS article_user_tags (
   tag         TEXT NOT NULL,
   PRIMARY KEY (article_id, tag)
 );
+
+CREATE TABLE IF NOT EXISTS article_notes (
+  article_id   TEXT PRIMARY KEY REFERENCES articles(id) ON DELETE CASCADE,
+  content      TEXT NOT NULL DEFAULT '',
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_article_notes_updated_at
+  ON article_notes (updated_at DESC);
 
 CREATE VIRTUAL TABLE IF NOT EXISTS article_fts USING fts5(
   article_id UNINDEXED,

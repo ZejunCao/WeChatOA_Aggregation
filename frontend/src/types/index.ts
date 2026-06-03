@@ -27,6 +27,12 @@ export interface Article {
   source?: 'crawl' | 'import'
   /** SQLite：是否出现在「导入」分栏 */
   import_listed?: boolean
+  /** SQLite：是否存在用户笔记（非空） */
+  has_note?: boolean
+  /** SQLite：笔记内容（HTML，仅笔记时间线接口返回） */
+  note_content?: string
+  /** SQLite：笔记最近编辑时间 */
+  note_updated_at?: string
 }
 
 // ── 单个公众号的文章集合（message_info.json 中每个 key 对应的 value） ────────
@@ -59,7 +65,7 @@ export type SortOrder = 'newest' | 'oldest'  // 最新优先 / 最早优先
 export type GroupBy = 'date' | 'account' | 'none'  // 按日期 / 按公众号 / 不分组
 
 // 已读/收藏筛选
-export type ReadFilter = 'all' | 'unread' | 'bookmarked' | 'imported'  // 全部 / 未读 / 收藏 / 链接导入
+export type ReadFilter = 'all' | 'unread' | 'bookmarked' | 'imported' | 'noted'  // 全部 / 未读 / 收藏 / 链接导入 / 有笔记
 
 // 标签筛选中的特殊值：表示“未打标签”的文章
 export const TAG_UNTAGGED = '__untagged__'

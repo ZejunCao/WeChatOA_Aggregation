@@ -4,10 +4,11 @@
 from __future__ import annotations
 
 import sqlite3
+import re
 
 from src.utils.helpers import time_now
 
-LATEST_SCHEMA_VERSION = 5
+LATEST_SCHEMA_VERSION = 9
 
 
 def apply_migrations(conn: sqlite3.Connection) -> None:
@@ -46,6 +47,42 @@ def apply_migrations(conn: sqlite3.Connection) -> None:
         conn.execute(
             "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
             (5, time_now()),
+        )
+        conn.commit()
+        current = 5
+
+    if current < 6:
+        _migrate_to_v6(conn)
+        conn.execute(
+            "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
+            (6, time_now()),
+        )
+        conn.commit()
+        current = 6
+
+    if current < 7:
+        _migrate_to_v7(conn)
+        conn.execute(
+            "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
+            (7, time_now()),
+        )
+        conn.commit()
+        current = 7
+
+    if current < 8:
+        _migrate_to_v8(conn)
+        conn.execute(
+            "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
+            (8, time_now()),
+        )
+        conn.commit()
+        current = 8
+
+    if current < 9:
+        _migrate_to_v9(conn)
+        conn.execute(
+            "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
+            (9, time_now()),
         )
         conn.commit()
 
@@ -154,3 +191,101 @@ def _migrate_to_v5(conn: sqlite3.Connection) -> None:
           )
         """
     )
+
+
+def _migrate_to_v6(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS article_notes (
+          article_id   TEXT PRIMARY KEY REFERENCES articles(id) ON DELETE CASCADE,
+          content      TEXT NOT NULL DEFAULT '',
+          created_at   TEXT NOT NULL,
+          updated_at   TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_article_notes_updated_at
+        ON article_notes (updated_at DESC)
+        """
+    )
+
+
+def _migrate_to_v7(conn: sqlite3.Connection) -> None:
+    row = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='articles'"
+    ).fetchone()
+    if not row:
+        return
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(articles)").fetchall()}
+    if "import_order" not in cols:
+        conn.execute(
+            "ALTER TABLE articles ADD COLUMN import_order INTEGER NOT NULL DEFAULT 0"
+        )
+    conn.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_articles_import_listed_order
+        ON articles (import_listed, import_order DESC, id DESC)
+        WHERE import_listed = 1
+        """
+    )
+
+
+def _migrate_to_v8(conn: sqlite3.Connection) -> None:
+    """
+    回填历史导入文章的 import_order，避免仍按发布时间观感排序。
+    规则：按 updated_at/create_time 从旧到新分配递增序号，最新导入排最前。
+    """
+    conn.execute(
+        """
+        WITH ranked AS (
+          SELECT
+            id,
+            ROW_NUMBER() OVER (
+              ORDER BY
+                COALESCE(NULLIF(updated_at, ''), NULLIF(create_time, ''), id) ASC,
+                id ASC
+            ) AS rn
+          FROM articles
+          WHERE import_listed = 1
+            AND COALESCE(import_order, 0) = 0
+        )
+        UPDATE articles
+        SET import_order = (
+          SELECT rn FROM ranked WHERE ranked.id = articles.id
+        )
+        WHERE id IN (SELECT id FROM ranked)
+        """
+    )
+
+
+def _migrate_to_v9(conn: sqlite3.Connection) -> None:
+    """修复历史导入文章字数偏小（未提交事务导致回退到标题长度）的数据。"""
+    rows = conn.execute(
+        """
+        SELECT ar.id, ar.title, ab.body_text
+        FROM articles ar
+        LEFT JOIN article_bodies ab ON ab.article_id = ar.id
+        WHERE ar.import_listed = 1
+        """
+    ).fetchall()
+    now = time_now()
+    for row in rows:
+        article_id = str(row["id"] or "")
+        if not article_id:
+            continue
+        raw = row["body_text"]
+        if raw is None:
+            text = ""
+        else:
+            text = str(raw)
+        cleaned = re.sub(r"\s+", "", text)
+        if cleaned:
+            wc = len(cleaned)
+        else:
+            wc = len(re.sub(r"\s+", "", str(row["title"] or "")))
+        conn.execute(
+            "UPDATE articles SET word_count=?, updated_at=? WHERE id=?",
+            (wc, now, article_id),
+        )

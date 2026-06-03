@@ -148,6 +148,8 @@ class ArticleRepository:
             item["source"] = str(row["source"] or "crawl")
         if "import_listed" in keys:
             item["import_listed"] = bool(row["import_listed"])
+        if "has_note" in keys:
+            item["has_note"] = bool(row["has_note"])
         return item
 
     def upsert_article_from_blog(
@@ -411,6 +413,7 @@ class ArticleRepository:
         read_filter: str | None = None,
         starred_only: bool = False,
         import_only: bool = False,
+        noted_only: bool = False,
     ) -> tuple[str, list[str], list[Any]]:
         where = ["ar.is_wx_deleted=0", "ar.is_user_deleted=0"]
         if import_only:
@@ -454,14 +457,32 @@ class ArticleRepository:
         if starred_only:
             where.append("COALESCE(ann.starred, 0) = 1")
             need_ann = True
+        if noted_only:
+            where.append(
+                """
+                EXISTS (
+                  SELECT 1 FROM article_notes nt
+                  WHERE nt.article_id=ar.id
+                    AND length(trim(COALESCE(nt.content, ''))) > 0
+                )
+                """
+            )
 
         if cursor:
             try:
-                ct, aid = cursor.split("|", 1)
-                where.append(
-                    "(ar.create_time < ? OR (ar.create_time = ? AND ar.id < ?))"
-                )
-                params.extend([ct, ct, aid])
+                left, aid = cursor.split("|", 1)
+                if import_only:
+                    order_no = int(left)
+                    where.append(
+                        "(COALESCE(ar.import_order, 0) < ? OR (COALESCE(ar.import_order, 0) = ? AND ar.id < ?))"
+                    )
+                    params.extend([order_no, order_no, aid])
+                else:
+                    ct = left
+                    where.append(
+                        "(ar.create_time < ? OR (ar.create_time = ? AND ar.id < ?))"
+                    )
+                    params.extend([ct, ct, aid])
             except ValueError:
                 pass
 
@@ -486,6 +507,7 @@ class ArticleRepository:
         read_filter: str | None = None,
         starred_only: bool = False,
         import_only: bool = False,
+        noted_only: bool = False,
     ) -> int:
         if article_ids is not None and not article_ids:
             return 0
@@ -498,6 +520,7 @@ class ArticleRepository:
             read_filter=read_filter,
             starred_only=starred_only,
             import_only=import_only,
+            noted_only=noted_only,
         )
         row = self.conn.execute(
             f"SELECT COUNT(*) AS c {from_sql} WHERE {' AND '.join(where)}",
@@ -518,6 +541,7 @@ class ArticleRepository:
         read_filter: str | None = None,
         starred_only: bool = False,
         import_only: bool = False,
+        noted_only: bool = False,
     ) -> tuple[list[dict[str, Any]], str | None]:
         limit = max(1, min(limit, 100))
         from_sql, where, params = self._articles_where(
@@ -530,18 +554,29 @@ class ArticleRepository:
             read_filter=read_filter,
             starred_only=starred_only,
             import_only=import_only,
+            noted_only=noted_only,
         )
         if article_ids is not None and not article_ids:
             return [], None
 
+        order_by = (
+            "COALESCE(ar.import_order, 0) DESC, ar.id DESC"
+            if import_only
+            else "ar.create_time DESC, ar.id DESC"
+        )
         sql = f"""
             SELECT ar.*,
                    COALESCE(ann.is_read, 0) AS is_read,
-                   COALESCE(ann.starred, 0) AS starred
+                   COALESCE(ann.starred, 0) AS starred,
+                   EXISTS (
+                     SELECT 1 FROM article_notes nt
+                     WHERE nt.article_id=ar.id
+                       AND length(trim(COALESCE(nt.content, ''))) > 0
+                   ) AS has_note
             FROM articles ar
             LEFT JOIN article_annotations ann ON ann.article_id = ar.id
             WHERE {' AND '.join(where)}
-            ORDER BY ar.create_time DESC, ar.id DESC
+            ORDER BY {order_by}
             LIMIT ?
         """
         params.append(limit + 1)
@@ -552,7 +587,10 @@ class ArticleRepository:
         next_cursor = None
         if has_more and rows:
             last = rows[-1]
-            next_cursor = f"{last['create_time']}|{last['id']}"
+            if import_only:
+                next_cursor = f"{int(last['import_order'] or 0)}|{last['id']}"
+            else:
+                next_cursor = f"{last['create_time']}|{last['id']}"
         return items, next_cursor
 
     def search_articles(
@@ -565,6 +603,7 @@ class ArticleRepository:
         read_filter: str | None = None,
         starred_only: bool = False,
         import_only: bool = False,
+        noted_only: bool = False,
     ) -> tuple[list[dict[str, Any]], str | None]:
         ids = fts_mod.search_article_ids(self.conn, query, limit=500)
         if not ids:
@@ -577,6 +616,7 @@ class ArticleRepository:
             read_filter=read_filter,
             starred_only=starred_only,
             import_only=import_only,
+            noted_only=noted_only,
         )
 
     def find_article_by_link(self, link: str) -> dict[str, Any] | None:
@@ -610,12 +650,16 @@ class ArticleRepository:
 
     def mark_article_as_imported(self, article_id: str) -> None:
         """链接导入命中已存在文章时，仅加入「导入」列表，不改变 origin。"""
+        row = self.conn.execute(
+            "SELECT COALESCE(MAX(import_order), 0) AS max_import_order FROM articles"
+        ).fetchone()
+        next_order = int(row["max_import_order"] or 0) + 1 if row else 1
         self.conn.execute(
             """
-            UPDATE articles SET import_listed=1, updated_at=?
+            UPDATE articles SET import_listed=1, import_order=?, updated_at=?
             WHERE id=? AND is_user_deleted=0
             """,
-            (time_now(), article_id),
+            (next_order, time_now(), article_id),
         )
 
     def remove_from_import(self, article_id: str, account: str) -> str | None:
@@ -764,13 +808,143 @@ class ArticleRepository:
                 star_n += 1
         return {"read_imported": read_n, "starred_imported": star_n}
 
+    # ── 笔记（article_notes）──────────────────────────────────────────────────
+
+    def list_notes(
+        self,
+        *,
+        limit: int = 100,
+        account: str | None = None,
+        article_ids: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        """笔记时间线：按笔记最近编辑时间倒序，返回文章信息 + 笔记内容。"""
+        limit = max(1, min(limit, 200))
+        where = [
+            "ar.is_user_deleted=0",
+            "length(trim(COALESCE(nt.content, ''))) > 0",
+        ]
+        params: list[Any] = []
+        if account:
+            where.append("ar.account_name=?")
+            params.append(account)
+        if article_ids is not None:
+            if not article_ids:
+                return []
+            placeholders = ",".join("?" * len(article_ids))
+            where.append(f"ar.id IN ({placeholders})")
+            params.extend(article_ids)
+        sql = f"""
+            SELECT ar.*,
+                   COALESCE(ann.is_read, 0) AS is_read,
+                   COALESCE(ann.starred, 0) AS starred,
+                   1 AS has_note,
+                   nt.content AS note_content,
+                   nt.updated_at AS note_updated_at
+            FROM article_notes nt
+            JOIN articles ar ON ar.id = nt.article_id
+            LEFT JOIN article_annotations ann ON ann.article_id = ar.id
+            WHERE {' AND '.join(where)}
+            ORDER BY nt.updated_at DESC, ar.id DESC
+            LIMIT ?
+        """
+        params.append(limit)
+        rows = self.conn.execute(sql, params).fetchall()
+        items: list[dict[str, Any]] = []
+        for r in rows:
+            item = self.row_to_feed_item(r)
+            item["note_content"] = str(r["note_content"] or "")
+            item["note_updated_at"] = str(r["note_updated_at"] or "")
+            items.append(item)
+        return items
+
+    def search_note_article_ids(
+        self, query: str, *, account: str | None = None
+    ) -> list[str]:
+        """在笔记正文内做关键词匹配（FTS 不索引笔记，故用 LIKE 兜底）。"""
+        q = (query or "").strip()
+        if not q:
+            return []
+        where = [
+            "ar.is_user_deleted=0",
+            "length(trim(COALESCE(nt.content, ''))) > 0",
+            "nt.content LIKE ?",
+        ]
+        params: list[Any] = [f"%{q}%"]
+        if account:
+            where.append("ar.account_name=?")
+            params.append(account)
+        sql = f"""
+            SELECT nt.article_id AS id
+            FROM article_notes nt
+            JOIN articles ar ON ar.id = nt.article_id
+            WHERE {' AND '.join(where)}
+            ORDER BY nt.updated_at DESC
+            LIMIT 500
+        """
+        rows = self.conn.execute(sql, params).fetchall()
+        return [str(r["id"]) for r in rows]
+
+    def get_article_note(self, article_id: str) -> dict[str, Any]:
+        row = self.conn.execute(
+            """
+            SELECT content, updated_at
+            FROM article_notes
+            WHERE article_id=?
+            """,
+            (article_id,),
+        ).fetchone()
+        if not row:
+            return {"content": "", "updated_at": ""}
+        return {
+            "content": str(row["content"] or ""),
+            "updated_at": str(row["updated_at"] or ""),
+        }
+
+    def set_article_note(self, article_id: str, content: str) -> dict[str, Any]:
+        now = time_now()
+        body = str(content or "")
+        self.conn.execute(
+            """
+            INSERT INTO article_notes (article_id, content, created_at, updated_at)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(article_id) DO UPDATE SET
+              content=excluded.content,
+              updated_at=excluded.updated_at
+            """,
+            (article_id, body, now, now),
+        )
+        return {"content": body, "updated_at": now}
+
+    def article_has_note(self, article_id: str) -> bool:
+        row = self.conn.execute(
+            """
+            SELECT 1
+            FROM article_notes
+            WHERE article_id=?
+              AND length(trim(COALESCE(content, ''))) > 0
+            LIMIT 1
+            """,
+            (article_id,),
+        ).fetchone()
+        return row is not None
+
     # ── 缓存清理 ─────────────────────────────────────────────────────────────
 
     def ids_older_than(self, cutoff: str) -> set[str]:
         rows = self.conn.execute(
             """
-            SELECT id FROM articles
-            WHERE create_time < ? AND is_user_deleted=0
+            SELECT ar.id
+            FROM articles ar
+            LEFT JOIN article_annotations ann ON ann.article_id = ar.id
+            WHERE ar.create_time < ?
+              AND ar.is_user_deleted=0
+              AND ar.import_listed=0
+              AND COALESCE(ann.starred, 0)=0
+              AND NOT EXISTS (
+                SELECT 1 FROM article_notes nt
+                WHERE nt.article_id=ar.id
+                  AND length(trim(COALESCE(nt.content, ''))) > 0
+              )
             """,
             (cutoff,),
         ).fetchall()

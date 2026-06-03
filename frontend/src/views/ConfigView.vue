@@ -49,6 +49,7 @@ import {
 import type { CrawlStatus, CachePreview, AuthStatus } from '@/types'
 import { useArticlesStore } from '@/stores/articles'
 import { useConfigStore } from '@/stores/config'
+import { accountColor } from '@/lib/accountColor'
 
 const articlesStore = useArticlesStore()
 const configStore = useConfigStore()
@@ -84,16 +85,6 @@ const latestUpdateTime = computed(() => {
   const times = articlesStore.accounts.map((a) => a.latest_update_time).filter(Boolean)
   return times.sort().reverse()[0] || '—'
 })
-
-// 公众号头像背景色（由名称首字符 charCode 取模决定，同名同色）
-const accountColors = [
-  '#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6', '#3b82f6', '#10b981',
-  '#f59e0b', '#ef4444', '#84cc16',
-]
-
-function getColor(name: string) {
-  return accountColors[name.charCodeAt(0) % accountColors.length]
-}
 
 // ── 添加公众号弹窗（两步流程） ────────────────────────────────────────────────
 // 第一步（'input'）：用户输入关键词 → 调用 POST /api/accounts/search → 展示候选列表
@@ -1754,7 +1745,7 @@ async function doCacheClear() {
           <!-- Avatar -->
           <div
             class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-white font-bold text-lg"
-            :style="{ backgroundColor: getColor(acc.name) }"
+            :style="{ backgroundColor: accountColor(acc.name) }"
           >
             {{ acc.name.slice(0, 2) }}
           </div>
@@ -2310,7 +2301,7 @@ async function doCacheClear() {
                     <div
                       v-else
                       class="h-11 w-11 rounded-xl flex items-center justify-center text-white font-bold text-base"
-                      :style="{ backgroundColor: getColor(item.nickname) }"
+                      :style="{ backgroundColor: accountColor(item.nickname) }"
                     >
                       {{ item.nickname.slice(0, 2) }}
                     </div>

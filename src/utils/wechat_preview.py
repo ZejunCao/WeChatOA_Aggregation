@@ -126,6 +126,7 @@ def _resolve_preview_link_href(href: str, base_url: str = _MP_ORIGIN) -> str | N
 
 # 标记预览 HTML 已处理外链（用于缓存失效）
 _PREVIEW_LINK_MARKER = "preview-link-v1"
+_PREVIEW_IMG_LIGHTBOX_MARKER = "preview-img-lightbox-v3"
 
 
 def _configure_preview_links(root: etree._Element, base_url: str = _MP_ORIGIN) -> None:
@@ -363,6 +364,38 @@ _PREVIEW_AI_CSS = """
 .wx_preview_ai_tag--1{background:#dbeafe;color:#1d4ed8}
 .wx_preview_ai_tag--2{background:#fce7f3;color:#9d174d}
 .wx_preview_ai_tag--3{background:#d1fae5;color:#047857}
+"""
+
+_PREVIEW_IMG_LIGHTBOX_JS = """
+(function(){
+  function normalizeLightboxSrc(raw){
+    var src = (raw || '').trim();
+    if (!src) return '';
+    if (/^https?:\\/\\//i.test(src)) return src;
+    if (src.charAt(0) === '/' && src.indexOf('/api/wechat-image') === 0) return src;
+    return '';
+  }
+  function openParentLightbox(src){
+    src = normalizeLightboxSrc(src);
+    if (!src) return;
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'wx-preview-img-open', src: src }, '*');
+      }
+    } catch (e) {}
+  }
+  var selectors = '.wx-preview-img, #js_content img, #js_article img';
+  document.querySelectorAll(selectors).forEach(function(img){
+    if (!img || img.tagName !== 'IMG') return;
+    img.style.cursor = 'zoom-in';
+    img.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var src = img.getAttribute('src') || img.getAttribute('data-src') || '';
+      openParentLightbox(src);
+    });
+  });
+})();
 """
 
 _REMOVE_IDS = (
@@ -671,7 +704,7 @@ def build_preview_document(
         is_picture_message_html,
     )
 
-    if item_show_type in (8, 10) or is_picture_message_html(raw_html):
+    if is_picture_message_html(raw_html):
         picture_html = build_picture_preview_document(
             raw_html,
             title=title,
@@ -760,6 +793,7 @@ def build_preview_document(
 <html lang="zh-CN">
 <head>
   <!-- {_PREVIEW_LINK_MARKER} -->
+  <!-- {_PREVIEW_IMG_LIGHTBOX_MARKER} -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0,viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
@@ -780,6 +814,7 @@ def build_preview_document(
 <body class="{body_cls}" {body_attrs}>
 {page_content}
 {bottom_html}
+<script>{_PREVIEW_IMG_LIGHTBOX_JS}</script>
 </body>
 </html>"""
 
@@ -800,6 +835,7 @@ def _wrap_preview_fragment(
 <html lang="zh-CN">
 <head>
   <!-- {_PREVIEW_LINK_MARKER} -->
+  <!-- {_PREVIEW_IMG_LIGHTBOX_MARKER} -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <meta name="color-scheme" content="light">
@@ -818,6 +854,7 @@ def _wrap_preview_fragment(
 </head>
 <body class="{body_cls}" data-weui-theme="light">
 <div id="js_article"><div id="js_content">{ai_html}{inner}</div></div>
+<script>{_PREVIEW_IMG_LIGHTBOX_JS}</script>
 </body>
 </html>"""
 
@@ -839,6 +876,7 @@ def is_full_preview_document(html: str | None) -> bool:
     has_surface = "preview-surface-v3" in html
     has_ai = "preview-ai-v1" in html
     has_img = "preview-img-v1" in html
+    has_img_lightbox = _PREVIEW_IMG_LIGHTBOX_MARKER in html
     has_link = "preview-link-v1" in html
     return (
         has_theme
@@ -847,5 +885,6 @@ def is_full_preview_document(html: str | None) -> bool:
         and has_surface
         and has_ai
         and has_img
+        and has_img_lightbox
         and has_link
     )

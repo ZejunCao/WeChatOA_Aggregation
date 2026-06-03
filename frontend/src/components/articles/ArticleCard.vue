@@ -8,11 +8,13 @@
 
 import { computed, ref } from 'vue'
 import { TooltipContent, TooltipPortal, TooltipRoot, TooltipTrigger } from 'reka-ui'
-import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, LogOut, Loader2 } from 'lucide-vue-next'
+import { Tag, Bot, Bookmark, BookmarkCheck, Trash2, LogOut, Loader2, NotebookPen } from 'lucide-vue-next'
 import type { Article } from '@/types'
 import { useReadingStore } from '@/stores/reading'
 import { useArticleOpen } from '@/composables/useArticleOpen'
 import { useArticleRemove } from '@/composables/useArticleRemove'
+import { accountColor } from '@/lib/accountColor'
+import { displayText, tagLabel } from '@/lib/displayText'
 
 const props = defineProps<{
   article: Article & { account: string }  // 文章数据 + 所属公众号名称
@@ -41,17 +43,7 @@ function toggleBookmark(e: MouseEvent) {
   readingStore.toggleBookmark(props.article.id)
 }
 
-/**
- * 封面图加载失败时的备用颜色（用公众号名首字符的 charCode 取模，
- * 保证同一公众号始终显示同一颜色）。
- */
-const coverFallback = computed(() => {
-  const colors = [
-    '#6366f1', '#8b5cf6', '#c94f7c', '#f97316', '#14b8a6', '#3b82f6', '#10b981',
-  ]
-  const idx = props.article.account.charCodeAt(0) % colors.length
-  return colors[idx]
-})
+const coverFallback = computed(() => accountColor(props.article.account))
 
 /**
  * 本地封面图路径：爬取时已下载到 data/covers/{id}.jpg。
@@ -70,10 +62,11 @@ const formattedDate = computed(() => {
   return d.slice(0, 10)
 })
 
-/** 优先显示 LLM 摘要（summary），没有则显示原始摘要（digest） */
-const displayDigest = computed(() => {
-  return props.article.summary || props.article.digest || ''
-})
+const cardTitle = computed(() => displayText(props.article.title))
+const displayDigest = computed(
+  () => displayText(props.article.summary) || displayText(props.article.digest),
+)
+const hasAiSummary = computed(() => !!displayText(props.article.summary))
 
 const tagTones = ['article-glass-tag--ai', 'article-glass-tag--tech', 'article-glass-tag--prod', 'article-glass-tag--design'] as const
 function tagToneClass(i: number) {
@@ -86,6 +79,7 @@ function tagToneClass(i: number) {
     role="button"
     tabindex="0"
     draggable="false"
+    :data-article-id="article.id"
     class="group relative article-glass-card cursor-pointer"
     :class="isRead ? 'is-read' : ''"
     @click="onArticleClick($event, article)"
@@ -97,7 +91,7 @@ function tagToneClass(i: number) {
       <img
         v-if="!coverError"
         :src="localCoverSrc"
-        :alt="article.title"
+        :alt="cardTitle"
         draggable="false"
         class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
@@ -114,7 +108,7 @@ function tagToneClass(i: number) {
       </div>
 
       <!-- AI 摘要徽标：有 LLM 生成的 summary 时显示 -->
-      <div v-if="article.summary" class="article-glass-badge-ai">
+      <div v-if="hasAiSummary" class="article-glass-badge-ai">
         <Bot class="h-3 w-3 shrink-0" />
         <span>AI 摘要</span>
       </div>
@@ -167,8 +161,8 @@ function tagToneClass(i: number) {
     <div class="article-glass-body">
       <div class="flex items-start gap-2">
         <span v-if="!isRead" class="feed-dot-unread" />
-        <h3 class="article-glass-title line-clamp-2">
-          {{ article.title }}
+        <h3 class="article-glass-heading line-clamp-2">
+          {{ cardTitle }}
         </h3>
       </div>
 
@@ -192,12 +186,12 @@ function tagToneClass(i: number) {
       <div v-if="article.tags && article.tags.length" class="flex flex-wrap gap-1.5">
         <span
           v-for="(tag, ti) in article.tags.slice(0, 3)"
-          :key="tag"
+          :key="`${ti}-${tagLabel(tag)}`"
           class="article-glass-tag inline-flex items-center gap-0.5"
           :class="tagToneClass(ti)"
         >
           <Tag class="h-2.5 w-2.5 opacity-80" />
-          {{ tag }}
+          {{ tagLabel(tag) }}
         </span>
       </div>
 
@@ -206,6 +200,14 @@ function tagToneClass(i: number) {
           {{ article.account }}
         </span>
         <div class="article-glass-ft-meta">
+          <span
+            v-if="article.has_note"
+            class="inline-flex items-center gap-1 rounded-md bg-[var(--color-primary)]/12 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]"
+            title="该文章包含笔记"
+          >
+            <NotebookPen class="h-3 w-3" />
+            笔记
+          </span>
           <span v-if="article.word_count && article.word_count > 0">{{ article.word_count }} 字</span>
           <span v-if="article.word_count && article.word_count > 0">·</span>
           <span>{{ formattedDate }}</span>

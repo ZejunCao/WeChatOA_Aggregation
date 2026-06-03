@@ -59,6 +59,14 @@ async function onLinkImported(payload: { articleId: string }) {
   filters.accounts = []
   await articlesStore.loadData(filters)
   const article = articlesStore.allArticles.find((a) => a.id === payload.articleId)
+  await nextTick()
+  const target = scrollRef.value?.querySelector<HTMLElement>(
+    `[data-article-id="${CSS.escape(payload.articleId)}"]`,
+  )
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' })
+    flashImportedTarget(target)
+  }
   if (article) {
     void previewStore.openPreview(article)
   }
@@ -87,6 +95,21 @@ const sentinelRef = ref<HTMLElement | null>(null)
 const scrollRef = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | null = null
 let loadMoreLocked = false
+let importHighlightTimer: ReturnType<typeof setTimeout> | undefined
+
+function flashImportedTarget(target: HTMLElement) {
+  if (importHighlightTimer) {
+    clearTimeout(importHighlightTimer)
+    importHighlightTimer = undefined
+  }
+  scrollRef.value
+    ?.querySelectorAll<HTMLElement>('.article-import-highlight')
+    .forEach((el) => el.classList.remove('article-import-highlight'))
+  target.classList.add('article-import-highlight')
+  importHighlightTimer = setTimeout(() => {
+    target.classList.remove('article-import-highlight')
+  }, 1150)
+}
 
 /** SQLite 加载更多后保持滚动位置，避免列表增高后视口被顶下去 */
 async function loadMoreSqlitePreserveScroll() {
@@ -177,6 +200,7 @@ watch(scrollRef, () => {
 
 onUnmounted(() => {
   observer?.disconnect()
+  if (importHighlightTimer) clearTimeout(importHighlightTimer)
 })
 
 // 筛选条件变化时重置显示数量
@@ -251,6 +275,8 @@ watch(
   (v) => {
     if (v === 'imported') {
       filters.accounts = []
+      filters.groupBy = 'none'
+      viewMode.value = 'grid'
       if (props.selectedAccount) emit('update:selectedAccount', '')
     }
   },

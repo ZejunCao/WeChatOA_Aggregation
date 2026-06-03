@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { Rss, Settings, ScrollText, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { Rss, Settings, ChevronLeft, ChevronRight, NotebookPen } from 'lucide-vue-next'
 import { useArticlesStore } from '@/stores/articles'
 import { useConfigStore } from '@/stores/config'
 import type { AccountInfo } from '@/types'
@@ -68,10 +68,14 @@ function scheduleAccountGhostClickAbsorb() {
 }
 
 const navItems = [
-  { name: '文章', icon: Rss, path: '/' },
-  { name: '配置', icon: Settings, path: '/config' },
-  { name: '日志', icon: ScrollText, path: '/logs' },
+  { label: '文章', icon: Rss, path: '/' },
+  { label: '笔记', icon: NotebookPen, path: '/notes' },
+  { label: '配置', icon: Settings, path: '/config' },
 ]
+
+function goNav(path: string) {
+  if (route.path !== path) router.push(path)
+}
 
 const visibleAccounts = computed(() => {
   const orderMap = new Map(configStore.accountOrder.map((name, idx) => [name, idx]))
@@ -100,7 +104,7 @@ watch(
 function selectAccount(name: string) {
   const newVal = props.selectedAccount === name ? '' : name
   emit('update:selectedAccount', newVal)
-  if (route.path !== '/') router.push('/')
+  if (route.path !== '/' && route.path !== '/notes') router.push('/')
 }
 
 function onAccountClick(name: string) {
@@ -291,20 +295,22 @@ const draggingAccountInfo = computed(
 
       <!-- Navigation -->
       <nav class="app-sidebar-nav space-y-1">
-        <router-link
-          v-for="item in navItems"
-          :key="item.path"
-          :to="item.path"
-          class="app-sidebar-link"
+        <button
+          v-for="nav in navItems"
+          :key="nav.path"
+          type="button"
+          class="app-sidebar-link w-full"
           :class="[
-            route.path === item.path ? 'app-sidebar-link--active' : '',
+            route.path === nav.path ? 'app-sidebar-link--active' : '',
             collapsed ? 'app-sidebar-link--collapsed' : '',
           ]"
-          :title="collapsed ? item.name : ''"
+          :title="collapsed ? nav.label : undefined"
+          :aria-current="route.path === nav.path ? 'page' : undefined"
+          @click="goNav(nav.path)"
         >
-          <component :is="item.icon" class="h-4 w-4 shrink-0" />
-          <span v-if="!collapsed">{{ item.name }}</span>
-        </router-link>
+          <component :is="nav.icon" class="h-4 w-4 shrink-0" />
+          <span v-if="!collapsed" class="truncate">{{ nav.label }}</span>
+        </button>
       </nav>
 
       <!-- Account list（文章页且展开时） -->

@@ -19,7 +19,7 @@ from src.utils.wechat_preview import (
     _extract_page_meta,
 )
 
-_PREVIEW_PICTURE_MARKER = "preview-picture-v1"
+_PREVIEW_PICTURE_MARKER = "preview-picture-v3"
 _PICTURE_SHOW_TYPES = frozenset({8, 10})
 
 
@@ -37,10 +37,30 @@ def parse_item_show_type(html: str) -> int:
 def is_picture_message_html(html: str) -> bool:
     if not html or not html.strip():
         return False
-    if parse_item_show_type(html) in _PICTURE_SHOW_TYPES:
-        return True
-    if "picture_page_info_list" in html and (
-        "js_row_immersive_stream" in html or "wx_stream_article" in html
+    show_type = parse_item_show_type(html)
+    has_picture_list = bool(
+        re.search(r"picture_page_info_list\s*[:=]\s*\[", html)
+    )
+    has_picture_urls = bool(
+        re.search(r"cdn_url\s*:\s*['\"]https://mmbiz\.qpic\.cn/", html)
+    )
+    has_stream_marker = (
+        "js_row_immersive_stream" in html
+        or "wx_stream_article" in html
+        or "immersive_stream" in html
+    )
+    tree = etree.HTML(html, parser=etree.HTMLParser(encoding="utf-8"))
+    rich_text_len = 0
+    if tree is not None:
+        rich_nodes = tree.xpath('//*[contains(@class, "rich_media_content")]')
+        if rich_nodes:
+            rich_text_len = len("".join(rich_nodes[0].itertext()).strip())
+    # 仅当命中图片流数据结构时，才认定为图片消息，避免普通图文被 item_show_type 误伤。
+    if (
+        has_picture_list
+        and has_picture_urls
+        and (has_stream_marker or show_type in _PICTURE_SHOW_TYPES)
+        and rich_text_len < 120
     ):
         return True
     return False
@@ -230,7 +250,7 @@ _PICTURE_CAROUSEL_CSS = """
 .wx-picture-slide{
   flex:0 0 100%;
   scroll-snap-align:start;
-  scroll-snap-stop:always;
+  scroll-snap-stop:normal;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -296,60 +316,7 @@ _PICTURE_CAROUSEL_CSS = """
   margin:0 18px 16px;font-size:14px;line-height:1.65;
   color:rgba(0,0,0,.72);white-space:pre-wrap;word-break:break-word;
 }
-.wx-picture-lightbox{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  display:none;
-  background:rgba(0,0,0,.92);
-  align-items:center;
-  justify-content:center;
-}
-.wx-picture-lightbox.is-open{display:flex}
-.wx-picture-lightbox-inner{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-.wx-picture-lightbox-image{
-  max-width:96vw;
-  max-height:96vh;
-  object-fit:contain;
-  transform-origin:center center;
-  transition:transform .08s ease-out;
-  cursor:zoom-in;
-  user-select:none;
-  -webkit-user-drag:none;
-}
-.wx-picture-lightbox.is-zoomed .wx-picture-lightbox-image{
-  cursor:grab;
-}
-.wx-picture-lightbox-close{
-  position:absolute;
-  top:14px;
-  right:14px;
-  width:36px;
-  height:36px;
-  border:none;
-  border-radius:999px;
-  background:rgba(255,255,255,.16);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-.wx-picture-lightbox-close svg{
-  width:18px;
-  height:18px;
-  stroke:currentColor;
-  stroke-width:2.2;
-  fill:none;
-}
+.wx-picture-slide img{cursor:zoom-in}
 """
 
 _PICTURE_CAROUSEL_JS = """
@@ -364,6 +331,11 @@ _PICTURE_CAROUSEL_JS = """
   var btnNext = document.getElementById('wx-picture-next');
   var total = slides.length;
   if (!total) return;
+  var activeIndex = 0;
+  var suppressImageClickUntil = 0;
+  var dragStartX = 0;
+  var dragStartY = 0;
+  var dragging = false;
 
   function pageScrollY(){
     return window.scrollY
@@ -394,6 +366,7 @@ _PICTURE_CAROUSEL_JS = """
   function setActive(i, opts){
     opts = opts || {};
     i = Math.max(0, Math.min(total - 1, i));
+    activeIndex = i;
     if (counter) counter.textContent = (i + 1) + ' / ' + total;
     thumbs.forEach(function(t, j){
       t.classList.toggle('is-active', j === i);
@@ -406,6 +379,7 @@ _PICTURE_CAROUSEL_JS = """
   function scrollTo(i){
     var keepY = pageScrollY();
     var w = track.clientWidth || 1;
+    i = Math.max(0, Math.min(total - 1, i));
     track.scrollTo({left: i * w, behavior: 'smooth'});
     setActive(i, {scrollThumb: true});
     requestAnimationFrame(function(){ restorePageScroll(keepY); });
@@ -415,6 +389,45 @@ _PICTURE_CAROUSEL_JS = """
   function preventFocusScroll(el){
     el.addEventListener('mousedown', function(e){ e.preventDefault(); });
   }
+
+  function onPointerStart(x, y){
+    dragStartX = x;
+    dragStartY = y;
+    dragging = false;
+  }
+
+  function onPointerMove(x, y){
+    if (dragging) return;
+    if (Math.abs(x - dragStartX) > 9 || Math.abs(y - dragStartY) > 9) {
+      dragging = true;
+      suppressImageClickUntil = Date.now() + 260;
+    }
+  }
+
+  track.addEventListener('touchstart', function(e){
+    var t = e.touches && e.touches[0];
+    if (!t) return;
+    onPointerStart(t.clientX, t.clientY);
+  }, {passive:true});
+  track.addEventListener('touchmove', function(e){
+    var t = e.touches && e.touches[0];
+    if (!t) return;
+    onPointerMove(t.clientX, t.clientY);
+  }, {passive:true});
+  track.addEventListener('touchend', function(){
+    if (dragging) suppressImageClickUntil = Date.now() + 260;
+    dragging = false;
+  }, {passive:true});
+  track.addEventListener('mousedown', function(e){
+    onPointerStart(e.clientX, e.clientY);
+  });
+  track.addEventListener('mousemove', function(e){
+    onPointerMove(e.clientX, e.clientY);
+  });
+  track.addEventListener('mouseup', function(){
+    if (dragging) suppressImageClickUntil = Date.now() + 260;
+    dragging = false;
+  });
 
   track.addEventListener('scroll', function(){
     window.requestAnimationFrame(function(){
@@ -427,7 +440,7 @@ _PICTURE_CAROUSEL_JS = """
     btnPrev.addEventListener('click', function(e){
       e.preventDefault();
       e.stopPropagation();
-      scrollTo(indexFromScroll() - 1);
+      scrollTo(activeIndex - 1);
     });
   }
   if (btnNext) {
@@ -435,7 +448,7 @@ _PICTURE_CAROUSEL_JS = """
     btnNext.addEventListener('click', function(e){
       e.preventDefault();
       e.stopPropagation();
-      scrollTo(indexFromScroll() + 1);
+      scrollTo(activeIndex + 1);
     });
   }
   thumbs.forEach(function(t){
@@ -448,93 +461,32 @@ _PICTURE_CAROUSEL_JS = """
     });
   });
 
-  var lightbox = document.getElementById('wx-picture-lightbox');
-  var lightboxImg = document.getElementById('wx-picture-lightbox-image');
-  var lightboxInner = document.getElementById('wx-picture-lightbox-inner');
-  var lightboxClose = document.getElementById('wx-picture-lightbox-close');
-  var zoomScale = 1;
-
-  function applyZoom(){
-    if (!lightbox || !lightboxImg) return;
-    lightboxImg.style.transform = 'scale(' + zoomScale.toFixed(3) + ')';
-    lightbox.classList.toggle('is-zoomed', zoomScale > 1.001);
+  function normalizeLightboxSrc(raw){
+    var src = (raw || '').trim();
+    if (!src) return '';
+    if (/^https?:\\/\\//i.test(src)) return src;
+    if (src.charAt(0) === '/' && src.indexOf('/api/wechat-image') === 0) return src;
+    return '';
   }
-
-  function openLightbox(src){
-    if (!lightbox || !lightboxImg) return;
-    lightboxImg.setAttribute('src', src);
-    zoomScale = 1;
-    applyZoom();
-    lightbox.classList.add('is-open');
-  }
-
-  function closeLightbox(){
-    if (!lightbox || !lightboxImg) return;
-    lightbox.classList.remove('is-open');
-    lightboxImg.setAttribute('src', '');
-    zoomScale = 1;
-    applyZoom();
-  }
-
-  function zoomBy(delta){
-    var next = zoomScale + delta;
-    zoomScale = Math.max(1, Math.min(6, next));
-    applyZoom();
+  function openParentLightbox(src){
+    src = normalizeLightboxSrc(src);
+    if (!src) return;
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'wx-preview-img-open', src: src }, '*');
+      }
+    } catch (e) {}
   }
 
   slides.forEach(function(s){
     var img = s.querySelector('img');
     if (!img) return;
     img.addEventListener('click', function(e){
+      if (Date.now() < suppressImageClickUntil) return;
       e.preventDefault();
       e.stopPropagation();
-      var src = img.getAttribute('src');
-      if (src) openLightbox(src);
+      openParentLightbox(img.getAttribute('src') || '');
     });
-  });
-
-  if (lightboxClose) {
-    lightboxClose.addEventListener('click', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      closeLightbox();
-    });
-  }
-  if (lightbox) {
-    lightbox.addEventListener('click', function(e){
-      if (e.target === lightbox) closeLightbox();
-    });
-  }
-  if (lightboxInner) {
-    lightboxInner.addEventListener('wheel', function(e){
-      e.preventDefault();
-      var step = Math.min(0.8, Math.max(0.06, Math.abs(e.deltaY) / 500));
-      zoomBy(e.deltaY < 0 ? step : -step);
-    }, {passive:false});
-  }
-  if (lightboxImg) {
-    lightboxImg.addEventListener('dblclick', function(e){
-      e.preventDefault();
-      zoomScale = 1;
-      applyZoom();
-    });
-  }
-  document.addEventListener('keydown', function(e){
-    if (!lightbox || !lightbox.classList.contains('is-open')) return;
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closeLightbox();
-      return;
-    }
-    if (e.key === '+' || e.key === '=') {
-      e.preventDefault();
-      zoomBy(0.15);
-      return;
-    }
-    if (e.key === '-') {
-      e.preventDefault();
-      zoomBy(-0.15);
-    }
   });
 
   setActive(0);
@@ -654,14 +606,6 @@ def build_picture_preview_document(
   <div class="wx-picture-counter" id="wx-picture-counter">1 / {len(images)}</div>
   <div class="wx-picture-thumbs" id="wx-picture-thumbs">
     {"".join(thumbs_html)}
-  </div>
-</div>
-<div class="wx-picture-lightbox" id="wx-picture-lightbox" aria-hidden="true">
-  <div class="wx-picture-lightbox-inner" id="wx-picture-lightbox-inner">
-    <img class="wx-picture-lightbox-image" id="wx-picture-lightbox-image" alt="全屏预览">
-    <button type="button" class="wx-picture-lightbox-close" id="wx-picture-lightbox-close" aria-label="关闭全屏">
-      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-    </button>
   </div>
 </div>
 <script>{_PICTURE_CAROUSEL_JS}</script>

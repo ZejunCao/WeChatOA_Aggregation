@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Search, X, Tags, LayoutGrid, List, Bookmark, BookmarkCheck, Circle, Link2 } from 'lucide-vue-next'
+import { Search, X, Tags, LayoutGrid, List, Bookmark, BookmarkCheck, Circle, Link2, NotebookPen } from 'lucide-vue-next'
 import { useArticlesStore } from '@/stores/articles'
 import { useReadingStore } from '@/stores/reading'
 import { TAG_UNTAGGED, type FilterState, type SortOrder, type ReadFilter } from '@/types'
@@ -56,6 +56,7 @@ const readTabs: { value: ReadFilter; label: string; icon: unknown }[] = [
   { value: 'unread',     label: '未读',   icon: Circle },
   { value: 'bookmarked', label: '收藏',   icon: Bookmark },
   { value: 'imported',   label: '导入',   icon: Link2 },
+  { value: 'noted',      label: '笔记',   icon: NotebookPen },
 ]
 
 function selectReadTab(value: ReadFilter) {
@@ -182,6 +183,7 @@ function tagChipClasses(tagValue: string) {
       >
         <BookmarkCheck v-if="tab.value === 'bookmarked'" class="h-3.5 w-3.5" />
         <Link2 v-else-if="tab.value === 'imported'" class="h-3.5 w-3.5" />
+        <NotebookPen v-else-if="tab.value === 'noted'" class="h-3.5 w-3.5" />
         <span
           v-else-if="tab.value === 'unread' && readingStore.unreadCount > 0"
           class="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] px-1.5 text-[10px] font-bold tabular-nums leading-none text-white"

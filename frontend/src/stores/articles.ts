@@ -137,6 +137,7 @@ export const useArticlesStore = defineStore('articles', () => {
     if (filters.readFilter === 'unread') params.set('read_filter', 'unread')
     if (filters.readFilter === 'bookmarked') params.set('starred_only', 'true')
     if (filters.readFilter === 'imported') params.set('import_only', 'true')
+    if (filters.readFilter === 'noted') params.set('read_filter', 'noted')
     return params
   }
 
@@ -227,7 +228,9 @@ export const useArticlesStore = defineStore('articles', () => {
   const accounts = computed(() => accountsList.value)
 
   const allArticles = computed<FeedArticle[]>(() =>
-    [...items.value].sort((a, b) => b.create_time.localeCompare(a.create_time)),
+    isSqlite.value
+      ? items.value
+      : [...items.value].sort((a, b) => b.create_time.localeCompare(a.create_time)),
   )
 
   const allTags = computed(() => [...tags.value].sort())

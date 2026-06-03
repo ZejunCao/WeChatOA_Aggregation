@@ -81,6 +81,8 @@ export function useFilters() {
         list = list.filter((a) => readingStore.isBookmarked(a.id))
       } else if (filters.readFilter === 'imported') {
         list = list.filter((a) => a.source === 'import')
+      } else if (filters.readFilter === 'noted') {
+        list = list.filter((a) => !!a.has_note)
       }
     }
     // 'all' 时不过滤
