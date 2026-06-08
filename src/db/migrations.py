@@ -8,7 +8,7 @@ import re
 
 from src.utils.helpers import time_now
 
-LATEST_SCHEMA_VERSION = 9
+LATEST_SCHEMA_VERSION = 10
 
 
 def apply_migrations(conn: sqlite3.Connection) -> None:
@@ -83,6 +83,15 @@ def apply_migrations(conn: sqlite3.Connection) -> None:
         conn.execute(
             "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
             (9, time_now()),
+        )
+        conn.commit()
+        current = 9
+
+    if current < 10:
+        _migrate_to_v10(conn)
+        conn.execute(
+            "INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)",
+            (10, time_now()),
         )
         conn.commit()
 
@@ -289,3 +298,32 @@ def _migrate_to_v9(conn: sqlite3.Connection) -> None:
             "UPDATE articles SET word_count=?, updated_at=? WHERE id=?",
             (wc, now, article_id),
         )
+
+
+def _migrate_to_v10(conn: sqlite3.Connection) -> None:
+    """区分爬取配置账号与链接导入占位账号。"""
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(accounts)").fetchall()}
+    if "in_crawl_config" not in cols:
+        conn.execute(
+            """
+            ALTER TABLE accounts
+            ADD COLUMN in_crawl_config INTEGER NOT NULL DEFAULT 1
+            CHECK (in_crawl_config IN (0, 1))
+            """
+        )
+    conn.execute(
+        "UPDATE accounts SET in_crawl_config = 0 WHERE fakeid LIKE 'import:%'"
+    )
+    conn.execute(
+        """
+        UPDATE accounts SET in_crawl_config = 0
+        WHERE in_crawl_config = 1
+          AND (latest_crawl_at IS NULL OR latest_crawl_at = '')
+          AND name IN (
+            SELECT account_name FROM articles
+            GROUP BY account_name
+            HAVING SUM(CASE WHEN source != 'import' THEN 1 ELSE 0 END) = 0
+               AND COUNT(*) > 0
+          )
+        """
+    )

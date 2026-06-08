@@ -246,6 +246,71 @@ class WechatRequest:
         crawl_message_info.sort(key=lambda x: x['create_time'])
         return crawl_message_info
 
+    def fetch_appmsg_preview_list(
+        self,
+        fakeid: str,
+        *,
+        count: int = 20,
+        begin: int = 0,
+    ) -> list[dict[str, Any]]:
+        """预览用：从微信拉取公众号文章列表（只读，不做入库去重/时间过滤）。"""
+        count = max(1, min(int(count), 40))
+        begin = max(0, int(begin))
+        params = {
+            'sub': 'list',
+            'search_field': 'null',
+            'begin': begin,
+            'count': count,
+            'query': '',
+            'fakeid': fakeid,
+            'type': '101_1',
+            'free_publish_type': 1,
+            'sub_action': 'list_ex',
+            'token': self.token,
+            'lang': 'zh_CN',
+            'f': 'json',
+            'ajax': 1,
+        }
+        url = "https://mp.weixin.qq.com/cgi-bin/appmsgpublish?"
+        response = self._mp_get_json(url, params)
+        publish_page = response.get('publish_page')
+        if not publish_page:
+            base = response.get('base_resp') or {}
+            raise RuntimeError(
+                f"无 publish_page: {base.get('err_msg') or base} (ret={base.get('ret')})"
+            )
+
+        try:
+            messages = json.loads(publish_page)['publish_list']
+        except (json.JSONDecodeError, KeyError, TypeError) as e:
+            raise RuntimeError(f"publish_page 解析失败: {e}") from e
+
+        articles: list[dict[str, Any]] = []
+        for message_i in range(len(messages)):
+            message = json.loads(messages[message_i]['publish_info'])
+            for i in range(len(message['appmsgex'])):
+                item = message['appmsgex'][i]
+                unique_id = (
+                    str(message['msgid']) + '-'
+                    + str(item['aid']) + '-'
+                    + str(item['create_time'])
+                )
+                articles.append(
+                    {
+                        'id': unique_id,
+                        'title': item.get('title') or '',
+                        'digest': item.get('digest') or '',
+                        'link': item.get('link') or '',
+                        'cover': item.get('cover') or '',
+                        'create_time': jstime2realtime(item['create_time']),
+                        'is_deleted': bool(item.get('is_deleted')),
+                        'item_show_type': int(item.get('item_show_type') or 0),
+                    }
+                )
+
+        articles.sort(key=lambda x: x['create_time'], reverse=True)
+        return articles
+
     def login(self):
         """
         打开浏览器，跳转到微信公众平台登录页，等待用户扫码登录。

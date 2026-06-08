@@ -5,7 +5,10 @@ from __future__ import annotations
 
 import sqlite3
 import threading
+import time
+from collections.abc import Callable
 from pathlib import Path
+from typing import TypeVar
 
 _init_lock = threading.Lock()
 _db_ready = False
@@ -32,7 +35,7 @@ def get_connection(*, readonly: bool = False) -> sqlite3.Connection:
         conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys=ON")
-    conn.execute("PRAGMA busy_timeout=5000")
+    conn.execute("PRAGMA busy_timeout=15000")
     if not readonly:
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA synchronous=NORMAL")
@@ -89,3 +92,27 @@ def init_database(conn: sqlite3.Connection | None = None) -> None:
 
 def database_exists() -> bool:
     return db_path().is_file()
+
+
+T = TypeVar("T")
+
+
+def db_write_with_retry(
+    fn: Callable[[], T],
+    *,
+    max_attempts: int = 8,
+    base_delay: float = 0.05,
+) -> T:
+    """SQLite 写锁冲突时指数退避重试。"""
+    last_err: sqlite3.OperationalError | None = None
+    for attempt in range(max_attempts):
+        try:
+            return fn()
+        except sqlite3.OperationalError as e:
+            if "locked" not in str(e).lower():
+                raise
+            last_err = e
+            if attempt < max_attempts - 1:
+                time.sleep(base_delay * (2**attempt))
+    assert last_err is not None
+    raise last_err

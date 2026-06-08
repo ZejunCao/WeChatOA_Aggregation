@@ -27,6 +27,7 @@ import {
   Minus,
 } from 'lucide-vue-next'
 import ArticleImageLightbox from '@/components/articles/ArticleImageLightbox.vue'
+import PreviewAccountDialog from '@/components/articles/PreviewAccountDialog.vue'
 import { useArticlePreviewStore } from '@/stores/articlePreview'
 import { useReadingStore } from '@/stores/reading'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
@@ -51,6 +52,7 @@ let copyResetTimer: ReturnType<typeof setTimeout> | undefined
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 const imgLightboxOpen = ref(false)
 const imgLightboxSrc = ref('')
+const accountDialogOpen = ref(false)
 
 function onPreviewIframeMessage(ev: MessageEvent) {
   if (!store.open) return
@@ -235,7 +237,7 @@ async function appendQuoteBlock() {
     .map((x) => x.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch] || ch)))
     .join('<br>')
   insertHtml(
-    `<p>【引用的原文】</p><blockquote>${q}</blockquote><p><br></p>`,
+    `<p>【引用的原文】</p><blockquote>${q}</blockquote><p></p>`,
   )
   selectedQuoteText.value = ''
   hideQuoteAction()
@@ -385,6 +387,13 @@ function shouldIgnorePreviewEscape(e: KeyboardEvent): boolean {
 function onKeydown(e: KeyboardEvent) {
   if (!store.open) return
   if (imgLightboxOpen.value) return
+  if (accountDialogOpen.value) {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      accountDialogOpen.value = false
+    }
+    return
+  }
   if (e.key === 'Escape') {
     if (shouldIgnorePreviewEscape(e)) return
     e.preventDefault()
@@ -478,6 +487,12 @@ function openPreviewLinkInNewWindow(rawHref: string) {
   win?.focus()
 }
 
+function openAccountDialog() {
+  const name = store.display?.account?.trim()
+  if (!name) return
+  accountDialogOpen.value = true
+}
+
 function bindPreviewLinkClicks() {
   unlinkPreviewClickHandler?.()
   unlinkPreviewClickHandler = undefined
@@ -487,6 +502,15 @@ function bindPreviewLinkClicks() {
   if (!doc) return
 
   const onDocClick = (e: MouseEvent) => {
+    const nicknameEl = (e.target as Element | null)?.closest?.(
+      '.rich_media_meta_nickname, #js_name, .wx-preview-account',
+    )
+    if (nicknameEl) {
+      e.preventDefault()
+      e.stopPropagation()
+      openAccountDialog()
+      return
+    }
     const anchor = (e.target as Element | null)?.closest?.('a')
     if (!anchor) return
     const href = anchor.getAttribute('href')
@@ -550,6 +574,7 @@ watch(
     }
     document.body.style.overflow = isOpen ? 'hidden' : ''
     if (!isOpen) {
+      accountDialogOpen.value = false
       noteImeComposing.value = false
       copyState.value = 'idle'
       if (copyResetTimer) clearTimeout(copyResetTimer)
@@ -826,6 +851,12 @@ onUnmounted(() => {
       :open="imgLightboxOpen"
       :src="imgLightboxSrc"
       @close="imgLightboxOpen = false"
+    />
+
+    <PreviewAccountDialog
+      :open="accountDialogOpen"
+      :account-name="store.display?.account || ''"
+      @close="accountDialogOpen = false"
     />
   </Teleport>
 </template>

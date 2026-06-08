@@ -56,29 +56,74 @@ class ArticleRepository:
 
     # ── 公众号 ─────────────────────────────────────────────────────────────
 
-    def upsert_account(self, name: str, fakeid: str, latest_crawl_at: str = "") -> None:
+    def upsert_account(
+        self,
+        name: str,
+        fakeid: str,
+        latest_crawl_at: str = "",
+        *,
+        in_crawl_config: int = 1,
+    ) -> None:
         now = time_now()
         self.conn.execute(
             """
-            INSERT INTO accounts (name, fakeid, latest_crawl_at, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO accounts (name, fakeid, latest_crawl_at, in_crawl_config, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT(name) DO UPDATE SET
               fakeid=excluded.fakeid,
               latest_crawl_at=COALESCE(NULLIF(excluded.latest_crawl_at,''), accounts.latest_crawl_at),
+              in_crawl_config=MAX(accounts.in_crawl_config, excluded.in_crawl_config),
               updated_at=excluded.updated_at
             """,
-            (name, fakeid, latest_crawl_at or "", now, now),
+            (name, fakeid, latest_crawl_at or "", int(in_crawl_config), now, now),
         )
 
-    def list_accounts(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
+    def upsert_import_account(self, name: str) -> None:
+        """链接导入：仅满足外键的占位账号，不加入批量爬取配置。"""
+        now = time_now()
+        fakeid = f"import:{name}"
+        self.conn.execute(
             """
-            SELECT a.name, a.fakeid, a.latest_crawl_at,
+            INSERT INTO accounts (name, fakeid, latest_crawl_at, in_crawl_config, created_at, updated_at)
+            VALUES (?, ?, '', 0, ?, ?)
+            ON CONFLICT(name) DO NOTHING
+            """,
+            (name, fakeid, now, now),
+        )
+
+    def enable_crawl_account(self, name: str, fakeid: str) -> None:
+        """用户主动添加：加入批量爬取配置。"""
+        now = time_now()
+        self.conn.execute(
+            """
+            INSERT INTO accounts (name, fakeid, latest_crawl_at, in_crawl_config, created_at, updated_at)
+            VALUES (?, ?, '', 1, ?, ?)
+            ON CONFLICT(name) DO UPDATE SET
+              fakeid=excluded.fakeid,
+              in_crawl_config=1,
+              updated_at=excluded.updated_at
+            """,
+            (name, fakeid, now, now),
+        )
+
+    def account_in_crawl_config(self, name: str) -> bool:
+        row = self.conn.execute(
+            "SELECT in_crawl_config FROM accounts WHERE name=?",
+            (name,),
+        ).fetchone()
+        return bool(row and int(row["in_crawl_config"] or 0) == 1)
+
+    def list_accounts(self, *, crawl_config_only: bool = True) -> list[dict[str, Any]]:
+        where = "WHERE a.in_crawl_config = 1" if crawl_config_only else ""
+        rows = self.conn.execute(
+            f"""
+            SELECT a.name, a.fakeid, a.latest_crawl_at, a.in_crawl_config,
                    COUNT(ar.id) AS article_count
             FROM accounts a
             LEFT JOIN articles ar ON ar.account_name = a.name
               AND ar.is_wx_deleted = 0 AND ar.is_user_deleted = 0
-            GROUP BY a.name, a.fakeid, a.latest_crawl_at
+            {where}
+            GROUP BY a.name, a.fakeid, a.latest_crawl_at, a.in_crawl_config
             ORDER BY a.name
             """
         ).fetchall()
@@ -88,12 +133,18 @@ class ArticleRepository:
                 "fakeid": r["fakeid"],
                 "latest_update_time": r["latest_crawl_at"] or "",
                 "article_count": r["article_count"],
+                "in_crawl_config": int(r["in_crawl_config"] or 0),
             }
             for r in rows
         ]
 
-    def get_name2fakeid(self) -> dict[str, str]:
-        rows = self.conn.execute("SELECT name, fakeid FROM accounts").fetchall()
+    def get_name2fakeid(self, *, crawl_config_only: bool = True) -> dict[str, str]:
+        if crawl_config_only:
+            rows = self.conn.execute(
+                "SELECT name, fakeid FROM accounts WHERE in_crawl_config = 1"
+            ).fetchall()
+        else:
+            rows = self.conn.execute("SELECT name, fakeid FROM accounts").fetchall()
         return {r["name"]: r["fakeid"] for r in rows}
 
     def set_account_latest_crawl(self, name: str, t: str) -> None:

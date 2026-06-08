@@ -503,6 +503,7 @@ def build_picture_preview_document(
     fallback_pub_time: str = "",
     fallback_pub_unix: int | None = None,
     digest: str = "",
+    account_name: str = "",
 ) -> str:
     """构建图片消息横滑预览 HTML（iframe srcdoc）。"""
     images = extract_picture_urls(raw_html)
@@ -544,6 +545,12 @@ def build_picture_preview_document(
         )
 
     meta_bits: list[str] = []
+    account = (account_name or page_meta.get("nickname") or "").strip()
+    if account:
+        meta_bits.append(
+            f'<span class="rich_media_meta rich_media_meta_nickname wx-preview-account">'
+            f'{_escape_html_text(account)}</span>'
+        )
     if pub:
         meta_bits.append(
             f'<em id="publish_time" class="rich_media_meta rich_media_meta_text">{_escape_html_text(pub)}</em>'

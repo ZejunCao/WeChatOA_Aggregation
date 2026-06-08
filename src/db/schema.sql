@@ -11,8 +11,10 @@ CREATE TABLE IF NOT EXISTS accounts (
   name              TEXT PRIMARY KEY,
   fakeid            TEXT NOT NULL DEFAULT '',
   latest_crawl_at   TEXT,
+  in_crawl_config   INTEGER NOT NULL DEFAULT 1,
   created_at        TEXT,
-  updated_at        TEXT
+  updated_at        TEXT,
+  CHECK (in_crawl_config IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS articles (

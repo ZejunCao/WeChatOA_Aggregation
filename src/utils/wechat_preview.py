@@ -198,6 +198,8 @@ body[data-weui-theme="light"]{
 .rich_media_meta_text,.rich_media_meta_list #publish_time{color:var(--weui-FG-2);font-style:normal}
 .rich_media_meta_nickname a,.rich_media_meta_link{color:var(--weui-LINK);text-decoration:none}
 .rich_media_meta_nickname a:hover{text-decoration:underline}
+.rich_media_meta_nickname,.rich_media_meta_nickname a,#js_name,.wx-preview-account{cursor:pointer}
+.rich_media_meta_nickname:hover,.rich_media_meta_nickname a:hover,#js_name:hover,.wx-preview-account:hover{opacity:.88}
 #meta_content_hide_info{display:inline}
 #js_ip_wording_wrp.rich_media_meta{display:inline-block}
 """
@@ -695,6 +697,7 @@ def build_preview_document(
     fallback_pub_unix: int | None = None,
     fallback_digest: str = "",
     item_show_type: int = 0,
+    account_name: str = "",
 ) -> str:
     """
     从微信原文页构建可 srcdoc 嵌入的完整 HTML（参考 exporter normalizeHtml）。
@@ -713,6 +716,7 @@ def build_preview_document(
             fallback_pub_time=fallback_pub_time,
             fallback_pub_unix=fallback_pub_unix,
             digest=fallback_digest,
+            account_name=account_name,
         )
         if picture_html.strip():
             return picture_html
