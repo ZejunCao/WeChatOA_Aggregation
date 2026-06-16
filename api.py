@@ -5,7 +5,6 @@
 """
 
 import json
-import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -79,6 +78,16 @@ class ArticleListResponse(BaseModel):
     total: int = 0
 
 
+class ArticleNoteResponse(BaseModel):
+    article_id: str
+    content: str
+    updated_at: str = ""
+
+
+class ArticleNoteUpdate(BaseModel):
+    content: str = ""
+
+
 @app.get("/api/articles", response_model=ArticleListResponse)
 def list_articles_api(
     limit: int = Query(30, ge=1, le=100),
@@ -88,15 +97,15 @@ def list_articles_api(
     date_from: str = "",
     date_to: str = "",
     read_filter: str | None = Query(
-        None, description="unread=仅未读, read=仅已读；默认全部"
+        None, description="unread=仅未读, read=仅已读, noted=仅有笔记；默认全部"
     ),
     starred_only: bool = Query(False, description="true=仅收藏"),
     import_only: bool = Query(False, description="true=仅链接导入的文章"),
 ):
     _require_database()
     rf = (read_filter or "").strip().lower() or None
-    if rf not in (None, "unread", "read"):
-        raise HTTPException(status_code=400, detail="read_filter 须为 unread 或 read")
+    if rf not in (None, "unread", "read", "noted"):
+        raise HTTPException(status_code=400, detail="read_filter 须为 unread/read/noted")
     from src.db.repository import ArticleRepository
 
     with ArticleRepository() as repo:
@@ -110,6 +119,7 @@ def list_articles_api(
             read_filter=rf,
             starred_only=starred_only,
             import_only=import_only,
+            noted_only=(rf == "noted"),
         )
         total = repo.count_articles(
             account=account or None,
@@ -119,6 +129,7 @@ def list_articles_api(
             read_filter=rf,
             starred_only=starred_only,
             import_only=import_only,
+            noted_only=(rf == "noted"),
         )
         repo.commit()
     return ArticleListResponse(items=items, next_cursor=next_c, total=total)
@@ -136,8 +147,8 @@ def search_articles_api(
 ):
     _require_database()
     rf = (read_filter or "").strip().lower() or None
-    if rf not in (None, "unread", "read"):
-        raise HTTPException(status_code=400, detail="read_filter 须为 unread 或 read")
+    if rf not in (None, "unread", "read", "noted"):
+        raise HTTPException(status_code=400, detail="read_filter 须为 unread/read/noted")
     from src.db.repository import ArticleRepository
 
     with ArticleRepository() as repo:
@@ -145,6 +156,14 @@ def search_articles_api(
 
         q = q.strip()
         ids = fts_mod.search_article_ids(repo.conn, q, limit=500)
+        if "mp.weixin.qq.com/" in q:
+            matched = repo.find_article_by_link(q)
+            if matched:
+                aid = str(matched.get("id") or "")
+                if aid:
+                    if aid in ids:
+                        ids.remove(aid)
+                    ids.insert(0, aid)
         items, next_c = repo.list_articles(
             limit=limit,
             cursor=cursor,
@@ -153,6 +172,7 @@ def search_articles_api(
             read_filter=rf,
             starred_only=starred_only,
             import_only=import_only,
+            noted_only=(rf == "noted"),
         )
         total = repo.count_articles(
             account=account or None,
@@ -160,9 +180,38 @@ def search_articles_api(
             read_filter=rf,
             starred_only=starred_only,
             import_only=import_only,
+            noted_only=(rf == "noted"),
         )
         repo.commit()
     return ArticleListResponse(items=items, next_cursor=next_c, total=total)
+
+
+@app.get("/api/notes/articles", response_model=ArticleListResponse)
+def list_noted_articles_api(
+    limit: int = Query(200, ge=1, le=500),
+    account: str | None = None,
+    q: str | None = Query(None, description="按笔记内容/标题/摘要/正文搜索"),
+):
+    """笔记时间线：按最近编辑排序，返回文章信息 + 笔记内容。"""
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        qv = (q or "").strip()
+        if qv:
+            from src.db import fts as fts_mod
+
+            ids = fts_mod.search_article_ids(repo.conn, qv, limit=1000)
+            note_ids = repo.search_note_article_ids(qv, account=account or None)
+            merged = list(dict.fromkeys([*note_ids, *ids]))
+            items = repo.list_notes(
+                limit=limit,
+                account=account or None,
+                article_ids=merged,
+            )
+        else:
+            items = repo.list_notes(limit=limit, account=account or None)
+    return ArticleListResponse(items=items, next_cursor=None, total=len(items))
 
 
 class ReadingPatchBody(BaseModel):
@@ -263,6 +312,47 @@ def list_articles_by_ids_api(
     return ArticleListResponse(items=items, next_cursor=None, total=len(items))
 
 
+@app.get("/api/articles/{article_id}/note", response_model=ArticleNoteResponse)
+def get_article_note_api(article_id: str):
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        row = repo.conn.execute(
+            "SELECT id FROM articles WHERE id=?",
+            (article_id,),
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="文章不存在")
+        note = repo.get_article_note(article_id)
+    return ArticleNoteResponse(
+        article_id=article_id,
+        content=str(note.get("content") or ""),
+        updated_at=str(note.get("updated_at") or ""),
+    )
+
+
+@app.put("/api/articles/{article_id}/note", response_model=ArticleNoteResponse)
+def put_article_note_api(article_id: str, body: ArticleNoteUpdate):
+    _require_database()
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        row = repo.conn.execute(
+            "SELECT id FROM articles WHERE id=?",
+            (article_id,),
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="文章不存在")
+        saved = repo.set_article_note(article_id, body.content)
+        repo.commit()
+    return ArticleNoteResponse(
+        article_id=article_id,
+        content=str(saved.get("content") or ""),
+        updated_at=str(saved.get("updated_at") or ""),
+    )
+
+
 @app.get("/api/articles/tags")
 def list_article_tags_api():
     _require_database()
@@ -302,8 +392,6 @@ def import_article_api(body: ImportArticleRequest):
     account_name = (
         str(blog.get("_import_account") or "链接导入").strip() or "链接导入"
     )
-    biz = str(blog.get("_import_biz") or "").strip()
-    fakeid = biz if biz else f"import:{account_name}"
     blog_row = {k: v for k, v in blog.items() if not str(k).startswith("_import")}
 
     with ArticleRepository() as repo:
@@ -321,11 +409,12 @@ def import_article_api(body: ImportArticleRequest):
                 message="该链接已在库中，已归入「导入」",
             )
 
-        repo.upsert_account(account_name, fakeid)
+        repo.upsert_import_account(account_name)
         repo.upsert_article_from_blog(
             account_name, blog_row, update_fts=False, source="import"
         )
         article_id = str(blog_row["id"])
+        repo.mark_article_as_imported(article_id)
         link = str(blog_row.get("link") or "")
         repo.commit()
 
@@ -335,7 +424,11 @@ def import_article_api(body: ImportArticleRequest):
             COVERS_DIR,
             _DOWNLOAD_HEADERS,
         )
-        _fetch_article_detail_text(article_id, link)
+        import_body = blog.get("_import_body_text")
+        if import_body is not None and import_body not in ("已删除", "请求错误", ""):
+            repo.set_body_text(article_id, import_body)
+        else:
+            _fetch_article_detail_text(article_id, link, repo=repo)
 
         from src.db import fts as fts_mod
         from src.utils.data_manager import data_manager
@@ -353,7 +446,7 @@ def import_article_api(body: ImportArticleRequest):
             str(blog_row.get("digest") or ""),
             body_for_fts,
         )
-        wc = article_word_count(blog_row, data_manager)
+        wc = _word_count_from_body_raw(body_raw, str(blog_row.get("title") or ""))
         repo.set_word_count(article_id, wc)
 
         if body.run_llm:
@@ -480,6 +573,38 @@ class AccountStatus(BaseModel):
     latest_update_time: str # 最后一次成功爬取的时间
 
 
+class PreviewArticleItem(BaseModel):
+    id: str
+    title: str
+    digest: str = ""
+    link: str = ""
+    cover: str = ""
+    create_time: str = ""
+    is_deleted: bool = False
+    item_show_type: int = 0
+
+
+class PreviewArticleListResponse(BaseModel):
+    items: list[PreviewArticleItem]
+    source: str = "wechat"
+    local_count: int = 0
+    local_ids: list[str] = Field(default_factory=list)
+    local_links: list[str] = Field(default_factory=list)
+
+
+class PullCandidatesResponse(BaseModel):
+    items: list[PreviewArticleItem]
+    count: int = 0
+    local_ids: list[str] = Field(default_factory=list)
+    local_links: list[str] = Field(default_factory=list)
+
+
+class IngestCrawlArticleResponse(BaseModel):
+    ok: bool
+    article_id: str
+    message: str = ""
+
+
 class CrawlStatus(BaseModel):
     """爬取任务的实时进度，前端通过轮询获取。"""
     running: bool        # True = 任务进行中
@@ -576,32 +701,130 @@ def article_word_count(article: dict, data_manager) -> int:
     return compute_word_count(article, data_manager)
 
 
-def _fetch_article_detail_text(article_id: str, link: str) -> bool:
+def _word_count_from_body_raw(raw: object, title: str = "") -> int:
+    """同事务内统计字数，避免未提交正文在新连接中不可见。"""
+    import re
+
+    if isinstance(raw, list):
+        text = "".join(str(x) for x in raw)
+    else:
+        text = str(raw or "")
+    cleaned = re.sub(r"\s+", "", text)
+    if cleaned:
+        return len(cleaned)
+    return len(re.sub(r"\s+", "", str(title or "")))
+
+
+def _account_index_keys(repo, account: str) -> tuple[list[str], list[str]]:
+    """返回公众号在库中的全部文章 id 与归一化链接（供弹窗匹配已收录）。"""
+    from src.utils.article_import import canonical_article_link
+
+    rows = repo.conn.execute(
+        """
+        SELECT id, link FROM articles
+        WHERE account_name=? AND is_user_deleted=0 AND is_wx_deleted=0
+        """,
+        (account,),
+    ).fetchall()
+    ids: list[str] = []
+    links: list[str] = []
+    seen_links: set[str] = set()
+    for row in rows:
+        aid = str(row["id"] or "").strip()
+        if aid:
+            ids.append(aid)
+        link = str(row["link"] or "").strip()
+        if not link:
+            continue
+        try:
+            canon = canonical_article_link(link)
+        except Exception:
+            canon = link.split("#")[0]
+        if canon and canon not in seen_links:
+            seen_links.add(canon)
+            links.append(canon)
+    return ids, links
+
+
+def _ingest_crawl_article(repo, account_name: str, article: dict) -> None:
+    """入库单篇爬取文章：元数据、封面、正文、字数、全文索引。"""
+    from src.db import fts as fts_mod
+
+    article_id = str(article.get("id") or "")
+    repo.upsert_article_from_blog(account_name, article, update_fts=False)
+    download_cover(
+        article_id,
+        str(article.get("cover") or ""),
+        COVERS_DIR,
+        _DOWNLOAD_HEADERS,
+    )
+    repo.update_cover_path(article_id)
+    repo.commit()
+    _fetch_article_detail_text(article_id, str(article.get("link") or ""), repo=repo)
+    body_raw = repo.get_body_text(article_id) or ""
+    if isinstance(body_raw, list):
+        body_for_fts = "\n".join(str(x) for x in body_raw)
+    else:
+        body_for_fts = str(body_raw)
+    fts_mod.upsert_article_fts(
+        repo.conn,
+        article_id,
+        str(article.get("title") or ""),
+        str(article.get("digest") or ""),
+        body_for_fts,
+    )
+    wc = _word_count_from_body_raw(body_raw, str(article.get("title") or ""))
+    repo.set_word_count(article_id, wc)
+    repo.commit()
+
+
+def _fetch_article_detail_text(
+    article_id: str,
+    link: str,
+    *,
+    repo=None,
+) -> bool:
     """
     根据文章链接拉取正文：纯文本（LLM/检索）+ HTML（预览排版），写入 article_bodies。
+    传入 repo 时复用同一连接；调用方应在网络抓取前 commit 元数据，避免长事务占锁。
     """
     if not link or not article_id:
         return False
+    from src.db.connection import db_write_with_retry
     from src.db.repository import ArticleRepository
     from src.utils.wechat_body import fetch_article_body
 
-    with ArticleRepository() as repo:
+    own_repo = repo is None
+    if own_repo:
+        repo = ArticleRepository()
+    try:
         if repo.has_body(article_id):
             return False
-        try:
-            text, _html = fetch_article_body(link)
+        text, _html = fetch_article_body(link)
+        if not text:
+            return False
+        if isinstance(text, str) and text in ("已删除", "请求错误"):
+            return False
+
+        def _persist() -> None:
             repo.set_body_text(article_id, text)
             repo.commit()
-            return True
-        except Exception as e:
-            print(f"[detail] 抓取正文失败 {article_id}: {e}")
-            return False
+
+        db_write_with_retry(_persist)
+        return True
+    except Exception as e:
+        print(f"[detail] 抓取正文失败 {article_id}: {e}")
+        return False
+    finally:
+        if own_repo:
+            repo.close()
 
 
 def _build_article_preview_html(article_id: str, *, refresh: bool = False) -> dict:
     """生成可 srcdoc 嵌入的预览 HTML（对齐 wechat-article-exporter，非 iframe 外链）。"""
     from src.db.repository import ArticleRepository
     from src.utils.wechat_body import fetch_article_body
+    from src.utils.wechat_picture import is_picture_preview_document
     from src.utils.wechat_preview import (
         build_preview_document,
         fetch_article_page_html,
@@ -610,7 +833,7 @@ def _build_article_preview_html(article_id: str, *, refresh: bool = False) -> di
 
     with ArticleRepository() as repo:
         row = repo.conn.execute(
-            "SELECT link, title, create_time, create_time_unix, llm_summary FROM articles WHERE id=?",
+            "SELECT link, title, digest, create_time, create_time_unix, llm_summary, item_show_type, account_name FROM articles WHERE id=?",
             (article_id,),
         ).fetchone()
         if not row:
@@ -621,12 +844,17 @@ def _build_article_preview_html(article_id: str, *, refresh: bool = False) -> di
             raise HTTPException(status_code=400, detail="文章无链接，无法预览")
 
         cached = repo.get_body_html(article_id) or ""
-        if not refresh and is_full_preview_document(cached):
-            return {"html": cached, "cached": True}
+        cached_is_picture = is_picture_preview_document(cached)
+        if not refresh:
+            if is_full_preview_document(cached) and not cached_is_picture:
+                return {"html": cached, "cached": True}
+            # 旧版本可能把普通图文误缓存为图片轮播：对非 8/10 文章不复用图片缓存。
+            if cached_is_picture and int(row["item_show_type"] or 0) in (8, 10):
+                return {"html": cached, "cached": True}
 
         raw_page = fetch_article_page_html(link)
         if not raw_page:
-            if is_full_preview_document(cached):
+            if is_full_preview_document(cached) or is_picture_preview_document(cached):
                 return {"html": cached, "cached": True}
             raise HTTPException(
                 status_code=410,
@@ -641,18 +869,30 @@ def _build_article_preview_html(article_id: str, *, refresh: bool = False) -> di
             ai_tags=ai_tags,
             fallback_pub_time=str(row["create_time"] or ""),
             fallback_pub_unix=row["create_time_unix"],
+            fallback_digest=str(row["digest"] or ""),
+            item_show_type=int(row["item_show_type"] or 0),
+            account_name=str(row["account_name"] or ""),
         )
         if not preview_html.strip():
             raise HTTPException(status_code=502, detail="未能解析微信正文")
 
+        from src.db.connection import db_write_with_retry
+
+        body_text = None
         if not repo.has_body(article_id):
             text, _frag = fetch_article_body(link)
             if text and not isinstance(text, str):
-                repo.set_body_text(article_id, text)
+                body_text = text
             elif isinstance(text, str) and text not in ("已删除", "请求错误"):
-                repo.set_body_text(article_id, text)
-        repo.set_body_html(article_id, preview_html)
-        repo.commit()
+                body_text = text
+
+        def _persist_preview() -> None:
+            if body_text is not None:
+                repo.set_body_text(article_id, body_text)
+            repo.set_body_html(article_id, preview_html)
+            repo.commit()
+
+        db_write_with_retry(_persist_preview)
         return {"html": preview_html, "cached": False}
 
 
@@ -694,6 +934,197 @@ def list_accounts():
             )
         )
     return result
+
+
+@app.get("/api/accounts/preview-articles", response_model=PreviewArticleListResponse)
+def preview_account_articles(
+    fakeid: str = Query(..., min_length=4),
+    account: str = Query("", description="本地库账号名，用于返回 local_count"),
+    days: int = Query(30, ge=1, le=90, description="仅返回近 N 天内文章（翻页拉全量）"),
+):
+    """从微信拉取公众号近一月文章列表，供预览弹窗展示（不入库）。"""
+    if fakeid.strip().startswith("import:"):
+        raise HTTPException(status_code=400, detail="该公众号暂无微信标识，无法拉取文章列表")
+
+    _get_wechat()
+    from src.crawler.wechat_request import WechatRequest
+
+    wechat = WechatRequest()
+    try:
+        items = wechat.fetch_appmsg_preview_list_recent(fakeid.strip(), days=days)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"微信文章列表获取失败：{e}") from e
+
+    local_count = 0
+    local_ids: list[str] = []
+    local_links: list[str] = []
+    account = account.strip()
+    if account:
+        from src.db.repository import ArticleRepository
+
+        with ArticleRepository() as repo:
+            local_count = repo.count_articles(account=account)
+            local_ids, local_links = _account_index_keys(repo, account)
+
+    return PreviewArticleListResponse(
+        items=[PreviewArticleItem(**item) for item in items],
+        source="wechat",
+        local_count=local_count,
+        local_ids=local_ids,
+        local_links=local_links,
+    )
+
+
+def _resolve_crawl_account(
+    repo, account_name: str, fakeid_hint: str = ""
+) -> tuple[str, str]:
+    """解析公众号名与 fakeid（支持前端传入 fakeid 兜底）。"""
+    account_name = account_name.strip()
+    fakeid_hint = (fakeid_hint or "").strip()
+
+    row = repo.conn.execute(
+        "SELECT name, fakeid FROM accounts WHERE name=?",
+        (account_name,),
+    ).fetchone()
+    if not row:
+        row = repo.conn.execute(
+            "SELECT name, fakeid FROM accounts WHERE lower(name)=lower(?)",
+            (account_name,),
+        ).fetchone()
+    if row:
+        name = str(row["name"])
+        fakeid = str(row["fakeid"] or "").strip() or fakeid_hint
+        return name, fakeid
+    if fakeid_hint and not fakeid_hint.startswith("import:"):
+        return account_name, fakeid_hint
+    raise HTTPException(
+        status_code=404,
+        detail=f"公众号「{account_name}」不在配置中",
+    )
+
+
+@app.get("/api/accounts/pull-candidates", response_model=PullCandidatesResponse)
+def pull_account_candidates_api(
+    account: str = Query(..., min_length=1, description="公众号名称"),
+    fakeid: str = Query("", description="可选，前端已知 fakeid 时传入"),
+):
+    """近一月内、本地尚未收录的文章（可翻页，供弹窗增量拉取）。"""
+    _require_database()
+    from src.crawler.wechat_request import CredentialExpiredError, WechatRequest
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        account_name, fakeid_val = _resolve_crawl_account(repo, account, fakeid)
+        if not fakeid_val or fakeid_val.startswith("import:"):
+            raise HTTPException(status_code=400, detail="该公众号无法从微信拉取文章")
+        existing = repo.get_blogs_for_account(account_name)
+        existing_ids = {str(b.get("id") or "") for b in existing if b.get("id")}
+        local_ids, local_links = _account_index_keys(repo, account_name)
+
+    _get_wechat()
+    wechat = WechatRequest()
+    try:
+        items = wechat.fetch_new_crawl_candidates(fakeid_val, existing_ids)
+    except CredentialExpiredError as e:
+        raise HTTPException(status_code=401, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"微信文章列表获取失败：{e}") from e
+
+    if local_links:
+        from src.utils.article_import import canonical_article_link
+
+        link_set = set(local_links)
+        filtered: list[dict] = []
+        for item in items:
+            link = str(item.get("link") or "").strip()
+            if not link:
+                filtered.append(item)
+                continue
+            try:
+                canon = canonical_article_link(link)
+            except Exception:
+                canon = link.split("#")[0]
+            if canon in link_set:
+                continue
+            filtered.append(item)
+        items = filtered
+
+    return PullCandidatesResponse(
+        items=[PreviewArticleItem(**item) for item in items],
+        count=len(items),
+        local_ids=local_ids,
+        local_links=local_links,
+    )
+
+
+@app.post("/api/accounts/ingest-article", response_model=IngestCrawlArticleResponse)
+def ingest_crawl_article_api(
+    body: PreviewArticleItem,
+    account: str = Query(..., min_length=1, description="公众号名称"),
+    fakeid: str = Query("", description="可选，前端已知 fakeid 时传入"),
+):
+    """收录单篇爬取文章（元数据 + 封面 + 正文）。"""
+    _require_database()
+    article_id = str(body.id or "").strip()
+    if not account.strip() or not article_id:
+        raise HTTPException(status_code=400, detail="参数不完整")
+
+    from src.db.repository import ArticleRepository
+
+    with ArticleRepository() as repo:
+        account_name, _ = _resolve_crawl_account(repo, account, fakeid)
+        if repo.conn.execute(
+            "SELECT 1 FROM accounts WHERE name=?",
+            (account_name,),
+        ).fetchone() is None and fakeid.strip():
+            from src.utils.helpers import time_now
+
+            repo.upsert_account(account_name, fakeid.strip())
+            repo.commit()
+        if repo.conn.execute(
+            "SELECT 1 FROM articles WHERE id=? AND is_user_deleted=0",
+            (article_id,),
+        ).fetchone():
+            return IngestCrawlArticleResponse(
+                ok=True,
+                article_id=article_id,
+                message="已在库中",
+            )
+        link = str(body.link or "").strip()
+        if link:
+            from src.utils.article_import import canonical_article_link
+
+            try:
+                canon = canonical_article_link(link)
+            except Exception:
+                canon = link.split("#")[0]
+            for exist in repo.conn.execute(
+                "SELECT id, link FROM articles WHERE account_name=? AND is_user_deleted=0",
+                (account_name,),
+            ):
+                el = str(exist["link"] or "").strip()
+                if not el:
+                    continue
+                try:
+                    el_canon = canonical_article_link(el)
+                except Exception:
+                    el_canon = el.split("#")[0]
+                if el_canon == canon:
+                    return IngestCrawlArticleResponse(
+                        ok=True,
+                        article_id=str(exist["id"]),
+                        message="已在库中",
+                    )
+        try:
+            _ingest_crawl_article(repo, account_name, body.model_dump())
+            from src.utils.helpers import time_now
+
+            repo.set_account_latest_crawl(account_name, time_now())
+            repo.commit()
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"收录失败：{e}") from e
+
+    return IngestCrawlArticleResponse(ok=True, article_id=article_id, message="收录成功")
 
 
 @app.post("/api/accounts/search", response_model=list[SearchCandidate])
@@ -770,12 +1201,13 @@ def add_account(body: ConfirmAddRequest):
     if not name or not fakeid:
         raise HTTPException(status_code=400, detail="name 和 fakeid 不能为空")
 
-    name2fakeid = _read_name2fakeid()
-    if name in name2fakeid:
-        raise HTTPException(status_code=409, detail=f"公众号「{name}」已在列表中")
+    from src.db.repository import ArticleRepository
 
-    name2fakeid[name] = fakeid
-    _write_name2fakeid(name2fakeid)
+    with ArticleRepository() as repo:
+        if repo.account_in_crawl_config(name):
+            raise HTTPException(status_code=409, detail=f"公众号「{name}」已在列表中")
+        repo.enable_crawl_account(name, fakeid)
+        repo.commit()
 
     # 记录操作日志
     _append_log(LOG_ACCOUNT_ADD, f"添加公众号「{name}」", {"name": name, "fakeid": fakeid})
@@ -814,6 +1246,7 @@ class ArticleDeleteRequest(BaseModel):
     """从前端移除一篇文章：写入黑名单并删除本地记录。"""
     article_id: str   # 文章唯一 id（msgid-aid-create_time）
     account: str      # 所属公众号名称（message_info 的 key）
+    force: bool = False
 
 
 @app.post("/api/articles/remove")
@@ -829,6 +1262,11 @@ def remove_article(body: ArticleDeleteRequest):
     from src.db.repository import ArticleRepository
 
     with ArticleRepository() as repo:
+        if repo.article_has_note(aid) and not body.force:
+            raise HTTPException(
+                status_code=409,
+                detail="该文章包含笔记，删除会同时移除笔记；请确认后重试",
+            )
         if not repo.remove_article(aid, acc):
             raise HTTPException(status_code=404, detail="文章不存在或已删除")
         repo.commit()
@@ -849,6 +1287,7 @@ def remove_article(body: ArticleDeleteRequest):
 class RemoveFromImportRequest(BaseModel):
     article_id: str
     account: str
+    force: bool = False
 
 
 @app.post("/api/articles/remove-from-import")
@@ -862,6 +1301,18 @@ def remove_from_import_api(body: RemoveFromImportRequest):
     from src.db.repository import ArticleRepository
 
     with ArticleRepository() as repo:
+        row = repo.conn.execute(
+            "SELECT source FROM articles WHERE id=? AND account_name=?",
+            (aid, acc),
+        ).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="文章不存在或已删除")
+        source = str(row["source"] or "crawl")
+        if source == "import" and repo.article_has_note(aid) and not body.force:
+            raise HTTPException(
+                status_code=409,
+                detail="该文章包含笔记，移出会同时删除笔记；请确认后重试",
+            )
         action = repo.remove_from_import(aid, acc)
         if not action:
             raise HTTPException(status_code=404, detail="文章不存在或已删除")
@@ -939,11 +1390,7 @@ _AUTH_FAIL_MSGS = {"invalid session", "invalid csrf token", "csrf token invalid"
 def _check_auth_valid() -> tuple[bool, str]:
     """
     向微信 API 发送一次轻量探测请求，检测 token/cookie 是否有效。
-
-    为什么不用 WechatRequest？
-    因为 WechatRequest 在检测到凭证失效时会自动调用 login()，
-    而 login() 会尝试打开浏览器——在服务器进程中这会卡住或失败。
-    这里直接用 requests 库发请求，只检测不登录。
+    直接用 requests 发请求，只检测不登录。
 
     返回：(is_valid, reason)
       - is_valid=True, reason=""        → 凭证正常
@@ -991,7 +1438,7 @@ def _check_auth_valid() -> tuple[bool, str]:
 def _run_crawl_sqlite() -> None:
     """SQLite 存储下的爬取主流程（不写 message_info.json）。"""
     global _crawl_state
-    from src.crawler.wechat_request import WechatRequest
+    from src.crawler.wechat_request import CredentialExpiredError, WechatRequest
     from src.db.repository import ArticleRepository
     from src.llm.article_tagging import tag_article
     from src.llm.llm_config import (
@@ -1047,22 +1494,11 @@ def _run_crawl_sqlite() -> None:
                 if new_articles:
                     new_total += len(new_articles)
                     for article in new_articles:
-                        repo.upsert_article_from_blog(
-                            oa_name, article, update_fts=False
-                        )
-                        download_cover(
-                            article["id"],
-                            article.get("cover", ""),
-                            COVERS_DIR,
-                            _DOWNLOAD_HEADERS,
-                        )
-                        repo.update_cover_path(article["id"])
-                        _fetch_article_detail_text(
-                            article["id"], article.get("link", "")
-                        )
-                        wc = article_word_count(article, data_manager)
-                        repo.set_word_count(article["id"], wc)
-                        article["word_count"] = wc
+                        _ingest_crawl_article(repo, oa_name, article)
+                        article["word_count"] = repo.conn.execute(
+                            "SELECT word_count FROM articles WHERE id=?",
+                            (article["id"],),
+                        ).fetchone()["word_count"]
 
                 if llm_enabled_for_crawl:
                     try:
@@ -1106,6 +1542,7 @@ def _run_crawl_sqlite() -> None:
                                                 str(summary or ""),
                                                 tags or [],
                                             )
+                                            repo.commit()
                                             article["summary"] = summary
                                             article["tags"] = tags
                                     except Exception as e:
@@ -1135,6 +1572,7 @@ def _run_crawl_sqlite() -> None:
                                             str(summary or ""),
                                             tags or [],
                                         )
+                                        repo.commit()
                                 except Exception as e:
                                     print(f"[tag] 单篇打标失败 {article.get('id')}: {e}")
                     except Exception as e:
@@ -1143,6 +1581,17 @@ def _run_crawl_sqlite() -> None:
                 repo.set_account_latest_crawl(oa_name, time_now())
                 repo.commit()
                 _mark_auth_ok()
+            except CredentialExpiredError as e:
+                err_str = str(e)
+                _crawl_state["auth_error"] = True
+                _crawl_state["errors"].append(err_str)
+                _mark_auth_failed(err_str)
+                _append_log(
+                    LOG_CRAWL_ERROR,
+                    f"凭证失效，爬取终止：{e}",
+                    {"error": err_str},
+                )
+                break
             except Exception as e:
                 err_str = str(e)
                 _crawl_state["errors"].append(f"{oa_name}: {err_str}")
@@ -1785,6 +2234,13 @@ class AuthStatus(BaseModel):
     error: str             # 失败原因（空 = 正常）
     token_hint: str        # token 前 8 位，供用户确认是否是最新的值
     id_info_mtime: str     # id_info.json 文件的最后修改时间
+    credential_saved_at: str = ""
+    credential_expires_at: str = ""
+    credential_days_remaining: float | None = None
+    credential_expired: bool = False
+    credential_expires_soon: bool = False
+    credential_ttl_days: int = 4
+    credential_expiry_label: str = ""
 
 
 def _build_auth_status() -> AuthStatus:
@@ -1792,13 +2248,21 @@ def _build_auth_status() -> AuthStatus:
     组合内存中的 _auth_state 和磁盘上的 id_info.json 元数据，
     构建完整的 AuthStatus 对象。
     """
+    from src.utils.credential_expiry import (
+        credential_expiry_from_id_info,
+        format_days_remaining_label,
+    )
+
     id_info_file = DATA_DIR / "id_info.json"
     has_credentials = False
     token_hint = ""
     mtime = ""
+    info: dict = {}
+    file_mtime_ts: float | None = None
 
     if id_info_file.exists():
         try:
+            file_mtime_ts = id_info_file.stat().st_mtime
             with open(id_info_file, encoding="utf-8") as f:
                 info = json.load(f)
             token = info.get("token", "").strip()
@@ -1806,9 +2270,14 @@ def _build_auth_status() -> AuthStatus:
             has_credentials = bool(token and cookie)
             # 只展示 token 前 8 位，防止完整 token 被截图泄露
             token_hint = token[:8] + "..." if len(token) > 8 else token
-            mtime = datetime.fromtimestamp(id_info_file.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            mtime = datetime.fromtimestamp(file_mtime_ts).strftime("%Y-%m-%d %H:%M:%S")
         except Exception:
             pass
+
+    expiry = credential_expiry_from_id_info(info, file_mtime=file_mtime_ts)
+    expiry_label = format_days_remaining_label(
+        expiry.get("days_remaining")  # type: ignore[arg-type]
+    )
 
     return AuthStatus(
         has_credentials=has_credentials,
@@ -1817,6 +2286,13 @@ def _build_auth_status() -> AuthStatus:
         error=_auth_state["error"],
         token_hint=token_hint,
         id_info_mtime=mtime,
+        credential_saved_at=str(expiry.get("saved_at") or ""),
+        credential_expires_at=str(expiry.get("expires_at") or ""),
+        credential_days_remaining=expiry.get("days_remaining"),  # type: ignore[arg-type]
+        credential_expired=bool(expiry.get("expired")),
+        credential_expires_soon=bool(expiry.get("expires_soon")),
+        credential_ttl_days=int(expiry.get("ttl_days") or 4),
+        credential_expiry_label=expiry_label,
     )
 
 
@@ -1901,6 +2377,10 @@ class ScanPollResponse(BaseModel):
 class LoginCompleteResponse(BaseModel):
     ok: bool = True
     token_hint: str = ""
+    message: str = ""
+    credential_expires_at: str = ""
+    credential_days_remaining: float | None = None
+    credential_expiry_label: str = ""
 
 
 @app.post("/api/auth/login/session", response_model=LoginSessionResponse)
@@ -1967,13 +2447,29 @@ def complete_login_session():
 
     login = _require_login_session()
     try:
+        from src.utils.credential_expiry import (
+            credential_expiry_from_id_info,
+            format_days_remaining_label,
+        )
+
         token, cookie_str = login.complete_login()
+        saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data_manager.id_info["token"] = token
         data_manager.id_info["cookie"] = cookie_str
+        data_manager.id_info["saved_at"] = saved_at
         data_manager.write("id_info")
         _mark_auth_ok()
+        expiry = credential_expiry_from_id_info(data_manager.id_info)
+        label = format_days_remaining_label(expiry.get("days_remaining"))  # type: ignore[arg-type]
         hint = token[:8] + "…" if len(token) > 8 else token
-        return LoginCompleteResponse(ok=True, token_hint=hint)
+        return LoginCompleteResponse(
+            ok=True,
+            token_hint=hint,
+            message=f"凭证已保存，{label}（有效期约 {int(expiry.get('ttl_days') or 4)} 天）",
+            credential_expires_at=str(expiry.get("expires_at") or ""),
+            credential_days_remaining=expiry.get("days_remaining"),  # type: ignore[arg-type]
+            credential_expiry_label=label,
+        )
     except Exception as e:
         raise HTTPException(status_code=502, detail=str(e)) from e
     finally:

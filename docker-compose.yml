@@ -27,8 +27,6 @@ services:
       - TZ=Asia/Shanghai
       # LLM 打标 / 摘要配置请在前端「模型配置」页面维护，会写入 data/llm_config.json
       # （该文件已随 data/ 挂载持久化，重建容器不会丢）
-    # Chromium 在容器里对共享内存敏感，调大 /dev/shm 避免无头截图偶发崩溃
-    shm_size: "1gb"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/docs"]
       interval: 30s

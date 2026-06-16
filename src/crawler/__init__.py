@@ -4,6 +4,6 @@
 # @File        : __init__.py
 # @description : crawler模块初始化文件
 
-from .wechat_request import WechatRequest
+from .wechat_request import CredentialExpiredError, WechatRequest
 
-__all__ = ['WechatRequest'] 
+__all__ = ['CredentialExpiredError', 'WechatRequest'] 

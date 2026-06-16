@@ -45,10 +45,12 @@ import {
   Sparkles,
   Info,
   ExternalLink,
+  ChevronRight,
 } from 'lucide-vue-next'
 import type { CrawlStatus, CachePreview, AuthStatus } from '@/types'
 import { useArticlesStore } from '@/stores/articles'
 import { useConfigStore } from '@/stores/config'
+import PreviewAccountDialog from '@/components/articles/PreviewAccountDialog.vue'
 import { accountColor } from '@/lib/accountColor'
 
 const articlesStore = useArticlesStore()
@@ -191,6 +193,19 @@ function serviceTypeLabel(t: number) {
   if (t === 0) return '订阅号'
   if (t === 1) return '服务号'
   return '公众号'
+}
+
+// ── 公众号文章预览弹窗（复用预览页 PreviewAccountDialog）────────────────────
+const accountPreviewOpen = ref(false)
+const accountPreviewName = ref('')
+
+function openAccountPreview(name: string) {
+  accountPreviewName.value = name
+  accountPreviewOpen.value = true
+}
+
+function closeAccountPreview() {
+  accountPreviewOpen.value = false
 }
 
 // ── 删除公众号 ────────────────────────────────────────────────────────────────
@@ -1719,12 +1734,18 @@ async function doCacheClear() {
         <div
           v-for="acc in filteredAccounts"
           :key="acc.name"
-          class="group relative flex flex-col rounded-xl border bg-[var(--color-card)] p-4 transition-all duration-200"
+          class="group relative flex cursor-pointer flex-col rounded-xl border bg-[var(--color-card)] p-4 transition-all duration-200 hover:bg-[var(--color-accent)]/30"
           :class="
             configStore.isVisible(acc.name)
               ? 'border-[var(--color-border)] opacity-100 hover:shadow-md'
               : 'border-[var(--color-border)] opacity-50 hover:shadow-md'
           "
+          :title="`查看「${acc.name}」最近文章`"
+          role="button"
+          tabindex="0"
+          @click="openAccountPreview(acc.name)"
+          @keydown.enter="openAccountPreview(acc.name)"
+          @keydown.space.prevent="openAccountPreview(acc.name)"
         >
           <!-- 仅眼睛按钮切换信息流显示/隐藏 -->
           <button
@@ -1742,41 +1763,46 @@ async function doCacheClear() {
             <EyeOff v-else class="h-3.5 w-3.5" />
           </button>
 
-          <!-- Avatar -->
+          <!-- 头像 / 名称 / 文章数 -->
           <div
-            class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-white font-bold text-lg"
+            class="mb-3 flex h-12 w-12 items-center justify-center rounded-xl text-white font-bold text-lg transition-transform group-hover:scale-[1.02]"
             :style="{ backgroundColor: accountColor(acc.name) }"
           >
             {{ acc.name.slice(0, 2) }}
           </div>
 
-          <!-- Name -->
-          <h3 class="text-sm font-semibold text-[var(--color-foreground)] mb-1 pr-6 line-clamp-2">
+          <h3 class="mb-1 pr-6 text-sm font-semibold text-[var(--color-foreground)] line-clamp-2 group-hover:text-[var(--color-primary)]">
             {{ acc.name }}
           </h3>
 
-          <!-- "Pending" hint for newly added accounts -->
           <p
             v-if="acc.article_count === 0"
             class="text-[11px] text-[var(--color-muted-foreground)] italic"
           >待首次爬取</p>
 
-          <!-- Meta + delete -->
-          <div class="mt-auto pt-3 border-t border-[var(--color-border)]">
+          <div class="mt-auto border-t border-[var(--color-border)] pt-3">
             <div class="flex items-center justify-between text-xs text-[var(--color-muted-foreground)]">
               <div class="flex items-center gap-1">
                 <FileText class="h-3 w-3" />
                 <span>{{ acc.article_count }} 篇文章</span>
               </div>
-              <div v-if="acc.latest_update_time" class="flex items-center gap-1">
-                <TrendingUp class="h-3 w-3" />
-                <span>{{ acc.latest_update_time.slice(0, 10) }}</span>
+              <div class="flex items-center gap-0.5">
+                <div v-if="acc.latest_update_time" class="flex items-center gap-1">
+                  <TrendingUp class="h-3 w-3" />
+                  <span>{{ acc.latest_update_time.slice(0, 10) }}</span>
+                </div>
+                <ChevronRight
+                  class="h-3.5 w-3.5 shrink-0 text-[var(--color-muted-foreground)] opacity-0 transition-opacity group-hover:opacity-100"
+                  aria-hidden="true"
+                />
               </div>
             </div>
+          </div>
 
-            <!-- Delete button: shown on hover, in footer -->
+          <!-- Delete button: shown on hover -->
+          <div class="pt-1">
             <button
-              class="mt-2 w-full flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs text-[var(--color-muted-foreground)] opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 transition-all"
+              class="w-full flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs text-[var(--color-muted-foreground)] opacity-0 group-hover:opacity-100 hover:!bg-red-50 hover:!text-red-500 dark:hover:!bg-red-900/20 transition-all"
               :class="deletingName === acc.name ? '!opacity-100 !text-red-500' : ''"
               @click.stop="removeAccount(acc.name)"
               title="从追踪列表中移除"
@@ -2558,6 +2584,13 @@ async function doCacheClear() {
         </div>
       </Transition>
     </Teleport>
+
+    <PreviewAccountDialog
+      :open="accountPreviewOpen"
+      :account-name="accountPreviewName"
+      context="config"
+      @close="closeAccountPreview"
+    />
   </div>
 </template>
 

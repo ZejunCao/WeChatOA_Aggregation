@@ -7,7 +7,6 @@
 # @description : 微信公众号爬虫核心类
 
 import json
-import re
 import time
 from dataclasses import asdict
 from typing import Any
@@ -18,6 +17,10 @@ from src.utils.data_manager import Message_Info, data_manager, headers
 from src.utils.helpers import jstime2realtime, time_delta, time_now
 
 
+class CredentialExpiredError(RuntimeError):
+    """微信公众平台 token/cookie 已失效，需在配置页重新扫码登录。"""
+
+
 class WechatRequest:
     """
     微信公众平台的请求封装类。
@@ -25,10 +28,10 @@ class WechatRequest:
     负责：
     1. 用公众号名称查询 fakeid（name2fakeid）
     2. 用 fakeid 获取近一月的文章列表（fakeid2message_update）
-    3. 在 token/cookie 过期时自动触发扫码登录（session_is_overdue → login）
 
     初始化时从 data_manager（即 data/id_info.json）读取 token 和 cookie，
     因此每次使用前应确保 id_info.json 是最新的。
+    凭证失效时抛出 CredentialExpiredError，由调用方引导用户扫码续期。
     """
 
     def __init__(self):
@@ -80,8 +83,9 @@ class WechatRequest:
                 continue
 
             if self.session_is_overdue(data):
-                params['token'] = self.token
-                continue
+                raise CredentialExpiredError(
+                    "微信公众平台凭证已失效，请在配置页重新扫码登录"
+                )
 
             base = data.get('base_resp') or {}
             err_msg = str(base.get('err_msg') or '')
@@ -107,7 +111,7 @@ class WechatRequest:
         微信搜索接口会返回多个模糊匹配结果，这里只返回名称精确匹配的那个。
         如果没有精确匹配，返回空字符串。
 
-        注意：如果 session 过期，会自动触发 login() 重新获取凭证后重试。
+        注意：凭证失效时抛出 CredentialExpiredError。
         """
         params = {
             'action': 'search_biz',
@@ -311,74 +315,130 @@ class WechatRequest:
         articles.sort(key=lambda x: x['create_time'], reverse=True)
         return articles
 
-    def login(self):
+    def fetch_appmsg_preview_list_recent(
+        self,
+        fakeid: str,
+        *,
+        days: int = 30,
+        page_size: int = 20,
+        max_pages: int = 100,
+    ) -> list[dict[str, Any]]:
+        """预览用：拉取近 days 天内全部文章（翻页，不限条数）。"""
+        days = max(1, int(days))
+        page_size = max(1, min(int(page_size), 40))
+        max_pages = max(1, int(max_pages))
+
+        articles: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        begin = 0
+
+        for _ in range(max_pages):
+            page_items = self.fetch_appmsg_preview_list(
+                fakeid, count=page_size, begin=begin
+            )
+            if not page_items:
+                break
+
+            for item in page_items:
+                uid = str(item.get("id") or "")
+                if not uid or uid in seen:
+                    continue
+                seen.add(uid)
+
+                create_time = str(item.get("create_time") or "")
+                if create_time and time_delta(time_now(), create_time).days > days:
+                    continue
+
+                articles.append(dict(item))
+
+            oldest = page_items[-1]
+            oldest_time = str(oldest.get("create_time") or "")
+            if oldest_time and time_delta(time_now(), oldest_time).days > days:
+                break
+            if len(page_items) < page_size:
+                break
+            begin += page_size
+
+        articles.sort(key=lambda x: x["create_time"], reverse=True)
+        return articles
+
+    def fetch_new_crawl_candidates(
+        self,
+        fakeid: str,
+        existing_ids: set[str],
+        *,
+        page_size: int = 20,
+        max_pages: int = 10,
+    ) -> list[dict[str, Any]]:
         """
-        打开浏览器，跳转到微信公众平台登录页，等待用户扫码登录。
-
-        登录成功后：
-        - 从 URL 中解析 token
-        - 从浏览器 cookies 中提取 cookie 字符串
-        - 将新的 token/cookie 写回 data/id_info.json 持久化
-
-        注意事项：
-        - 此方法会阻塞，直到用户完成扫码或手动关闭浏览器
-        - 在 api.py 的后台爬取流程中不会调用此方法（避免在服务进程中打开浏览器）
-        - api.py 扫码登录使用 HTTP 接口（见 src.auth.mp_scan_login）
+        近一月内、本地尚未收录的文章（支持翻页）。
+        从微信最新列表往前扫，遇超过 30 天或列表末尾即停止。
         """
-        from DrissionPage import ChromiumPage, ChromiumOptions
+        from src.db.repository import ArticleRepository
 
-        # auto_port()：自动分配调试端口启动新 Chrome，不连接已有实例
-        co = ChromiumOptions().auto_port()
-        bro = ChromiumPage(co)
-        bro.get('https://mp.weixin.qq.com/')
-        bro.set.window.max()  # 最大化窗口，方便用户操作
+        with ArticleRepository() as repo:
+            rows = repo.conn.execute(
+                "SELECT article_id FROM deleted_articles"
+            ).fetchall()
+            skipped_by_user = {r["article_id"] for r in rows}
 
-        # 轮询等待 URL 中出现 token（说明用户已完成扫码登录）
-        while 'token' not in bro.url:
-            pass
+        is_deleted_set = set(data_manager.issues_message.get("is_delete") or [])
+        candidates: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        begin = 0
+        page_size = max(1, min(int(page_size), 40))
 
-        # 从 URL 参数中提取 token（形如 ?token=123456789）
-        match = re.search(r'token=(.*)', bro.url)
-        if not match:
-            raise ValueError("无法在URL中找到token")
-        token = match.group(1)
+        for _ in range(max_pages):
+            page_items = self.fetch_appmsg_preview_list(
+                fakeid, count=page_size, begin=begin
+            )
+            if not page_items:
+                break
 
-        # 将浏览器 cookies 拼接为字符串格式（"name=value; name2=value2; ..."）
-        cookie = bro.cookies()
-        cookie_str = ''
-        for c in cookie:
-            cookie_str += c['name'] + '=' + c['value'] + '; '
+            for item in page_items:
+                uid = str(item.get("id") or "")
+                if not uid or uid in seen:
+                    continue
+                seen.add(uid)
 
-        # 更新内存和磁盘中的凭证
-        self.token = token
-        self.headers['Cookie'] = cookie_str
-        data_manager.id_info['token'] = token
-        data_manager.id_info['cookie'] = cookie_str
-        data_manager.write('id_info')
+                create_time = str(item.get("create_time") or "")
+                if create_time and time_delta(time_now(), create_time).days > 30:
+                    continue
 
-        bro.close()
+                if uid in skipped_by_user:
+                    continue
+                if uid in existing_ids:
+                    continue
+                if item.get("is_deleted") and uid not in is_deleted_set:
+                    data_manager.issues_message["is_delete"].append(uid)
+                    continue
+                if int(item.get("item_show_type") or 0) in (5, 8, 10):
+                    continue
 
-    def session_is_overdue(self, response):
+                candidates.append(dict(item))
+
+            oldest = page_items[-1]
+            oldest_time = str(oldest.get("create_time") or "")
+            if oldest_time and time_delta(time_now(), oldest_time).days > 30:
+                break
+            if len(page_items) < page_size:
+                break
+            begin += page_size
+
+        candidates.sort(key=lambda x: x["create_time"], reverse=True)
+        return candidates
+
+    def session_is_overdue(self, response) -> bool:
         """
         检查微信 API 响应是否表明 session/token 已过期。
 
-        返回 True：凭证已过期（并已自动触发 login() 重新登录）
-        返回 False：凭证正常
-
-        触发条件：
-        - "invalid session"    → Cookie 中的 session 失效
-        - "invalid csrf token" → token 参数失效
-
-        特殊情况：
-        - "freq control"：请求频率过快，抛出异常提示等待
+        返回 True 表示凭证失效；调用方应引导用户在配置页扫码续期。
         """
         base = response.get('base_resp') if isinstance(response, dict) else None
         if not isinstance(base, dict):
             return False
         err_msg = base.get('err_msg') or ''
         if err_msg in ['invalid session', 'invalid csrf token']:
-            # 凭证失效，自动登录后调用方应用新的 token 重试
-            self.login()
             return True
         if err_msg == 'freq control':
             raise Exception('The number of requests is too fast, please try again later')

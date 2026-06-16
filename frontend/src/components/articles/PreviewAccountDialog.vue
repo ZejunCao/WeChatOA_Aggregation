@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  RefreshCw,
 } from 'lucide-vue-next'
 import type { Article } from '@/types'
 import { useArticlesStore } from '@/stores/articles'
@@ -27,10 +28,15 @@ interface SearchCandidate {
 
 type LocalArticle = Article & { account: string }
 
-const props = defineProps<{
-  open: boolean
-  accountName: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    accountName: string
+    /** preview：文章预览内打开；config：配置页公众号卡片 */
+    context?: 'preview' | 'config'
+  }>(),
+  { context: 'preview' },
+)
 
 const emit = defineEmits<{
   close: []
@@ -52,11 +58,19 @@ const articleTotal = ref(0)
 const articleSource = ref<'wechat' | 'local'>('local')
 const localArticleCount = ref(0)
 const localIdSet = ref<Set<string>>(new Set())
+const localLinkSet = ref<Set<string>>(new Set())
+const localIndexVersion = ref(0)
 const articlesFetchHint = ref('')
+const articlesRefreshing = ref(false)
+const pullRunning = ref(false)
 const showOtherMatches = ref(false)
 const avatarBroken = ref(false)
 
-const ARTICLE_FETCH_LIMIT = 20
+type IngestStatus = 'idle' | 'pulling' | 'done' | 'failed'
+const articleIngestStatus = ref<Record<string, IngestStatus>>({})
+const articleIngestError = ref<Record<string, string>>({})
+
+const PREVIEW_DAYS = 30
 
 const displayName = computed(() => displayText(props.accountName))
 const dotColor = computed(() => accountColor(displayName.value))
@@ -95,11 +109,11 @@ const articleCountLabel = computed(() => {
   if (n <= 0) return '暂无文章'
   if (articleSource.value === 'wechat') {
     if (localArticleCount.value > 0) {
-      return `最近 ${n} 篇 · 本地已收录 ${localArticleCount.value} 篇`
+      return `近一月 ${n} 篇 · 本地已收录 ${localArticleCount.value} 篇`
     }
-    return `最近 ${n} 篇`
+    return `近一月 ${n} 篇`
   }
-  return `本地 ${n} 篇`
+  return `本地已收录 ${n} 篇`
 })
 
 const followBtnLabel = computed(() => {
@@ -132,6 +146,102 @@ const alternateMatchCount = computed(() => {
   return searchResults.value.filter((i) => i.fakeid !== primaryCandidate.value?.fakeid).length
 })
 
+const unindexedCount = computed(() =>
+  localArticles.value.filter(
+    (a) => !isArticleIndexed(a) && articleIngestStatus.value[a.id] !== 'done',
+  ).length,
+)
+
+const showArticleActionColumn = computed(() => articleSource.value === 'wechat')
+
+type ArticleActionState = 'ingest' | 'retry' | 'pulling' | 'done' | 'pending'
+
+function articleActionState(article: LocalArticle): ArticleActionState {
+  const st = articleIngestStatus.value[article.id]
+  if (st === 'pulling') return 'pulling'
+  if (st === 'done' || isArticleIndexed(article)) return 'done'
+  if (!isConfigured.value) return 'pending'
+  if (st === 'failed') return 'retry'
+  return 'ingest'
+}
+
+function normalizeArticleLink(url: string): string {
+  const raw = (url || '').trim().split('#')[0]
+  if (!raw) return ''
+  try {
+    const u = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`)
+    const host = u.hostname.replace(/^www\./, '').toLowerCase()
+    if (host === 'mp.weixin.qq.com') {
+      const path = u.pathname.replace(/\/$/, '') || '/'
+      if (path.includes('/s/')) {
+        return `https://mp.weixin.qq.com${path}`
+      }
+    }
+    return u.toString()
+  } catch {
+    return raw
+  }
+}
+
+function isArticleIndexed(article: { id: string; link?: string }): boolean {
+  void localIndexVersion.value
+  if (localIdSet.value.has(article.id)) return true
+  const link = normalizeArticleLink(article.link || '')
+  return !!link && localLinkSet.value.has(link)
+}
+
+function applyLocalIndexPayload(data: {
+  local_ids?: string[]
+  local_links?: string[]
+  local_count?: number
+}) {
+  if (Array.isArray(data.local_ids)) {
+    localIdSet.value = new Set(data.local_ids.filter(Boolean))
+  }
+  if (Array.isArray(data.local_links)) {
+    localLinkSet.value = new Set(data.local_links.filter(Boolean))
+  }
+  if (typeof data.local_count === 'number') {
+    localArticleCount.value = data.local_count
+  }
+  localIndexVersion.value++
+}
+
+function markArticleIndexed(article: { id: string; link?: string }) {
+  const link = normalizeArticleLink(article.link || '')
+  localIdSet.value = new Set([...localIdSet.value, article.id])
+  if (link) {
+    localLinkSet.value = new Set([...localLinkSet.value, link])
+  }
+  localIndexVersion.value++
+}
+
+function articleStatusBadge(article: { id: string; link?: string }): { text: string; cls: string; title?: string } | null {
+  const st = articleIngestStatus.value[article.id]
+  if (st === 'pulling') return { text: '拉取中', cls: 'is-pulling' }
+  if (st === 'failed') {
+    return {
+      text: '失败',
+      cls: 'is-failed',
+      title: articleIngestError.value[article.id] || '收录失败',
+    }
+  }
+  if (st === 'done' || isArticleIndexed(article)) {
+    return { text: '已收录', cls: 'is-done' }
+  }
+  return null
+}
+
+const articleBadges = computed(() => {
+  void localIndexVersion.value
+  const out: Record<string, { text: string; cls: string; title?: string }> = {}
+  for (const a of localArticles.value) {
+    const badge = articleStatusBadge(a)
+    if (badge) out[a.id] = badge
+  }
+  return out
+})
+
 function resetState() {
   searchState.value = 'idle'
   searchError.value = ''
@@ -144,7 +254,13 @@ function resetState() {
   articleSource.value = 'local'
   localArticleCount.value = 0
   localIdSet.value = new Set()
+  localLinkSet.value = new Set()
+  localIndexVersion.value = 0
   articlesFetchHint.value = ''
+  articlesRefreshing.value = false
+  pullRunning.value = false
+  articleIngestStatus.value = {}
+  articleIngestError.value = {}
   showOtherMatches.value = false
   avatarBroken.value = false
   panelLoading.value = false
@@ -182,6 +298,35 @@ function formatArticleMeta(createTime: string) {
   return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
 }
 
+function articleWithinPreviewWindow(createTime: string): boolean {
+  const raw = (createTime || '').trim()
+  if (!raw) return true
+  const d = new Date(raw.replace(' ', 'T'))
+  if (Number.isNaN(d.getTime())) return true
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - PREVIEW_DAYS)
+  cutoff.setHours(0, 0, 0, 0)
+  return d >= cutoff
+}
+
+function buildAccountQuery(name: string): URLSearchParams {
+  const configured = configuredAccount.value
+  const fakeid =
+    configured?.fakeid?.trim() ||
+    primaryCandidate.value?.fakeid?.trim() ||
+    ''
+  const params = new URLSearchParams({ account: name })
+  if (fakeid) params.set('fakeid', fakeid)
+  return params
+}
+
+function canIngestArticle(article: LocalArticle): boolean {
+  if (!isConfigured.value) return false
+  if (isArticleIndexed(article)) return false
+  const st = articleIngestStatus.value[article.id]
+  return !st || st === 'failed'
+}
+
 async function fetchSearchResults(name: string): Promise<SearchCandidate[]> {
   const res = await fetch('/api/accounts/search', {
     method: 'POST',
@@ -195,6 +340,194 @@ async function fetchSearchResults(name: string): Promise<SearchCandidate[]> {
   return data as SearchCandidate[]
 }
 
+async function loadLocalIndex(name: string): Promise<Article[]> {
+  const allItems: Article[] = []
+  let cursor: string | null = null
+  const ids: string[] = []
+  const links: string[] = []
+
+  for (;;) {
+    const params = new URLSearchParams({ limit: '100', account: name })
+    if (cursor) params.set('cursor', cursor)
+    const localRes = await fetch(`/api/articles?${params.toString()}`)
+    const localData = localRes.ok ? await localRes.json() : { items: [], total: 0 }
+    const batch: Article[] = localData.items || []
+    allItems.push(...batch)
+    for (const a of batch) {
+      if (a.id) ids.push(a.id)
+      const link = normalizeArticleLink(a.link || '')
+      if (link) links.push(link)
+    }
+    if (typeof localData.total === 'number') {
+      localArticleCount.value = localData.total
+    }
+    cursor = (localData.next_cursor as string | null) || null
+    if (!cursor) break
+  }
+
+  if (ids.length) localIdSet.value = new Set(ids)
+  if (links.length) localLinkSet.value = new Set(links)
+  localIndexVersion.value++
+  return allItems
+}
+
+async function loadWechatArticles(name: string, fakeid: string): Promise<boolean> {
+  const params = new URLSearchParams({
+    fakeid,
+    account: name,
+    days: String(PREVIEW_DAYS),
+  })
+  const res = await fetch(`/api/accounts/preview-articles?${params.toString()}`)
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    articlesFetchHint.value =
+      (data as { detail?: string }).detail || '无法从微信平台拉取最新文章，请检查凭证后重试'
+    return false
+  }
+  const items = Array.isArray((data as { items?: Article[] }).items)
+    ? (data as { items: Article[] }).items
+    : []
+  if (items.length === 0) {
+    articlesFetchHint.value = '微信平台暂无文章'
+    return false
+  }
+  localArticles.value = items.map((item) => ({
+    ...item,
+    account: name,
+  }))
+  articleTotal.value = localArticles.value.length
+  articleSource.value = 'wechat'
+  applyLocalIndexPayload(data as {
+    local_ids?: string[]
+    local_links?: string[]
+    local_count?: number
+  })
+  articlesFetchHint.value = ''
+  return true
+}
+
+async function refreshWechatArticles() {
+  const name = props.accountName.trim()
+  if (!name || articlesRefreshing.value || panelLoading.value) return
+
+  const configured = articlesStore.accounts.find((a) => a.name === name)
+  const fakeid =
+    configured?.fakeid?.trim() ||
+    primaryCandidate.value?.fakeid?.trim() ||
+    ''
+  if (!fakeid || fakeid.startsWith('import:')) return
+
+  articlesRefreshing.value = true
+  articlesFetchHint.value = ''
+  try {
+    await loadLocalIndex(name)
+    const ok = await loadWechatArticles(name, fakeid)
+    if (!ok) {
+      localArticles.value = []
+      articleTotal.value = 0
+      articleSource.value = 'local'
+    }
+  } finally {
+    articlesRefreshing.value = false
+  }
+}
+
+async function ingestSingleArticle(
+  article: LocalArticle,
+  opts?: { reload?: boolean },
+): Promise<boolean> {
+  const name = props.accountName.trim()
+  if (!name || !canIngestArticle(article)) return false
+  if (articleIngestStatus.value[article.id] === 'pulling') return false
+
+  const accountQuery = buildAccountQuery(name)
+  articleIngestStatus.value[article.id] = 'pulling'
+  delete articleIngestError.value[article.id]
+  try {
+    const ing = await fetch(`/api/accounts/ingest-article?${accountQuery}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(article),
+    })
+    const ingData = await ing.json().catch(() => ({}))
+    if (!ing.ok) {
+      articleIngestStatus.value[article.id] = 'failed'
+      articleIngestError.value[article.id] =
+        (ingData as { detail?: string }).detail || '收录失败'
+      return false
+    }
+    articleIngestStatus.value[article.id] = 'done'
+    markArticleIndexed(article)
+    if (opts?.reload !== false) {
+      await articlesStore.reloadAccounts()
+    }
+    return true
+  } catch (e) {
+    articleIngestStatus.value[article.id] = 'failed'
+    articleIngestError.value[article.id] =
+      e instanceof Error ? e.message : '收录失败'
+    return false
+  }
+}
+
+async function pullNewArticles() {
+  const name = props.accountName.trim()
+  if (!name || pullRunning.value || !isConfigured.value) return
+
+  const accountQuery = buildAccountQuery(name)
+
+  pullRunning.value = true
+  articlesFetchHint.value = '正在获取待收录列表…'
+  try {
+    const res = await fetch(`/api/accounts/pull-candidates?${accountQuery}`)
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      articlesFetchHint.value =
+        (data as { detail?: string }).detail || '获取待收录列表失败'
+      return
+    }
+
+    const items = ((data as { items?: Article[] }).items || []) as Article[]
+    applyLocalIndexPayload(data as {
+      local_ids?: string[]
+      local_links?: string[]
+      local_count?: number
+    })
+    if (items.length === 0) {
+      articlesFetchHint.value = '近一月内没有新的未收录文章'
+      return
+    }
+
+    const merged = new Map<string, LocalArticle>()
+    for (const a of localArticles.value) merged.set(a.id, a)
+    for (const item of items) {
+      merged.set(item.id, { ...item, account: name })
+    }
+    localArticles.value = [...merged.values()].sort((a, b) =>
+      (b.create_time || '').localeCompare(a.create_time || ''),
+    )
+    articleTotal.value = localArticles.value.length
+    articleSource.value = 'wechat'
+
+    let okCount = 0
+    for (const item of items) {
+      if (isArticleIndexed(item)) continue
+      articlesFetchHint.value = `正在收录：${okCount + 1} / ${items.length} 篇…`
+      const ok = await ingestSingleArticle({ ...item, account: name }, { reload: false })
+      if (ok) okCount++
+    }
+
+    const failCount = items.length - okCount
+    articlesFetchHint.value =
+      failCount > 0
+        ? `拉取完成：成功 ${okCount} 篇，失败 ${failCount} 篇`
+        : `拉取完成：成功收录 ${okCount} 篇`
+    await articlesStore.reloadAccounts()
+  } finally {
+    pullRunning.value = false
+  }
+}
+
 async function loadPanelData(name: string) {
   panelLoading.value = true
   searchState.value = 'loading'
@@ -206,26 +539,18 @@ async function loadPanelData(name: string) {
   const configuredFakeid = configured?.fakeid?.trim() || ''
 
   try {
-    const localParams = new URLSearchParams({ limit: '100', account: name })
-    const [searchData, localRes] = await Promise.all([
+    let searchFailed = false
+    const [searchData, localItems] = await Promise.all([
       fetchSearchResults(name).catch((e: Error) => {
-        searchState.value = 'error'
+        searchFailed = true
         searchError.value = e.message || '搜索失败'
         return [] as SearchCandidate[]
       }),
-      fetch(`/api/articles?${localParams.toString()}`),
+      loadLocalIndex(name),
     ])
 
     searchResults.value = searchData
-    if (searchState.value !== 'error') {
-      searchState.value = 'idle'
-    }
-
-    const localData = localRes.ok ? await localRes.json() : { items: [], total: 0 }
-    const localItems: Article[] = localData.items || []
-    localIdSet.value = new Set(localItems.map((a) => a.id))
-    localArticleCount.value =
-      typeof localData.total === 'number' ? localData.total : localIdSet.value.size
+    searchState.value = searchFailed ? 'error' : 'idle'
 
     const exact = searchData.find((item) => item.nickname.trim() === name)
     const candidate = exact || searchData[0] || null
@@ -235,36 +560,25 @@ async function loadPanelData(name: string) {
       ''
 
     if (fakeid && !fakeid.startsWith('import:')) {
-      const params = new URLSearchParams({
-        fakeid,
-        account: name,
-        limit: String(ARTICLE_FETCH_LIMIT),
-      })
-      const res = await fetch(`/api/accounts/preview-articles?${params.toString()}`)
-      const data = await res.json()
-      if (res.ok && Array.isArray(data.items) && data.items.length > 0) {
-        localArticles.value = data.items.map((item: Article) => ({
-          ...item,
-          account: name,
-        }))
-        articleTotal.value = localArticles.value.length
-        articleSource.value = 'wechat'
-        if (typeof data.local_count === 'number') {
-          localArticleCount.value = data.local_count
-        }
-        return
-      }
-      if (!res.ok) {
-        articlesFetchHint.value = data.detail || '无法从微信拉取文章，以下为本地已收录'
-      }
-    } else if (!fakeid || fakeid.startsWith('import:')) {
+      const ok = await loadWechatArticles(name, fakeid)
+      if (ok) return
+      // 已配置公众号：微信拉取失败时不回退本地列表，避免与「最新」混淆
+      localArticles.value = []
+      articleTotal.value = 0
+      articleSource.value = 'local'
+      return
+    }
+
+    if (!fakeid || fakeid.startsWith('import:')) {
       articlesFetchHint.value = '该公众号未加入配置，仅展示本地已收录文章'
     }
 
-    localArticles.value = localItems.slice(0, ARTICLE_FETCH_LIMIT).map((item) => ({
-      ...item,
-      account: name,
-    }))
+    localArticles.value = localItems
+      .filter((item) => articleWithinPreviewWindow(item.create_time))
+      .map((item) => ({
+        ...item,
+        account: name,
+      }))
     articleTotal.value = localArticleCount.value
     articleSource.value = 'local'
   } catch {
@@ -322,6 +636,9 @@ async function removeFromConfig() {
     }
     confirmState.value = 'idle'
     await articlesStore.reloadAccounts()
+    if (props.context === 'config') {
+      close()
+    }
   } catch {
     confirmState.value = 'error'
     confirmError.value = '网络错误，请重试'
@@ -338,7 +655,7 @@ function onConfigToggle() {
 
 function openArticle(article: LocalArticle) {
   close()
-  if (localIdSet.value.has(article.id)) {
+  if (isArticleIndexed(article)) {
     void previewStore.openPreview(article)
     return
   }
@@ -426,7 +743,7 @@ watch(
               <span>{{ followBtnLabel }}</span>
             </button>
             <button
-              v-if="isConfigured"
+              v-if="isConfigured && context !== 'config'"
               type="button"
               class="wx-account-config-link"
               @click="goConfig"
@@ -440,7 +757,7 @@ watch(
             class="wx-account-banner wx-account-banner--ok"
           >
             <CheckCircle2 class="h-4 w-4 shrink-0" />
-            <p>已加入配置，可在配置页批量爬取。</p>
+            <p>{{ context === 'config' ? '已加入配置。' : '已加入配置，可在配置页批量爬取。' }}</p>
           </div>
 
           <div
@@ -495,6 +812,30 @@ watch(
 
           <div class="wx-account-tabs">
             <span class="wx-account-tab is-active">文章</span>
+            <div class="wx-account-tab-actions">
+              <button
+                v-if="isConfigured && !panelLoading && (unindexedCount > 0 || pullRunning)"
+                type="button"
+                class="wx-account-pull-btn"
+                :disabled="pullRunning || articlesRefreshing"
+                title="收录近一月内尚未入库的文章（从上次已收录处增量）"
+                @click="pullNewArticles"
+              >
+                <Loader2 v-if="pullRunning" class="h-3.5 w-3.5 animate-spin" />
+                <span>{{ pullRunning ? '拉取中…' : `拉取未收录 (${unindexedCount})` }}</span>
+              </button>
+              <button
+                v-if="isConfigured && !panelLoading"
+                type="button"
+                class="wx-account-refresh-btn"
+                :disabled="articlesRefreshing || pullRunning"
+                title="从微信平台重新拉取最新文章列表"
+                @click="refreshWechatArticles"
+              >
+                <RefreshCw class="h-3.5 w-3.5" :class="{ 'animate-spin': articlesRefreshing }" />
+                <span>{{ articlesRefreshing ? '刷新中…' : '刷新' }}</span>
+              </button>
+            </div>
           </div>
 
           <p v-if="articlesFetchHint" class="wx-account-articles-hint-bar">{{ articlesFetchHint }}</p>
@@ -506,33 +847,85 @@ watch(
             </div>
 
             <div v-else-if="!localArticles.length" class="wx-account-articles-empty">
-              <span>暂无文章</span>
-              <span v-if="!isConfigured" class="wx-account-articles-hint">加入配置后可在配置页批量爬取</span>
+              <span>{{ articlesFetchHint || '暂无文章' }}</span>
+              <button
+                v-if="isConfigured && articlesFetchHint"
+                type="button"
+                class="wx-account-refresh-inline"
+                :disabled="articlesRefreshing"
+                @click="refreshWechatArticles"
+              >
+                重试拉取
+              </button>
+              <span v-else-if="!isConfigured" class="wx-account-articles-hint">加入配置后可在配置页批量爬取</span>
             </div>
 
-            <button
+            <div
               v-for="article in localArticles"
               :key="article.id"
-              type="button"
               class="wx-account-article-row"
-              @click="openArticle(article)"
             >
-              <div class="wx-account-article-main">
-                <p class="wx-account-article-title">{{ displayText(article.title) || '无标题' }}</p>
-                <p class="wx-account-article-meta">
-                  {{ formatArticleMeta(article.create_time) }}
-                </p>
+              <button
+                type="button"
+                class="wx-account-article-open"
+                @click="openArticle(article)"
+              >
+                <div class="wx-account-article-main">
+                  <p class="wx-account-article-title">{{ displayText(article.title) || '无标题' }}</p>
+                  <p class="wx-account-article-meta">
+                    {{ formatArticleMeta(article.create_time) }}
+                    <span
+                      v-if="articleBadges[article.id]"
+                      class="wx-account-article-badge"
+                      :class="articleBadges[article.id]?.cls"
+                      :title="articleBadges[article.id]?.title"
+                    >{{ articleBadges[article.id]?.text }}</span>
+                  </p>
+                </div>
+                <div class="wx-account-article-cover">
+                  <img
+                    :src="articleCoverSrc(article)"
+                    :alt="article.title"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    @error="($event.target as HTMLImageElement).style.visibility = 'hidden'"
+                  />
+                </div>
+              </button>
+              <div
+                v-if="showArticleActionColumn"
+                class="wx-account-article-action"
+              >
+                <button
+                  v-if="articleActionState(article) === 'ingest' || articleActionState(article) === 'retry'"
+                  type="button"
+                  class="wx-account-article-cache-btn"
+                  :disabled="articleIngestStatus[article.id] === 'pulling' || pullRunning"
+                  :title="articleActionState(article) === 'retry' ? '重试收录' : '收录到本地'"
+                  @click="ingestSingleArticle(article)"
+                >
+                  <Loader2
+                    v-if="articleIngestStatus[article.id] === 'pulling'"
+                    class="h-3.5 w-3.5 animate-spin"
+                  />
+                  <span v-else>{{ articleActionState(article) === 'retry' ? '重试' : '收录' }}</span>
+                </button>
+                <span
+                  v-else-if="articleActionState(article) === 'pulling'"
+                  class="wx-account-article-action-status is-pulling"
+                >
+                  <Loader2 class="h-3.5 w-3.5 animate-spin" />
+                </span>
+                <span
+                  v-else-if="articleActionState(article) === 'done'"
+                  class="wx-account-article-action-status is-done"
+                >已收录</span>
+                <span
+                  v-else
+                  class="wx-account-article-action-status is-pending"
+                >未收录</span>
               </div>
-              <div class="wx-account-article-cover">
-                <img
-                  :src="articleCoverSrc(article)"
-                  :alt="article.title"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  @error="($event.target as HTMLImageElement).style.visibility = 'hidden'"
-                />
-              </div>
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -564,7 +957,7 @@ watch(
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
-  --wx-pad-x: 15%;
+  --wx-pad-x: 12%;
 }
 
 .dark .wx-account-sheet {
@@ -862,11 +1255,72 @@ watch(
 .wx-account-tabs {
   display: flex;
   align-items: center;
-  gap: 24px;
+  justify-content: space-between;
+  gap: 12px;
   padding: 0 var(--wx-pad-x);
   background: #fff;
   border-bottom: 1px solid #eee;
   flex-shrink: 0;
+}
+
+.wx-account-tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.wx-account-pull-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #07c160;
+  transition: background-color 0.15s ease;
+}
+
+.wx-account-pull-btn:hover:not(:disabled) {
+  background: rgba(7, 193, 96, 0.12);
+}
+
+.wx-account-pull-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.wx-account-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #576b95;
+  transition: background-color 0.15s ease;
+}
+
+.wx-account-refresh-btn:hover:not(:disabled) {
+  background: rgba(87, 107, 149, 0.1);
+}
+
+.wx-account-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.wx-account-refresh-inline {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #576b95;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.wx-account-refresh-inline:disabled {
+  opacity: 0.6;
 }
 
 .dark .wx-account-tabs {
@@ -951,15 +1405,12 @@ watch(
 
 .wx-account-article-row {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: stretch;
+  gap: 8px;
   width: 100%;
-  padding: 11px var(--wx-pad-x);
-  border: none;
+  padding: 10px var(--wx-pad-x);
   border-bottom: 1px solid #f0f0f0;
   background: #fff;
-  text-align: left;
-  cursor: pointer;
   transition: background 0.12s;
 }
 
@@ -978,6 +1429,86 @@ watch(
 
 .wx-account-article-row:last-child {
   border-bottom: none;
+}
+
+.wx-account-article-open {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wx-account-article-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+}
+
+.wx-account-article-action-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.wx-account-article-action-status.is-done {
+  color: #07a050;
+}
+
+.wx-account-article-action-status.is-pending {
+  color: #576b95;
+}
+
+.wx-account-article-action-status.is-pulling {
+  color: #07c160;
+}
+
+.dark .wx-account-article-action-status.is-done {
+  color: #2fd07a;
+}
+
+.dark .wx-account-article-action-status.is-pending {
+  color: #8fa3c8;
+}
+
+.wx-account-article-cache-btn {
+  flex-shrink: 0;
+  padding: 3px 6px;
+  border: 1px solid rgba(7, 193, 96, 0.45);
+  border-radius: 4px;
+  background: rgba(7, 193, 96, 0.08);
+  color: #07a050;
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.wx-account-article-cache-btn:hover:not(:disabled) {
+  background: rgba(7, 193, 96, 0.16);
+  border-color: rgba(7, 193, 96, 0.65);
+}
+
+.wx-account-article-cache-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.dark .wx-account-article-cache-btn {
+  color: #2fd07a;
+  border-color: rgba(47, 208, 122, 0.4);
+  background: rgba(47, 208, 122, 0.1);
 }
 
 .wx-account-article-main {
@@ -1005,11 +1536,43 @@ watch(
   margin: 6px 0 0;
   font-size: 12px;
   color: #b2b2b2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wx-account-article-badge {
+  display: inline-block;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.wx-account-article-badge.is-pending {
+  color: #576b95;
+  background: rgba(87, 107, 149, 0.12);
+}
+
+.wx-account-article-badge.is-pulling {
+  color: #07c160;
+  background: rgba(7, 193, 96, 0.12);
+}
+
+.wx-account-article-badge.is-done {
+  color: #07c160;
+  background: rgba(7, 193, 96, 0.08);
+}
+
+.wx-account-article-badge.is-failed {
+  color: #e54d42;
+  background: rgba(229, 77, 66, 0.12);
+  cursor: help;
 }
 
 .wx-account-article-cover {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 4px;
   overflow: hidden;
   flex-shrink: 0;

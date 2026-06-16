@@ -55,7 +55,7 @@
 | 层级 | 选用 |
 |------|------|
 | 前端 | Vue 3、TypeScript、Vite、Tailwind CSS v4、Pinia、Vue Router、lucide-vue-next 等 |
-| 后端 | FastAPI、Uvicorn、Requests、Pillow、DrissionPage、datasketch 等（见 `pyproject.toml`） |
+| 后端 | FastAPI、Uvicorn、Requests、Pillow、datasketch 等（见 `pyproject.toml`） |
 | 数据 | 本地 JSON / JSONL、静态封面目录，无独立数据库服务 |
 
 ---
@@ -111,7 +111,7 @@ cd frontend && npm run dev
 
 | 项 | 说明 |
 |----|------|
-| **镜像内容** | Python 3.11 + uv + 项目依赖 + Chromium（可选，CLI 脚本 `WechatRequest.login()` 仍用） + 前端构建产物 |
+| **镜像内容** | Python 3.11 + uv + 项目依赖 + 前端构建产物 |
 | **入口** | `uvicorn server:app`（见仓库根目录 `server.py`，复用 `api.app` 并挂载前端 dist 与 `/data`） |
 | **端口** | 容器内 `8000`，默认只绑定到宿主 `127.0.0.1:8000`（避免把扫码凭证暴露到公网） |
 | **持久化** | 宿主 `./data` ↔ 容器 `/app/data`；迁移 = 拷贝 `data/` 目录 |
@@ -136,7 +136,7 @@ uv run python scripts/migrate_json_to_sqlite.py
 
 启动成功后浏览器打开 <http://127.0.0.1:8000> → **配置页 → 扫码登录** 即可使用，和本地跑 `./start_all.sh` 体验一致。
 
-> 首次构建会下载 Chromium 与前端依赖，体积约 1.2~1.5 GB；后续变更代码只会重跑受影响的层。
+> 首次构建会安装 Python 依赖并编译前端；后续变更代码只会重跑受影响的层。
 >
 > 若需要跨机访问，自行改 `docker-compose.yml` 里的端口映射，并在上游挡一层反向代理 + HTTPS；**不建议将 `8000` 直接暴露到公网**，因为 `data/` 中的 `id_info.json`、`llm_config.json` 含有敏感凭证。
 
