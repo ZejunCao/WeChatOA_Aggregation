@@ -44,9 +44,14 @@ export type ImportArticleResult = {
   message: string
 }
 
+export type FeedDirtyMode = 'incremental' | 'full'
+
 export const useArticlesStore = defineStore('articles', () => {
   const name2fakeid = ref<Name2FakeId>({})
   const loading = ref(false)
+  const feedRefreshing = ref(false)
+  const feedInitialized = ref(false)
+  const feedDirtyMode = ref<FeedDirtyMode | null>(null)
   const error = ref<string | null>(null)
 
   const items = ref<FeedArticle[]>([])
@@ -154,13 +159,20 @@ export const useArticlesStore = defineStore('articles', () => {
     }
   }
 
+  function markFeedDirty(mode: FeedDirtyMode = 'incremental') {
+    if (mode === 'full' || feedDirtyMode.value !== 'full') {
+      feedDirtyMode.value = mode
+    }
+  }
+
   async function loadArticlesPage(
     filters: Partial<FilterState>,
-    options: { reset?: boolean } = {},
+    options: { reset?: boolean; silent?: boolean } = {},
   ) {
     const reset = options.reset !== false
+    const silent = options.silent === true
     if (reset) {
-      loading.value = true
+      if (!silent) loading.value = true
       nextCursor.value = null
     } else {
       if (!nextCursor.value || loadingMore.value) return
@@ -209,6 +221,78 @@ export const useArticlesStore = defineStore('articles', () => {
     await loadArticlesPage(filters, { reset: false })
   }
 
+  async function refreshIncrementalArticles(filters: Partial<FilterState>) {
+    feedRefreshing.value = true
+    error.value = null
+    try {
+      await Promise.all([
+        loadAccounts(),
+        loadTags(),
+        fetchImportTotal(),
+        fetchGlobalTotal(),
+        useReadingStore().syncFromServer(),
+      ])
+      const kw = (filters.keyword || '').trim()
+      const params = buildArticlesQuery(filters, null)
+      let url: string
+      if (kw) {
+        params.set('q', kw)
+        url = `/api/articles/search?${params}`
+      } else {
+        url = `/api/articles?${params}`
+      }
+      const data = await fetchJson<{
+        items: FeedArticle[]
+        next_cursor?: string | null
+        total?: number
+      }>(url)
+      const pageItems = data.items || []
+      if (typeof data.total === 'number') {
+        filterTotalCount.value = data.total
+      }
+      const existingIds = new Set(items.value.map((a) => a.id))
+      const newItems = pageItems.filter((it) => !existingIds.has(it.id))
+      if (newItems.length > 0) {
+        items.value = [...newItems, ...items.value]
+        useReadingStore().mergeFeedStates(newItems)
+      }
+      if (filterTotalCount.value > 0 && items.value.length > filterTotalCount.value) {
+        await loadArticlesPage(filters, { reset: true, silent: true })
+      }
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : '文章刷新失败'
+    } finally {
+      feedRefreshing.value = false
+    }
+  }
+
+  /** 文章页被激活时：无脏数据则跳过；有新增则增量合并；删除/大变更则静默全量重载 */
+  async function syncFeedOnActivate(filters: Partial<FilterState>) {
+    if (!feedInitialized.value) {
+      await loadData(filters)
+      return
+    }
+    const mode = feedDirtyMode.value
+    if (!mode) return
+    feedDirtyMode.value = null
+    if (mode === 'full') {
+      feedRefreshing.value = true
+      error.value = null
+      try {
+        await Promise.all([loadAccounts(), loadTags(), fetchImportTotal()])
+        await fetchGlobalTotal()
+        await useReadingStore().syncFromServer()
+        await loadArticlesPage(filters, { reset: true, silent: true })
+      } catch (e) {
+        error.value = e instanceof Error ? e.message : '数据刷新失败'
+      } finally {
+        feedRefreshing.value = false
+      }
+      return
+    }
+    await refreshIncrementalArticles(filters)
+  }
+
   async function loadData(filters?: Partial<FilterState>) {
     loading.value = true
     error.value = null
@@ -217,7 +301,9 @@ export const useArticlesStore = defineStore('articles', () => {
       await Promise.all([loadAccounts(), loadTags(), fetchImportTotal()])
       await fetchGlobalTotal()
       await useReadingStore().syncFromServer()
-      await loadArticlesPage(filters || {}, { reset: true })
+      await loadArticlesPage(filters || {}, { reset: true, silent: true })
+      feedInitialized.value = true
+      feedDirtyMode.value = null
     } catch (e) {
       error.value = e instanceof Error ? e.message : '数据加载失败'
     } finally {
@@ -262,12 +348,17 @@ export const useArticlesStore = defineStore('articles', () => {
       body: JSON.stringify({ url }),
     })
     await fetchImportTotal()
+    markFeedDirty('full')
     return result
   }
 
   return {
     name2fakeid,
     loading,
+    feedRefreshing,
+    feedInitialized,
+    markFeedDirty,
+    syncFeedOnActivate,
     error,
     storageBackend,
     isSqlite,

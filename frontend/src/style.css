@@ -1916,12 +1916,6 @@ body.is-account-dragging * {
   flex: 1;
   width: 100%;
   min-height: 0;
-  opacity: 0;
-  transition: opacity 0.22s ease;
-}
-
-.article-preview-iframe.is-media-ready {
-  opacity: 1;
   border: none;
   background: transparent;
 }

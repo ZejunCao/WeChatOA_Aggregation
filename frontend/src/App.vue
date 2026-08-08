@@ -25,7 +25,9 @@ onClickOutside(settingsRef, () => {
 
 onMounted(async () => {
   configStore.initTheme()
-  await articlesStore.loadData()
+  if (!articlesStore.feedInitialized) {
+    await articlesStore.loadData()
+  }
 })
 </script>
 
@@ -116,11 +118,16 @@ onMounted(async () => {
         <span class="text-sm font-semibold text-[var(--color-foreground)]">微信公众号聚合</span>
       </div>
 
-      <router-view
-        :selected-account="selectedAccount"
-        @update:selectedAccount="selectedAccount = $event"
-        class="flex-1 overflow-hidden"
-      />
+      <router-view v-slot="{ Component }">
+        <keep-alive include="FeedView,ConfigView,NotesView">
+          <component
+            :is="Component"
+            :selected-account="selectedAccount"
+            @update:selectedAccount="selectedAccount = $event"
+            class="flex-1 overflow-hidden"
+          />
+        </keep-alive>
+      </router-view>
     </main>
   </div>
     <ArticlePreviewPanel />

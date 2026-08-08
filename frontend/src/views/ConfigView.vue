@@ -1,4 +1,5 @@
 <script setup lang="ts">
+defineOptions({ name: 'ConfigView' })
 // ─────────────────────────────────────────────────────────────────────────────
 // ConfigView — 公众号管理页面
 //
@@ -181,6 +182,7 @@ async function confirmAdd(candidate: SearchCandidate) {
     }
     confirmState.value = 'success'
     await articlesStore.reloadAccounts()
+    articlesStore.markFeedDirty('incremental')
     setTimeout(() => closeAddDialog(), 1000)
   } catch {
     confirmState.value = 'error'
@@ -261,7 +263,11 @@ async function reloadArticlesAfterCrawl(data: CrawlStatus) {
     return
   }
   _lastReloadedCrawlFinishAt = data.finished_at
-  await articlesStore.loadData()
+  if ((data.new_articles ?? 0) > 0) {
+    articlesStore.markFeedDirty('incremental')
+  } else {
+    await articlesStore.reloadAccounts()
+  }
   await loadAuthStatus()
 }
 
@@ -1156,8 +1162,8 @@ onMounted(async () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('mousedown', handleGlobalMouseDown)
   }
-  // 配置页可能在爬取完成后才被打开；主动刷新一次，避免“最近更新”仍显示旧值。
-  await articlesStore.loadData()
+  // 配置页可能在爬取完成后才被打开；主动刷新公众号元数据，避免「最近更新」仍显示旧值。
+  await articlesStore.reloadAccounts()
   restoreAuthStatusFromCache()
   void checkAuthStatus()
   await resumeCrawlBannerIfRunning()
@@ -1385,7 +1391,7 @@ async function doCacheClear() {
     })
     if (res.ok) {
       cacheClearDone.value = true
-      await articlesStore.loadData()
+      articlesStore.markFeedDirty('full')
       // 刷新预览数据
       await fetchCachePreview()
     } else {

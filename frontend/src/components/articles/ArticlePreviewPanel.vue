@@ -67,16 +67,10 @@ function onPreviewIframeMessage(ev: MessageEvent) {
   imgLightboxSrc.value = src
   imgLightboxOpen.value = true
 }
-/** HTML 已注入 iframe，首屏配图加载完成（或超时）后再展示 */
-const mediaReady = ref(false)
-let mediaReadyTimer: ReturnType<typeof setTimeout> | undefined
-let mediaWaitGen = 0
 let unlinkPreviewClickHandler: (() => void) | undefined
 
 const PREVIEW_LINK_BASE = 'https://mp.weixin.qq.com/'
 
-const FIRST_SCREEN_IMG_COUNT = 6
-const MEDIA_READY_TIMEOUT_MS = 2800
 const NOTE_AUTOSAVE_MS = 900
 
 const notesExpanded = ref(false)
@@ -407,69 +401,6 @@ function onKeydown(e: KeyboardEvent) {
   }
 }
 
-function clearMediaReadyTimer() {
-  if (mediaReadyTimer) {
-    clearTimeout(mediaReadyTimer)
-    mediaReadyTimer = undefined
-  }
-}
-
-function finishMediaReady() {
-  clearMediaReadyTimer()
-  mediaReady.value = true
-}
-
-function waitForFirstScreenImages() {
-  const gen = ++mediaWaitGen
-  mediaReady.value = false
-  clearMediaReadyTimer()
-  mediaReadyTimer = setTimeout(() => {
-    if (gen === mediaWaitGen) finishMediaReady()
-  }, MEDIA_READY_TIMEOUT_MS)
-
-  void nextTick(() => {
-    if (gen !== mediaWaitGen) return
-    const doc = iframeRef.value?.contentDocument
-    if (!doc) {
-      finishMediaReady()
-      return
-    }
-    const imgs = Array.from(
-      doc.querySelectorAll<HTMLImageElement>(
-        '#js_content img, #js_article img, .wx-preview-img, .wx-picture-slide img',
-      ),
-    ).filter((el) => el.getAttribute('src'))
-    const targets = imgs.slice(0, FIRST_SCREEN_IMG_COUNT)
-    if (!targets.length) {
-      finishMediaReady()
-      return
-    }
-    const markLoaded = (img: HTMLImageElement) => {
-      img.setAttribute('data-wx-img-state', 'loaded')
-    }
-    void Promise.all(
-      targets.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            if (img.complete && img.naturalWidth > 0) {
-              markLoaded(img)
-              resolve()
-              return
-            }
-            const done = () => {
-              if (img.naturalWidth > 0) markLoaded(img)
-              resolve()
-            }
-            img.addEventListener('load', done, { once: true })
-            img.addEventListener('error', done, { once: true })
-          }),
-      ),
-    ).then(() => {
-      if (gen === mediaWaitGen) finishMediaReady()
-    })
-  })
-}
-
 function openPreviewLinkInNewWindow(rawHref: string) {
   const href = rawHref.trim()
   if (!href || href.startsWith('#')) return
@@ -555,14 +486,7 @@ function bindPreviewLinkClicks() {
 
 function onIframeLoad() {
   if (!store.previewHtml || store.loading) return
-  const doc = iframeRef.value?.contentDocument
-  const isPicture = doc?.body?.getAttribute('data-wx-preview-kind') === 'picture'
   bindPreviewLinkClicks()
-  if (isPicture) {
-    finishMediaReady()
-    return
-  }
-  waitForFirstScreenImages()
 }
 
 watch(
@@ -578,9 +502,6 @@ watch(
       noteImeComposing.value = false
       copyState.value = 'idle'
       if (copyResetTimer) clearTimeout(copyResetTimer)
-      mediaReady.value = false
-      clearMediaReadyTimer()
-      mediaWaitGen++
       unlinkPreviewClickHandler?.()
       unlinkPreviewClickHandler = undefined
       selectingUnbind?.()
@@ -596,8 +517,6 @@ watch(
   () => store.display?.id,
   (id) => {
     copyState.value = 'idle'
-    mediaReady.value = false
-    mediaWaitGen++
     selectedQuoteText.value = ''
     hideQuoteAction()
     if (id) void loadNote(id)
@@ -623,16 +542,6 @@ watch(
   },
 )
 
-watch(
-  () => [store.loading, store.previewHtml] as const,
-  ([loading, html]) => {
-    if (loading || !html) {
-      mediaReady.value = false
-      mediaWaitGen++
-    }
-  },
-)
-
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
   window.addEventListener('message', onPreviewIframeMessage)
@@ -643,7 +552,6 @@ onUnmounted(() => {
   imgLightboxOpen.value = false
   document.body.style.overflow = ''
   if (copyResetTimer) clearTimeout(copyResetTimer)
-  clearMediaReadyTimer()
   if (noteSaveTimer) clearTimeout(noteSaveTimer)
   unlinkPreviewClickHandler?.()
   selectingUnbind?.()
@@ -813,20 +721,11 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <div
-              v-if="!store.loading && !store.error && safePreviewHtml && !mediaReady"
-              class="article-preview-iframe-loading"
-            >
-              <Loader2 class="h-6 w-6 animate-spin text-[var(--color-muted-foreground)]" />
-              <span class="text-sm text-[var(--color-muted-foreground)]">正在加载…</span>
-            </div>
-
             <iframe
               v-if="!store.loading && !store.error && safePreviewHtml"
               ref="iframeRef"
               :key="store.display.id"
               class="article-preview-iframe"
-              :class="{ 'is-media-ready': mediaReady }"
               title="微信公众号原文预览"
               :sandbox="previewIframeSandbox"
               :srcdoc="safePreviewHtml"

@@ -92,7 +92,6 @@ def _configure_preview_image(img: etree._Element, idx: int) -> None:
     if prev_cls:
         classes.insert(0, prev_cls)
     img.set("class", " ".join(classes))
-    img.set("data-wx-img-state", "loading")
 
     if idx < _PREVIEW_FIRST_SCREEN_IMG_COUNT:
         img.set("loading", "eager")
@@ -103,7 +102,7 @@ def _configure_preview_image(img: etree._Element, idx: int) -> None:
     img.set("decoding", "async")
 
     for attr in list(img.attrib):
-        if attr.startswith("data-") and attr not in ("data-wx-img-state",):
+        if attr.startswith("data-"):
             del img.attrib[attr]
 
 
@@ -253,23 +252,16 @@ _ARTICLE_TABLE_CSS = """
 
 # 阅读区背景：固定浅色（不受系统深色模式影响，避免代码块/表格与背景同色）
 _PREVIEW_IMG_CSS = """
-/* preview-img-v1 */
+/* preview-img-v2 */
 .wx-preview-img{
   display:block;
   max-width:100%!important;
   height:auto!important;
+  min-height:48px;
   margin:12px auto;
   background:#e8e4de;
   border-radius:4px;
   object-fit:contain;
-}
-.wx-preview-img[data-wx-img-state="loading"]{
-  min-height:48px;
-  animation:wx-preview-img-pulse 1.2s ease-in-out infinite;
-}
-@keyframes wx-preview-img-pulse{
-  0%,100%{opacity:1}
-  50%{opacity:.72}
 }
 """
 
@@ -879,7 +871,7 @@ def is_full_preview_document(html: str | None) -> bool:
     has_table = "preview-table-v1" in html
     has_surface = "preview-surface-v3" in html
     has_ai = "preview-ai-v1" in html
-    has_img = "preview-img-v1" in html
+    has_img = "preview-img-v2" in html
     has_img_lightbox = _PREVIEW_IMG_LIGHTBOX_MARKER in html
     has_link = "preview-link-v1" in html
     return (

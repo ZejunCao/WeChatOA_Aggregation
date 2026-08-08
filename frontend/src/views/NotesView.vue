@@ -1,4 +1,5 @@
 <script setup lang="ts">
+defineOptions({ name: 'NotesView' })
 import { computed, onMounted, ref, watch } from 'vue'
 import { Loader2, NotebookPen, Search } from 'lucide-vue-next'
 import type { Article } from '@/types'

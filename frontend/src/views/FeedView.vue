@@ -1,4 +1,5 @@
 <script setup lang="ts">
+defineOptions({ name: 'FeedView' })
 // ─────────────────────────────────────────────────────────────────────────────
 // FeedView — 文章信息流主页面
 //
@@ -9,7 +10,7 @@
 //   - 提供"全部已读"快捷操作
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { ref, computed, watch, onMounted, onUnmounted, onActivated, nextTick, TransitionGroup } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, onActivated, onDeactivated, nextTick, TransitionGroup } from 'vue'
 import { Loader2, AlertCircle, Inbox, CheckCheck } from 'lucide-vue-next'
 import { useArticlesStore } from '@/stores/articles'
 import { useReadingStore } from '@/stores/reading'
@@ -57,7 +58,8 @@ function markAllReadInView() {
 async function onLinkImported(payload: { articleId: string }) {
   filters.readFilter = 'imported'
   filters.accounts = []
-  await articlesStore.loadData(filters)
+  articlesStore.markFeedDirty('full')
+  await articlesStore.syncFeedOnActivate(filters)
   const article = articlesStore.allArticles.find((a) => a.id === payload.articleId)
   await nextTick()
   const target = scrollRef.value?.querySelector<HTMLElement>(
@@ -93,6 +95,7 @@ const PAGE_SIZE = 20
 const displayLimit = ref(INITIAL_COUNT)
 const sentinelRef = ref<HTMLElement | null>(null)
 const scrollRef = ref<HTMLElement | null>(null)
+let savedScrollTop = 0
 let observer: IntersectionObserver | null = null
 let loadMoreLocked = false
 let importHighlightTimer: ReturnType<typeof setTimeout> | undefined
@@ -177,16 +180,23 @@ const hasMore = computed(() =>
 )
 
 onMounted(() => {
-  void articlesStore.loadData(filters).then(() => {
-    displayLimit.value = INITIAL_COUNT
-    nextTick(() => setupScrollObserver())
-  })
+  displayLimit.value = INITIAL_COUNT
+  nextTick(() => setupScrollObserver())
 })
 
 onActivated(() => {
-  if (!articlesStore.isSqlite) {
-    void articlesStore.loadData(filters)
-  }
+  void articlesStore.syncFeedOnActivate(filters).then(() => {
+    nextTick(() => {
+      if (scrollRef.value && savedScrollTop > 0) {
+        scrollRef.value.scrollTop = savedScrollTop
+      }
+      setupScrollObserver()
+    })
+  })
+})
+
+onDeactivated(() => {
+  savedScrollTop = scrollRef.value?.scrollTop ?? 0
 })
 
 // sentinel / 滚动容器在 loading 结束后才挂载，需重新绑定 observer
@@ -349,6 +359,9 @@ function handleReset() {
             <template v-if="readingStore.unreadCount > 0">
               · <span class="feed-unread-count">{{ readingStore.unreadCount }} 未读</span>
             </template>
+            <template v-if="articlesStore.feedRefreshing">
+              · <span class="text-[var(--color-muted-foreground)]">同步中…</span>
+            </template>
           </p>
         </div>
         <button
@@ -379,7 +392,7 @@ function handleReset() {
     <div class="relative flex-1 min-h-0">
       <div ref="scrollRef" class="feed-content-scroll h-full overflow-y-auto px-4 py-5 sm:px-6 sm:py-6 hide-scrollbar" @scroll="updateScrollbar">
       <!-- Loading -->
-      <div v-if="articlesStore.loading" class="flex flex-col items-center justify-center py-24 gap-3">
+      <div v-if="articlesStore.loading && !articlesStore.feedInitialized" class="flex flex-col items-center justify-center py-24 gap-3">
         <Loader2 class="h-8 w-8 animate-spin text-[var(--color-primary)]" />
         <p class="text-sm text-[var(--color-muted-foreground)]">加载数据中...</p>
       </div>
